@@ -6,7 +6,7 @@ import { useQuery } from 'react-query';
 import React, { useEffect, useState } from 'react';
 import Logo from './assets/google.png'; 
 import { Switch } from './ui/switch';
-import { ColorPickerPopup } from './ui/ColorPicker2';
+import { ColorPickerPopup } from './ui/colorPicker';
 
 function Loading() {
   return (
@@ -18,26 +18,26 @@ function App() {
   const [CurrentUserId, setCurrentUserId] = useState('');
   const [loadingGoogle, setloadingGoogle] = useState(false);
 
-  // useEffect(() => {
-  //   chrome.storage.local.get(['userId'], function(result) {
-  //     if (!chrome.runtime.lastError) {
-  //       setCurrentUserId(result.userId)
-  //     }
-  //   });
-  // }, []);
+  useEffect(() => {
+    chrome.storage.local.get(['userId'], function(result) {
+      if (!chrome.runtime.lastError) {
+        setCurrentUserId(result.userId)
+      }
+    });
+  }, []);
 
 
-  // const handleLogout = async () => {
-  //   setloadingGoogle(false)
-  //   await Logout();
-  //   setCurrentUserId('')
-  // };
+  const handleLogout = async () => {
+    setloadingGoogle(false)
+    await Logout();
+    setCurrentUserId('')
+  };
 
-  // const handleLogin = async () => {
-  //   setloadingGoogle(true)
-  //   const logged = await Login();
-  //   setCurrentUserId(logged)
-  // };
+  const handleLogin = async () => {
+    setloadingGoogle(true)
+    const logged = await Login();
+    setCurrentUserId(logged)
+  };
 
   const LoginButton = () => {
     return (
@@ -64,7 +64,7 @@ function App() {
 console.log(colorWorkSpace)
   return (
     <div id='app'>
-      <div style={{
+      {/* <div style={{
         display: 'flex',
         width: '100vw',
         height: '100vh',
@@ -78,16 +78,16 @@ console.log(colorWorkSpace)
               setColorPopup={setColorWorkSpacePopup}
               color={colorWorkSpace || '#4969fb'}
             />
-        {/* <Switch 
+        <Switch 
           width={200}
           height={48}
           options={['En cours', 'Archives']}
           color={'#4969fb'}
           currentOption={currentOption}
           setCurrentOption={setCurrentOption}
-        /> */}
-      </div>
-      {/* {CurrentUserId ? (
+        />
+      </div> */}
+      {CurrentUserId ? (
           <div>
             <div>logged</div>
             <div onClick={() => {handleLogout()}}>logout</div>
@@ -96,7 +96,7 @@ console.log(colorWorkSpace)
         <div id='app_logout'>
            <LoginButton/>
         </div>
-      )} */}
+      )}
     </div>
   );
 }

@@ -16,7 +16,7 @@ export const ColorPickerPopup = ({
 }: Props) => {
     const colorPopupRef = useRef<HTMLDivElement | null>(null);
 
-    const handleColorWorkSpace = async (etat: boolean) => {
+    const DisplayPopupAnimation = async (etat: boolean) => {
         if (etat) {
             setColorPopup(true);
             await wait(30);
@@ -31,19 +31,19 @@ export const ColorPickerPopup = ({
     }
 
     const handleChooseColor = async (color: string) => {
-        await handleColorWorkSpace(false)
+        await DisplayPopupAnimation(false)
         setColor(color)
     }
 
     const ColorButton = () => {
         return (
-            <button style={{ backgroundColor: color }} id='add_workspace_choose_color' onClick={() => { handleColorWorkSpace(true) }}></button>
+            <button style={{ backgroundColor: color }} id='add_workspace_choose_color' onClick={() => { DisplayPopupAnimation(true) }}></button>
         )
     }
 
     const ColorPicker = () => {
         return (
-            <div ref={colorPopupRef} id='popup_color' onClick={() => { handleColorWorkSpace(false) }}>
+            <div ref={colorPopupRef} id='popup_color' onClick={() => { DisplayPopupAnimation(false) }}>
                 <div className='color_picker'>
                     {
                         colors.map((color, i1) => (
