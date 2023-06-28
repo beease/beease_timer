@@ -1,6 +1,6 @@
 import { useRef } from 'react';
-import {wait} from '../../../src/utils/function'
-import {colors} from '../../../src/libs/colors'
+import {wait} from '../utils/function'
+import {colors} from '../libs/colors'
 interface Props {
     setColor: (color: string) => void;
     colorPopup: boolean;

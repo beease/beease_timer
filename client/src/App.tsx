@@ -5,8 +5,8 @@ import AppLogged from './AppLogged'
 import { useQuery } from 'react-query';
 import React, { useEffect, useState } from 'react';
 import Logo from './assets/google.png'; 
-import { Switch } from '../client/src/ui/switch';
-import { ColorPickerPopup } from '../client/src/ui/colorPicker2';
+import { Switch } from './ui/switch';
+import { ColorPickerPopup } from './ui/ColorPicker2';
 
 function Loading() {
   return (
