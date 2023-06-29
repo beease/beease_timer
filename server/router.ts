@@ -1,19 +1,20 @@
-/*import express, { Request, Response, NextFunction } from 'express';
-import { PrismaClient, Role } from '@prisma/client';
-import { VERIFY_TOKEN } from './services/auth';
+import { z } from 'zod';
+import { PrismaClient,User } from '@prisma/client';
+import { publicProcedure, router } from './trpc';
+
 const prisma = new PrismaClient();
-import {checkRoleMiddleware , handleAsyncError} from './services/router/utils'
-const router = express.Router();
 
-// Add custom endpoints
+const appRouter = router({
+    createUser: publicProcedure
+    .input(z.object({ name: z.string().min(5) }))
+    .mutation(async (opts) => {
+      // use your ORM of choicec
+      console.log(opts.input);
+      return await prisma.user.create({
+        data: opts.input,
+      });
+    }),
+});
 
-// router.get(
-//   `/user/me`,
-//   checkRoleMiddleware ([]), 
-//   async (res: Response) => {
-//      // @ts-ignore
-//    await handleAsyncError(res, () => prismaModel.findMany());
-//  });
-
-
-export default router;*/
+export type AppRouter = typeof appRouter;
+export default appRouter;
