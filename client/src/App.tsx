@@ -7,6 +7,7 @@ import React, { useEffect, useState } from 'react';
 import Logo from './assets/google.png'; 
 import { Switch } from './ui/switch';
 import { ColorPickerPopup } from './ui/colorPicker';
+import  trpc from "./trpc"
 
 function Loading() {
   return (
@@ -14,10 +15,11 @@ function Loading() {
   )
 }
 
+
+
 function App() {
   const [CurrentUserId, setCurrentUserId] = useState('');
   const [loadingGoogle, setloadingGoogle] = useState(false);
-
   useEffect(() => {
     chrome.storage.local.get(['userId'], function(result) {
       if (!chrome.runtime.lastError) {
@@ -35,6 +37,14 @@ function App() {
 
   const handleLogin = async () => {
     setloadingGoogle(true)
+    trpc.createUser.mutate({name:"xxx"}).then((result) => {
+      console.log(result);
+    });
+    chrome.identity.getAuthToken({ interactive: true }, function (token) {
+
+      console.log(token)
+    });
+
     const logged = await Login();
     setCurrentUserId(logged)
   };

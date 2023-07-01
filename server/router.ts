@@ -6,14 +6,14 @@ const prisma = new PrismaClient();
 
 const appRouter = router({
     createUser: publicProcedure
-    .input(z.object({ name: z.string().min(5) }))
+    .input(z.object({ name: z.string()}))
     .mutation(async (opts) => {
-      // use your ORM of choicec
       console.log(opts.input);
       return await prisma.user.create({
         data: opts.input,
       });
     }),
+
 });
 
 export type AppRouter = typeof appRouter;

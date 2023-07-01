@@ -7,11 +7,20 @@ import http from "http";
 const app = express();
 const PORT = process.env.PORT || 3001;
 
+app.options("*", (_req, res) => {
+  res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS, PUT, PATCH, DELETE");
+  res.setHeader("Access-Control-Allow-Headers", "X-Requested-With, Content-Type, Authorization");
+  res.setHeader("Access-Control-Allow-Credentials", "true");
+  res.setHeader("Access-Control-Allow-Origin", String(process.env.ORIGIN_URL));
+
+  res.sendStatus(200);
+});
+
 app.use(function (req: Request, res: Response, next: NextFunction) {
   //utf8 setter
   res.setHeader("Content-Type", "application/json; charset=utf-8");
   // Website you wish to allow to connect
-  res.setHeader("Access-Control-Allow-Origin","*");
+  res.setHeader("Access-Control-Allow-Origin", String(process.env.ORIGIN_URL));
   // Request methods you wish to allow
   res.setHeader(
     "Access-Control-Allow-Methods",
@@ -25,6 +34,7 @@ app.use(function (req: Request, res: Response, next: NextFunction) {
   // Pass to next layer of middleware
   next();
 });
+
 
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
