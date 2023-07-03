@@ -1,6 +1,6 @@
 import express, { Request, Response, NextFunction } from "express";
 import * as trpcExpress from "@trpc/server/adapters/express";
-import appRouter from "./router";
+import appRouter from "./routers/router";
 import http from "http";
 
 const app = express();
@@ -37,10 +37,10 @@ app.use(function (req: Request, res: Response, next: NextFunction) {
 
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
-app.use((req, _res, next) => {
+app.use((req:Request, res:Response, next: NextFunction) => {
   // request logger
   console.log("⬅️ ", req.method, req.path, req.body ?? req.query);
-
+  
   next();
 });
 
@@ -58,3 +58,5 @@ const server = http.createServer(app);
 server.listen(PORT, () => {
   console.log(`listening on port ${PORT}`);
 });
+
+

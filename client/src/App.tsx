@@ -15,7 +15,7 @@
 //   )
 // }
 
-// function App() {
+// exportfunction App() {
 //   const [CurrentUserId, setCurrentUserId] = useState('');
 //   const [loadingGoogle, setloadingGoogle] = useState(false);
 //   useEffect(() => {
@@ -110,25 +110,21 @@
 //   );
 // }
 
-// export default App
 
 import { useState } from 'react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { httpBatchLink } from '@trpc/client';
-import { Router } from './router';
-import { createTRPCReact  } from '@trpc/react-query';
-import type { AppRouter } from '../../server/router.ts';
+import { AppRouter } from './router';
+import { trpc } from './trpc';
+
 export function App() {
-  
- const trpc = createTRPCReact<AppRouter>();
   const [queryClient] = useState(() => new QueryClient());
   const [trpcClient] = useState(() =>
     trpc.createClient({
       links: [
         httpBatchLink({
-          url: 'http://localhost:3001/trpc',
-          // You can pass any HTTP headers you wish here
-          
+          url: `${import.meta.env.VITE_SERVER_URL}/trpc`,
+          // You can pass any HTTP headers you wish here         
         }),
       ],
     }),
@@ -137,7 +133,7 @@ export function App() {
   return (
     <trpc.Provider client={trpcClient} queryClient={queryClient}>
       <QueryClientProvider client={queryClient}>
-        <Router/>
+        <AppRouter/>
       </QueryClientProvider>
     </trpc.Provider>
   );

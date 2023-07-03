@@ -30,25 +30,33 @@ const postUser = async (googleData: any) => {
     })
 }     
 
+// export const Login = async () => {
+//     const googleInfos: any = await getUserInfos()
+//     return chrome.storage.local.set({ 'userId': googleInfos.id }).then(() => {
+//         console.log("User id set to "+googleInfos.id );
+//         return googleInfos.id
+//     });
+//     // if(!await GetSpecificUser(googleInfos.id)){
+//     //     // const newUser = await postUser(googleInfos)
+//     //     return chrome.storage.local.set({ 'userId': newUser.google_id }).then(() => {
+//     //         console.log("new User id set to "+newUser.google_id );
+//     //         return newUser.google_id
+//     //     });
+//     // }else{
+//     //     return chrome.storage.local.set({ 'userId': googleInfos.id }).then(() => {
+//     //         console.log("User id set to "+googleInfos.id );
+//     //         return googleInfos.id
+//     //     });
+//     // }
+// };
+
 export const Login = async () => {
-    const googleInfos: any = await getUserInfos()
-    return chrome.storage.local.set({ 'userId': googleInfos.id }).then(() => {
-        console.log("User id set to "+googleInfos.id );
-        return googleInfos.id
-    });
-    // if(!await GetSpecificUser(googleInfos.id)){
-    //     // const newUser = await postUser(googleInfos)
-    //     return chrome.storage.local.set({ 'userId': newUser.google_id }).then(() => {
-    //         console.log("new User id set to "+newUser.google_id );
-    //         return newUser.google_id
-    //     });
-    // }else{
-    //     return chrome.storage.local.set({ 'userId': googleInfos.id }).then(() => {
-    //         console.log("User id set to "+googleInfos.id );
-    //         return googleInfos.id
-    //     });
-    // }
-};
+        return await chrome.identity.getAuthToken({ 
+          interactive: true,
+          scopes: ['https://www.googleapis.com/auth/userinfo.email', 'https://www.googleapis.com/auth/userinfo.profile']
+        })
+}
+
 
 export const Logout = async () =>{
     chrome.storage.local.remove(["userId"]).then(() => {

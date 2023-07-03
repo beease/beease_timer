@@ -1,7 +1,5 @@
 import { Response } from "express";
 
-
-
 export const handleAsyncError = async (
   res: Response,
   executeOperation: () => Promise<any>
