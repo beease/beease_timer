@@ -26,3 +26,69 @@ export const signUserByGoogleToken = async (google_token: string) => {
     "Failed to create user with Prisma."
   );
 };
+
+export const getUserList = async () => {
+    return asyncFunctionErrorCatcher(
+        () =>
+        prisma.user.findMany({
+            select: {
+            id: true,
+            name: true,
+            email: true,
+            verified_email: true,
+            picture: true,
+            locale: true,
+            family_name: true,
+            given_name: true,
+            },
+        }),
+        "Failed to get user list with Prisma."
+    );
+};
+
+export const getUserById = async (id: string) => {
+    return asyncFunctionErrorCatcher(
+        () =>
+        prisma.user.findUnique({
+            where: {
+            id,
+            },
+            select: {
+            id: true,
+            name: true,
+            email: true,
+            verified_email: true,
+            picture: true,
+            locale: true,
+            family_name: true,
+            given_name: true,
+            },
+        }),
+        "Failed to get user by id with Prisma."
+    );
+}
+
+export const updateUserById = async (id: string, data: Prisma.UserUpdateInput) => {
+    return asyncFunctionErrorCatcher(
+        () =>
+        prisma.user.update({
+            where: {
+            id,
+            },
+            data,
+        }),
+        "Failed to update user by id with Prisma."
+    );
+}
+
+export const deleteUserById = async (id: string) => {
+    return asyncFunctionErrorCatcher(
+        () =>
+        prisma.user.delete({
+            where: {
+            id,
+            },
+        }),
+        "Failed to delete user by id with Prisma."
+    );
+}
