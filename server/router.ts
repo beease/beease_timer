@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { PrismaClient,User } from '@prisma/client';
+import { PrismaClient } from '@prisma/client';
 import { publicProcedure, router } from './trpc';
 
 const prisma = new PrismaClient();
@@ -13,6 +13,7 @@ const appRouter = router({
         data: opts.input,
       });
     }),
+    greeting: publicProcedure.query(() => 'hello tRPC v10!'),
 
 });
 

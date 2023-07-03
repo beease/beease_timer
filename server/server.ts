@@ -1,7 +1,6 @@
 import express, { Request, Response, NextFunction } from "express";
 import * as trpcExpress from "@trpc/server/adapters/express";
 import appRouter from "./router";
-import { createContext } from "./trpc";
 import http from "http";
 
 const app = express();
@@ -49,7 +48,6 @@ app.use(
   "/trpc",
   trpcExpress.createExpressMiddleware({
     router: appRouter,
-    createContext,
   })
 );
 
