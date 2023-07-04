@@ -2,6 +2,7 @@ import express, { Request, Response, NextFunction } from "express";
 import * as trpcExpress from "@trpc/server/adapters/express";
 import appRouter from "./routers/router";
 import http from "http";
+import { createContext } from './trpc';
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -45,9 +46,10 @@ app.use((req:Request, res:Response, next: NextFunction) => {
 });
 
 app.use(
-  "/trpc",
+  "/api",
   trpcExpress.createExpressMiddleware({
     router: appRouter,
+    createContext,
   })
 );
 

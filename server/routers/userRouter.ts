@@ -1,25 +1,20 @@
 import { z } from 'zod';
-import { router, publicProcedure } from '../trpc';
+import { router, publicProcedure, isAuthed } from '../trpc';
 import * as userService from '../services/CRUD/userService';
 
 export const userRouter = router({
 
-    signUserByGoogleToken: publicProcedure
+    loginByGoogleToken: publicProcedure
     .input(z.object({ google_token: z.string() }))
     .mutation(async (opts) => {
-      return await userService.signUserByGoogleToken(opts.input.google_token);
+      return await userService.loginByGoogleToken(opts.input.google_token);
     }),
 
-    getUserById: publicProcedure
-    .input(z.object({ id: z.string() }))
+    getMyUser: publicProcedure.use(isAuthed)
     .query(async (opts) => {
-      return await userService.getUserById(opts.input.id);
-    }),
-
-    getUserList: publicProcedure
-    .input(z.object({}))
-    .query(async () => {
-      return await userService.getUserList();
+      if (opts.ctx.tokenPayload) {
+        return await userService.getUserById(opts.ctx.tokenPayload.userId);
+      }
     }),
 
 });

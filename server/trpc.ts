@@ -1,9 +1,44 @@
-import { initTRPC } from '@trpc/server';
- 
+import { initTRPC, inferAsyncReturnType, TRPCError } from '@trpc/server';
+import * as trpcNext from '@trpc/server/adapters/next';
+import { verifyJwt } from './services/auth/jwt';
+import { PayloadOnAuthJWT } from '../shared/interfaces/queryInterfaces';
 // You can use any variable name you like.
 // We use t to keep things simple.
-const t = initTRPC.create();
- 
+
+export async function createContext({
+    req,
+    res,
+  }: trpcNext.CreateNextContextOptions) {
+    async function getUserFromHeader() {
+      if (req.headers.authorization) {
+        const tokenPayload = await verifyJwt(
+          req.headers.authorization.split(' ')[1],
+        );
+        return tokenPayload as PayloadOnAuthJWT;
+      }
+      return null;
+    }
+    const tokenPayload = await getUserFromHeader();
+    return {
+        tokenPayload,
+    };
+  }
+  export type Context = inferAsyncReturnType<typeof createContext>;
+
+  export const t = initTRPC.context<Context>().create();
+
+  export const isAuthed = t.middleware((opts) => {
+    const { ctx } = opts;
+    if (!ctx.tokenPayload) {
+      throw new TRPCError({ code: 'UNAUTHORIZED' });
+    }
+    return opts.next({
+      ctx: {
+        user: ctx.tokenPayload,
+      },
+    });
+  });
+
 export const router = t.router;
 export const middleware = t.middleware;
 export const publicProcedure = t.procedure;

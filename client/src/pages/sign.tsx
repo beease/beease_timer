@@ -14,7 +14,10 @@ function Loading() {
 export function Sign() {
   const [CurrentUserId, setCurrentUserId] = useState('');
   const [loadingGoogle, setloadingGoogle] = useState(false);
-  const mutation = trpc.signUserByGoogleToken.useMutation();
+  const mutation = trpc.user.loginByGoogleToken.useMutation();
+
+  const myUser = trpc.user.getMyUser.useQuery();
+
   useEffect(() => {
     chrome.storage.local.get(['userId'], function(result) {
       if (!chrome.runtime.lastError) {
@@ -39,7 +42,6 @@ export function Sign() {
 
     Login().then((googleAuthResult) => {
       const token = googleAuthResult.token;
-      console.log(token)
       token && mutation.mutate({ google_token: token });        
       setloadingGoogle(false)
     });
@@ -66,7 +68,8 @@ export function Sign() {
       </div>)
   }
   return (
-    <div id='app'>    
+    <div id='app'>  
+    {myUser.data?.id}  
       {CurrentUserId ? (
           <div>
             <div>logged</div>

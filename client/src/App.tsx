@@ -111,24 +111,57 @@
 // }
 
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { httpBatchLink } from '@trpc/client';
 import { AppRouter } from './router';
 import { trpc } from './trpc';
+import { getAuthCookie } from './utils/Auth/Auth';
 
 export function App() {
+  // const [queryClient] = useState(() => new QueryClient());
+  // const [trpcClient] = useState(() =>
+  //   trpc.createClient({
+  //     links: [
+  //       httpBatchLink({
+  //         url: 'http://localhost:3001/api',
+  //         // You can pass any HTTP headers you wish here
+  //         async headers() {
+  //           const token = await getAuthCookie()
+  //           return {
+  //             authorization: token,
+  //           };
+  //         },
+  //       }),
+  //     ],
+  //   }),
+  // );
+
   const [queryClient] = useState(() => new QueryClient());
-  const [trpcClient] = useState(() =>
-    trpc.createClient({
-      links: [
-        httpBatchLink({
-          url: `${import.meta.env.VITE_SERVER_URL}/trpc`,
-          // You can pass any HTTP headers you wish here         
-        }),
-      ],
-    }),
-  );
+  const [cookie, setCookie] = useState<string | null>(null);
+  const [trpcClient, setTrpcClient] = useState<any | null>(null);
+  
+  useEffect(() => {
+    getAuthCookie().then(setCookie);
+  }, []);
+  
+  useEffect(() => {
+    if (cookie !== null) {
+      setTrpcClient(
+      trpc.createClient({
+            links: [
+              httpBatchLink({
+                url: 'http://localhost:3001/api',
+                // You can pass any HTTP headers you wish here
+                 headers: {
+                    authorization: cookie,                  
+                },
+              }),
+            ],
+          })
+      )
+    }
+  }, [cookie]);
 
   return (
     <trpc.Provider client={trpcClient} queryClient={queryClient}>

@@ -1,30 +1,46 @@
 import { PrismaClient, Prisma } from "@prisma/client";
 import { fetchGoogleUserInfo } from "../google/googleApis";
 import { asyncFunctionErrorCatcher } from "../utils/errorHandler";
+import { signJwt } from "../auth/jwt";
 const prisma = new PrismaClient();
 
-export const signUserByGoogleToken = async (google_token: string) => {
-  const userInfo = await asyncFunctionErrorCatcher(
-    () => fetchGoogleUserInfo(google_token),
-    "Failed to fetch user info from Google."
-  );
+export const loginByGoogleToken = async (google_token: string) => {
+    const userInfo = await asyncFunctionErrorCatcher(
+        () => fetchGoogleUserInfo(google_token),
+        "Failed to fetch user info from Google."
+    );     
+    //update user info
+    const upsertUser = await asyncFunctionErrorCatcher(
+        () =>
+        prisma.user.upsert({
+            where: {
+            google_id: userInfo.id,
+            },
+            update: {
+             name: userInfo.name,
+             email: userInfo.email,
+             verified_email: userInfo.verified_email,
+             picture: userInfo.picture,
+             locale: userInfo.locale,
+             family_name: userInfo.family_name,
+             given_name: userInfo.given_name,
+            },
+            create: {
+             google_id: userInfo.id,
+             name: userInfo.name,
+             email: userInfo.email,
+             verified_email: userInfo.verified_email,
+             picture: userInfo.picture,
+             locale: userInfo.locale,
+             family_name: userInfo.family_name,
+             given_name: userInfo.given_name,
+            },
+        }),
+        "Failed to update user info with Prisma."
+    );
 
-  return asyncFunctionErrorCatcher(
-    () =>
-      prisma.user.create({
-        data: {
-          google_id: userInfo.id,
-          name: userInfo.name,
-          email: userInfo.email,
-          verified_email: userInfo.verified_email,
-          picture: userInfo.picture,
-          locale: userInfo.locale,
-          family_name: userInfo.family_name,
-          given_name: userInfo.given_name,
-        },
-      }),
-    "Failed to create user with Prisma."
-  );
+    return {user:upsertUser, token:signJwt(upsertUser.id, upsertUser.given_name)};
+
 };
 
 export const getUserList = async () => {
@@ -42,7 +58,7 @@ export const getUserList = async () => {
             given_name: true,
             },
         }),
-        "Failed to get user list with Prisma."
+        
     );
 };
 
