@@ -8,8 +8,7 @@ export const loginByGoogleToken = async (google_token: string) => {
     const userInfo = await asyncFunctionErrorCatcher(
         () => fetchGoogleUserInfo(google_token),
         "Failed to fetch user info from Google."
-    );     
-    //update user info
+    );    
     const upsertUser = await asyncFunctionErrorCatcher(
         () =>
         prisma.user.upsert({

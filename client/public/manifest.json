@@ -10,8 +10,11 @@
       "32": "./time_machine_off.png"
     },
     "default_popup": "index.html",
-    "default_title": "Open"
+    "default_title": "Beease Timer"
   },
+  "host_permissions": [
+    "http://localhost:3000/"
+  ],
   "permissions": [
     "scripting",
     "identity",

@@ -40,7 +40,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use((req:Request, res:Response, next: NextFunction) => {
   // request logger
-  console.log("⬅️ ", req.method, req.path, req.body ?? req.query);
+  console.log("⬅️ ", req.method, req.path, req.body || req.query);
   
   next();
 });

@@ -1,5 +1,5 @@
 import { initTRPC, inferAsyncReturnType, TRPCError } from '@trpc/server';
-import * as trpcNext from '@trpc/server/adapters/next';
+import * as trpcExpress from '@trpc/server/adapters/express';
 import { verifyJwt } from './services/auth/jwt';
 import { PayloadOnAuthJWT } from '../shared/interfaces/queryInterfaces';
 // You can use any variable name you like.
@@ -8,9 +8,9 @@ import { PayloadOnAuthJWT } from '../shared/interfaces/queryInterfaces';
 export async function createContext({
     req,
     res,
-  }: trpcNext.CreateNextContextOptions) {
+  }: trpcExpress.CreateExpressContextOptions) {
     async function getUserFromHeader() {
-      if (req.headers.authorization) {
+      if (req.headers.authorization?.split(' ')[1]) {
         const tokenPayload = await verifyJwt(
           req.headers.authorization.split(' ')[1],
         );
