@@ -27,7 +27,7 @@ model User {
   locale         String?
   google_id      String?     @unique
   credential     Credential?
-  workspaces     Member[]
+  workspaces     Workspace[]
 }
 
 model Credential {
@@ -40,8 +40,6 @@ model Credential {
 model Member {
   id        String    @id @default(cuid())
   createdAt DateTime  @default(now())
-  user      User      @relation(fields: [userId], references: [id])
-  userId    String    @unique
   role      Role      @default(MEMBER)
   projects  Project[]
   sessions  Session[]
@@ -53,6 +51,8 @@ model Workspace {
   name      String
   projects  Project[]
   color     String
+  user  User @relation(fields: [userIds],references: [id])
+  userIds String[] 
 }
 
 model Project {
