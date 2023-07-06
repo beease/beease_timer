@@ -1,15 +1,15 @@
 import { z } from 'zod';
-import { router, publicProcedure, isAuthed } from '../trpc';
-import { Prisma, PrismaClient } from '@prisma/client';
+import { router, publicProcedure } from '../trpc';
 import * as workspaceService from '../services/CRUD/workspaceService';
 
-const prisma = new PrismaClient();
-
 export const workspaceRouter = router({
-    getMyWorkspaces: publicProcedure.use(isAuthed)
-    .query(async (opts) => {
-      if (opts.ctx.tokenPayload) {
-        return await workspaceService.getWorkspacesByUserId(opts.ctx.tokenPayload.userId);
-      }
+    createWorkspace: publicProcedure.input(z.object({ name: z.string(), color: z.string() })).mutation(async (opts) => {
+        return await workspaceService.createWorkspace(opts.input.name, opts.input.color);
     }),
+    getWorkspaceById: publicProcedure.input(z.object({ id: z.string() })).query(async (opts) =>{
+        return await workspaceService.getWorkspaceById(opts.input.id);
+    })
 });
+
+
+
