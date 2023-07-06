@@ -244,7 +244,7 @@ export function App() {
   const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
     const [isLogged, setIsLogged] = useState<boolean>(false);
   
-   var isAccessTokenValidAndSetLogged = (accessToken:string) => {
+   const isAccessTokenValidAndSetLogged = (accessToken:string) => {
         fetch(`${import.meta.env.VITE_SERVER_URL}/api/credential.isLogged`, {
               method: 'GET',
               headers: {

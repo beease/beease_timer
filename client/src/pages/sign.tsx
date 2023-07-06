@@ -1,6 +1,6 @@
 /* global chrome */
 import '../App.scss';
-import { Login } from '../utils/Auth/Auth';
+// import { Login } from '../utils/Auth/Auth';
 import { useState, useContext } from 'react';
 import { AuthContext } from '../App';
 import Logo from '../assets/google.png'; 
@@ -17,21 +17,21 @@ export function Sign() {
   const {login} = useContext(AuthContext);
   const mutation = trpc.user.loginByGoogleToken.useMutation();
   const handleLogin = async () => {
-    Login().then((googleAuthResult) => {
-      const token = googleAuthResult.token;
-      if (token) {
-        mutation.mutate({ google_token: token }, {
-          onSuccess: (data) => {
-            //setAuthCookieToken(data.token)
-            login(data.token)
-          },
-          onError: (error) => {
-            // Handle the error here
-            console.log(error);
-          }
-        }); 
-      }
-    });
+    // Login().then((googleAuthResult) => {
+    //   const token = googleAuthResult.token;
+    //   if (token) {
+    //     mutation.mutate({ google_token: token }, {
+    //       onSuccess: (data) => {
+    //         //setAuthCookieToken(data.token)
+    //         login(data.token)
+    //       },
+    //       onError: (error) => {
+    //         // Handle the error here
+    //         console.log(error);
+    //       }
+    //     }); 
+    //   }
+    // });
   };
 
   const LoginButton = () => {
@@ -53,6 +53,9 @@ export function Sign() {
         <div id='app_logout'>
            <LoginButton/>
         </div>      
+        <div>
+          
+        </div>
     </div>
   );
 }
