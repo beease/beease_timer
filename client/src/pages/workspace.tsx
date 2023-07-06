@@ -1,8 +1,7 @@
 
 import '../App.scss';
 import { useEffect, useState, useContext } from 'react';
-import { Logout } from '../utils/Auth/Auth';
-//import { AuthContext } from '../App';
+import { AuthContext } from '../App';
 import Logo from '../assets/google.png'; 
 import { trpc } from '../trpc';
 
@@ -13,7 +12,7 @@ function Loading() {
 }
 
 export function Workspace() {
-  //const {logout} = useContext(AuthContext);
+  const {logout} = useContext(AuthContext);
   const {data: user, error, isLoading} = trpc.user.getMyUser.useQuery();
   const [currentOption, setCurrentOption] = useState<number>(0);
   const [colorWorkSpace, setColorWorkSpace] = useState('');
@@ -58,7 +57,7 @@ export function Workspace() {
               <div>logged</div>
            
               welcome {user.given_name}
-              <div onClick={() => {Logout()}}>logout</div>
+              <div onClick={() => {logout()}}>logout</div>
             </div>
       </div>
     );

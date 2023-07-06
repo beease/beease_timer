@@ -1,6 +1,5 @@
 /* global chrome */
 
-
 export const getAuthCookie = () => {
     return new Promise<string>((resolve) => {
         console.log(import.meta.env.VITE_CLIENT_URL)
@@ -31,26 +30,6 @@ export const removeAuthCookie = async () => {
 export const Logout = async () =>{
     removeAuthCookie()
 }
-
-// export const Login = async () => {
-//     const googleInfos: any = await getUserInfos()
-//     return chrome.storage.local.set({ 'userId': googleInfos.id }).then(() => {
-//         console.log("User id set to "+googleInfos.id );
-//         return googleInfos.id
-//     });
-//     // if(!await GetSpecificUser(googleInfos.id)){
-//     //     // const newUser = await postUser(googleInfos)
-//     //     return chrome.storage.local.set({ 'userId': newUser.google_id }).then(() => {
-//     //         console.log("new User id set to "+newUser.google_id );
-//     //         return newUser.google_id
-//     //     });
-//     // }else{
-//     //     return chrome.storage.local.set({ 'userId': googleInfos.id }).then(() => {
-//     //         console.log("User id set to "+googleInfos.id );
-//     //         return googleInfos.id
-//     //     });
-//     // }
-// };
 
 export const getGoogleToken = async () => {
         return await chrome.identity.getAuthToken({ 
