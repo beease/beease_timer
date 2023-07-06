@@ -32,7 +32,7 @@ export const Logout = async () =>{
 }
 
 export const getGoogleToken = async () => {
-        return await chrome.identity.getAuthToken({ 
+        return chrome.identity.getAuthToken({ 
           interactive: true,
           scopes: ['https://www.googleapis.com/auth/userinfo.email', 'https://www.googleapis.com/auth/userinfo.profile']
         })

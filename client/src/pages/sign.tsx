@@ -7,28 +7,30 @@ import { trpc } from '../trpc';
 export function Sign() {
   
   const {login} = useContext(AuthContext);
-  const mutation = trpc.user.loginByGoogleToken.useMutation();
+  const {mutate, data:userAuthData, error, isLoading } = trpc.user.loginByGoogleToken.useMutation();
   const handleLogin = async () => {
-    getGoogleToken().then((googleAuthResult) => {
-      const token = googleAuthResult.token;
-      if (token) {
-        mutation.mutate({ google_token: token }, {
-          onSuccess: (data) => {
-            login(data.token)
-          },
-          onError: (error) => {
-            console.log(error);
-          }
-        }); 
+   const googleToken =  (await getGoogleToken()).token
+      if (googleToken) {
+        mutate({ google_token: googleToken })
       }
-    });
   };
+
+  if(userAuthData?.token){
+    login(userAuthData.token)
+  }
+
+  // if(error){
+  //   return <div>error</div>
+  // }
+
+  // if(isLoading){
+  //   return <div>loading</div>
+  // }
 
   const LoginButton = () => {
     return (
       <div id='app_logout'>
         <button id='google_connect' onClick={() => {handleLogin()}}>
-        {mutation.status}
             {
                 <div className='google_connect_cont'>
                   <img alt='google_logo' src={Logo} />
@@ -42,10 +44,7 @@ export function Sign() {
     <div id='app'>       
         <div id='app_logout'>
            <LoginButton/>
-        </div>      
-        <div>
-          
-        </div>
+        </div>  
     </div>
   );
 }
