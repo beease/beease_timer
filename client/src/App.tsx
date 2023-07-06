@@ -111,181 +111,181 @@
 // }
 
 
-// import { useState, useEffect, createContext, ReactNode } from 'react';
-// import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-// import { httpBatchLink } from '@trpc/client';
-// import { AppRouter } from './router';
-// import { trpc } from './trpc';
-// import { getAuthCookie } from './utils/Auth/Auth';
-
-// export function App() {
-
-//   const [queryClient] = useState(() => new QueryClient());
-//   const [authCookieToken, setAuthCookieToken] = useState<string>("");
-//   const [trpcClient, setTrpcClient] = useState<any | null>(null);
-//   const [isLogged,setIsLogged] = useState<boolean>(false)
-
-//   useEffect(() => {
-//     getAuthCookie().then(token => {
-//       if (token) {
-//         setAuthCookieToken(token);
-//       }
-//     });
-//   }, []);
-  
-//   useEffect(() => {   
-//     console.log("token: ", authCookieToken) 
-//       setTrpcClient(
-//       trpc.createClient({
-//             links: [
-//               httpBatchLink({
-//                 url: `${import.meta.env.VITE_SERVER_URL}/api`,
-//                 // You can pass any HTTP headers you wish here
-//                 headers: {
-//                     authorization: `Bearer ${authCookieToken}`,                  
-//                 },
-//               }),
-//             ],
-//           })
-//       )
-//   }, [authCookieToken]);
-
-//   useEffect(() => {
-//     if (authCookieToken) {
-//       fetch(`${import.meta.env.VITE_SERVER_URL}/api/credential.isLogged`, {
-//         method: 'GET',
-//         headers: {
-//           'Content-Type': 'application/json',
-//           'Authorization': `Bearer ${authCookieToken}`
-//         }
-//       })
-//       .then(response => response.json())
-//       .then(data => setIsLogged(data.result.data))
-//       .catch(error => console.error('Error:', error));
-//     }else{
-//       setIsLogged(false)
-//     }
-//   }, [trpcClient]);
-
-//   return (
-//     <trpc.Provider client={trpcClient} queryClient={queryClient}>
-//       <QueryClientProvider client={queryClient}>
-//          <AppRouter isLogged={isLogged} />
-//       </QueryClientProvider>
-//     </trpc.Provider>
-//   );
-// }
-
 import { useState, useEffect, createContext, ReactNode } from 'react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { httpBatchLink } from '@trpc/client';
 import { AppRouter } from './router';
 import { trpc } from './trpc';
-
-
-
-const getAuthCookie = () => {
-  return new Promise<string>((resolve) => {
-      chrome.cookies.get({ url: import.meta.env.VITE_CLIENT_URL, name: "auth" }, (cookie) => {
-          if (cookie) {
-              resolve(cookie.value);
-          } else {
-              resolve("");
-          }
-      });
-  });
-  //set token
-};
-
-const setAuthCookie = async (value: string) => {
-  return await chrome.cookies.set({ url: import.meta.env.VITE_CLIENT_URL, name: "auth", value: value }, (cookie) => {
-      if (cookie) {
-          return cookie.value
-      } else {
-          return null
-      }
-  })
-}
-
-const removeAuthCookie = async () => {
-  return await chrome.cookies.remove({ url: import.meta.env.VITE_CLIENT_URL, name: "auth" })
-}
-
-interface AuthContextProps {
-  logout: () => void;
-  login: (token: string) => void;
-  isLogged: boolean;
-}
-
-export const AuthContext = createContext<AuthContextProps>({
-  logout: () => {},
-  login: () => {},
-  isLogged: false,
-});
+import { getAuthCookie } from './utils/Auth/Auth';
 
 export function App() {
 
   const [queryClient] = useState(() => new QueryClient());
+  const [authCookieToken, setAuthCookieToken] = useState<string>("");
   const [trpcClient, setTrpcClient] = useState<any | null>(null);
+  const [isLogged,setIsLogged] = useState<boolean>(false)
 
-  const regenerateTrpc =(token:string)=> {setTrpcClient(
-    trpc.createClient({
-      links: [
-        httpBatchLink({
-          url: `${import.meta.env.VITE_SERVER_URL}/api`,
-          headers: {
-            authorization: `Bearer ${token}`,
-          },
-        }),
-      ],
-    })
-  );}
+  useEffect(() => {
+    getAuthCookie().then(token => {
+      if (token) {
+        setAuthCookieToken(token);
+      }
+    });
+  }, []);
+  
+  useEffect(() => {   
+    console.log("token: ", authCookieToken) 
+      setTrpcClient(
+      trpc.createClient({
+            links: [
+              httpBatchLink({
+                url: `${import.meta.env.VITE_SERVER_URL}/api`,
+                // You can pass any HTTP headers you wish here
+                headers: {
+                    authorization: `Bearer ${authCookieToken}`,                  
+                },
+              }),
+            ],
+          })
+      )
+  }, [authCookieToken]);
 
-  const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-    const [isLogged, setIsLogged] = useState<boolean>(false);
-  
-   const isAccessTokenValidAndSetLogged = (accessToken:string) => {
-        fetch(`${import.meta.env.VITE_SERVER_URL}/api/credential.isLogged`, {
-              method: 'GET',
-              headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${accessToken}`
-              }
-            })
-            .then(response => response.json())
-            .then(data => {
-              setIsLogged(data.result.data)
-              setAuthCookie(accessToken);
-              regenerateTrpc(accessToken)
-            })
-            .catch(error => console.error('Error:', error));        
+  useEffect(() => {
+    if (authCookieToken) {
+      fetch(`${import.meta.env.VITE_SERVER_URL}/api/credential.isLogged`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${authCookieToken}`
         }
-  
-    useEffect(() => {
-      getAuthCookie().then(token => {
-        if (token) {
-          isAccessTokenValidAndSetLogged(token)
-        }
-      });
-    }, []);
-  
-    const logout = async () => {
-      removeAuthCookie();
-      setIsLogged(false);
-      regenerateTrpc("")
+      })
+      .then(response => response.json())
+      .then(data => setIsLogged(data.result.data))
+      .catch(error => console.error('Error:', error));
+    }else{
+      setIsLogged(false)
     }
+  }, [trpcClient]);
+
+  return (
+    <trpc.Provider client={trpcClient} queryClient={queryClient}>
+      <QueryClientProvider client={queryClient}>
+         <AppRouter isLogged={isLogged} />
+      </QueryClientProvider>
+    </trpc.Provider>
+  );
+}
+
+// import { useState, useEffect, createContext, ReactNode } from 'react';
+// import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+// import { httpBatchLink } from '@trpc/client';
+// import { AppRouter } from './router';
+// import { trpc } from './trpc';
+
+
+
+// const getAuthCookie = () => {
+//   return new Promise<string>((resolve) => {
+//       chrome.cookies.get({ url: import.meta.env.VITE_CLIENT_URL, name: "auth" }, (cookie) => {
+//           if (cookie) {
+//               resolve(cookie.value);
+//           } else {
+//               resolve("");
+//           }
+//       });
+//   });
+//   //set token
+// };
+
+// const setAuthCookie = async (value: string) => {
+//   return await chrome.cookies.set({ url: import.meta.env.VITE_CLIENT_URL, name: "auth", value: value }, (cookie) => {
+//       if (cookie) {
+//           return cookie.value
+//       } else {
+//           return null
+//       }
+//   })
+// }
+
+// const removeAuthCookie = async () => {
+//   return await chrome.cookies.remove({ url: import.meta.env.VITE_CLIENT_URL, name: "auth" })
+// }
+
+// interface AuthContextProps {
+//   logout: () => void;
+//   login: (token: string) => void;
+//   isLogged: boolean;
+// }
+
+// export const AuthContext = createContext<AuthContextProps>({
+//   logout: () => {},
+//   login: () => {},
+//   isLogged: false,
+// });
+
+// export function App() {
+
+//   const [queryClient] = useState(() => new QueryClient());
+//   const [trpcClient, setTrpcClient] = useState<any | null>(null);
+
+//   const regenerateTrpc =(token:string)=> {setTrpcClient(
+//     trpc.createClient({
+//       links: [
+//         httpBatchLink({
+//           url: `${import.meta.env.VITE_SERVER_URL}/api`,
+//           headers: {
+//             authorization: `Bearer ${token}`,
+//           },
+//         }),
+//       ],
+//     })
+//   );}
+
+//   const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
+//     const [isLogged, setIsLogged] = useState<boolean>(false);
   
-    const login = async (token: string) => {
-      isAccessTokenValidAndSetLogged(token)
+//    var isAccessTokenValidAndSetLogged = (accessToken:string) => {
+//         fetch(`${import.meta.env.VITE_SERVER_URL}/api/credential.isLogged`, {
+//               method: 'GET',
+//               headers: {
+//                 'Content-Type': 'application/json',
+//                 'Authorization': `Bearer ${accessToken}`
+//               }
+//             })
+//             .then(response => response.json())
+//             .then(data => {
+//               setIsLogged(data.result.data)
+//               setAuthCookie(accessToken);
+//               regenerateTrpc(accessToken)
+//             })
+//             .catch(error => console.error('Error:', error));        
+//         }
+  
+//     useEffect(() => {
+//       getAuthCookie().then(token => {
+//         if (token) {
+//           isAccessTokenValidAndSetLogged(token)
+//         }
+//       });
+//     }, []);
+  
+//     const logout = async () => {
+//       removeAuthCookie();
+//       setIsLogged(false);
+//       regenerateTrpc("")
+//     }
+  
+//     const login = async (token: string) => {
+//       isAccessTokenValidAndSetLogged(token)
       
-    }
+//     }
   
-    return (
-      <AuthContext.Provider value={{ login, logout, isLogged }}>
-        {children}
-      </AuthContext.Provider>
-    );
-  };
+//     return (
+//       <AuthContext.Provider value={{ login, logout, isLogged }}>
+//         {children}
+//       </AuthContext.Provider>
+//     );
+//   };
   
 
 
@@ -293,13 +293,13 @@ export function App() {
  
 
 
-  return (
-    <trpc.Provider client={trpcClient} queryClient={queryClient}>
-      <QueryClientProvider client={queryClient}>
-        <AuthProvider>
-          <AppRouter />
-        </AuthProvider>
-      </QueryClientProvider>
-    </trpc.Provider>
-  );
-}
+//   return (
+//     <trpc.Provider client={trpcClient} queryClient={queryClient}>
+//       <QueryClientProvider client={queryClient}>
+//         <AuthProvider>
+//           <AppRouter />
+//         </AuthProvider>
+//       </QueryClientProvider>
+//     </trpc.Provider>
+//   );
+// }
