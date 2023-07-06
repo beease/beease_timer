@@ -9,10 +9,9 @@ export const createWorkspace = async (name:string, color:string, userId:string) 
     return asyncFunctionErrorCatcher(
         () => prisma.workspace.create({
             data: ({
-                createdAt: new Date(),
                 name: name,
                 color: color,
-                userId: userId,
+                userIds:[userId],
             })
         })
     )
