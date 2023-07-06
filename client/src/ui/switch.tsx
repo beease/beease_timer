@@ -1,4 +1,6 @@
-interface Props {
+import React from "react";
+
+interface Props extends React.HTMLAttributes<HTMLDivElement>{
     width: number;
     height: number;
     options: [string, string]; 
@@ -7,12 +9,12 @@ interface Props {
     setCurrentOption: (option: number) => void;
 }
 
-export const Switch = ({options, width, height, color, currentOption, setCurrentOption}: Props) => {
+export const Switch = ({options, width, height, color, currentOption, setCurrentOption, ...props}: Props) => {
     const lineHeight = `${height - 16}px`;
     const buttonPosition = `${currentOption === 1 ?(width / 2) * currentOption - 8 : 0}px`;
 
     return (
-        <div className='ui_switch_cont' style={{width: `${width}px`, height: `${height}px`}}>
+        <div {...props} className='ui_switch_cont' style={{width: `${width}px`, height: `${height}px`}}>
             <div className='ui_switch_text_cont'>
                 <div
                     className={`ui_switch_text ${currentOption === 0 && 'selected'}`}

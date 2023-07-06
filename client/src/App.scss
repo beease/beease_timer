@@ -6,12 +6,12 @@ $red-bg-color: rgb(255, 85, 85);
 $green-bg-color: #6be65b;
 $grey-1: rgb(247, 248, 252);
 $grey-2: rgb(233, 234, 240);
-$grey-2b: rgb(225, 226, 233);
-$grey-3: rgb(215, 215, 224);
-$grey-4: rgb(175, 181, 186);
-$grey-5: rgb(95, 95, 95);
-$grey-8: rgb(85, 85, 91);
-$grey-9: rgb(52, 52, 59);
+$grey-3: rgb(225, 226, 233);
+$grey-4: rgb(215, 215, 224);
+$grey-5: rgb(175, 181, 186);
+$grey-6: rgb(95, 95, 95);
+$grey-9: rgb(85, 85, 91);
+$grey-10: rgb(52, 52, 59);
 
 @mixin flex-center {
     display: flex;
@@ -24,11 +24,20 @@ $grey-9: rgb(52, 52, 59);
     border-radius: 5px;
     cursor: pointer;
     transition: all ease-in-out 0.2s;
+    outline: none;
   }
 
 body{
     background-color: $grey-1;
 }
+.white {
+  filter: brightness(0) invert(1) grayscale(1);
+}
+.black {
+  filter: brightness(0) invert(0) grayscale(1);
+}
+
+// UI switch
 .ui_switch_cont{
     background-color: white;
     border-radius: 4px;
@@ -60,6 +69,8 @@ body{
     }
 }
 
+
+//color picker
 #popup_color {
     opacity: 0;
     z-index: 100;
@@ -83,21 +94,148 @@ body{
     background-color: $grey-1;
     box-shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;
   }
-  
   .color_nuance {
-    height: 36px;
-    width: 36px;
+    height: 40px;
+    width: 40px;
     @include button-base;
     &:hover {
       opacity: 0.8;
     }
   }
 
-  #add_workspace_choose_color{
-    height: 40px;
-    width: 40px;
-    border: 3px solid $grey-4;
-    border-radius: 5px;
+  #color_picker_button{
+    height: 42px;
+    width: 42px;
+    border: 4px solid $grey-4;
+    border-radius: 4px;
     cursor: pointer;
+    box-sizing: border-box;
   }
   
+
+  //project card
+  .ProjectCard{
+    height: 64px;
+    width: 100%;
+    background-color: white;
+    border-radius: 8px;
+    transition: all 0.1s ease-in-out;
+    .ProjectCard_top{
+      padding: 8px;
+      display: flex;
+      gap: 8px;
+      .ProjectCard_top_more_infos, .ProjectCard_top_play{
+        height: 48px;
+        width: 48px;
+        border-radius: 4px;
+        @include button-base;
+        @include flex-center;
+        img{
+          height: 22px;
+          transition: all 0.1s ease-in-out;
+        }
+      }
+
+      .ProjectCard_top_infos{
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        justify-content: space-between;
+        .ProjectCard_top_infos_title{
+          font-size: 14px;
+          font-weight: 700;
+          color: $grey-10;
+        }
+        .ProjectCard_top_infos_timer{
+          background-color: $grey-1;
+          height: 24px;
+          font-size: 14px;
+          line-height: 24px;
+          padding: 0 8px;
+          border-radius: 4px;
+          letter-spacing: 2px;
+          color: $grey-5;
+        }
+      }      
+    }
+    .ProjectCard_moreInfos{
+      opacity: 0;
+      transition: all 0.1s ease-in-out;
+      height: 100px;
+      background-color: white;
+      width: 100%;
+      .ProjectCard_moreInfos_menu{
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        margin: 0 0 8px 8px;
+        button{
+          height: 48px;
+          width: 48px;
+          @include flex-center;
+          @include button-base;
+          img{
+            height: 22px;
+            path{
+              fill: white;
+            }
+          }
+        }
+        button.selected{
+          width: 56px;
+          padding: 0 8px 0 0;
+          border-radius: 5px 0px 0px 5px;
+        }
+      }
+    }
+  }
+
+.animationCard{
+  height: 64px;
+  width: 200px;
+  background: rgb(2,0,36);
+background: linear-gradient(193deg, rgba(2,0,36,1) 0%, rgba(7,30,148,1) 49%, rgba(0,112,255,1) 100%);
+  border-radius: 8px;
+  .stars{
+    .star_cont{
+      height: 0px;
+      width: 0px;
+    }
+    .star{
+      background-color: white;
+      border-radius: 50%;
+      animation: brillance 1s infinite;
+      position: relative;
+      box-shadow: 0px 0px 5px 0px rgba(255, 255, 255, 1), 0px 0px 1px 0px rgba(255, 255, 255, 1);
+    }
+    @keyframes brillance {
+      0% { opacity: 1; }
+      50% { opacity: 0.5; }
+      0% { opacity: 1; }
+    }
+  }
+}
+.navette{
+  height: 0px;
+  width: 0px;
+  position: relative;
+  z-index: 10;
+  left: 20px;
+  top: 10px;
+  img{
+    height: 40px;
+    animation: wiggle 6s infinite;
+    animation-timing-function: ease-in-out;
+    transform-origin: 10px;
+  }
+  @keyframes wiggle {
+    0% { 
+      transform: rotate(-3deg) translateY(-3px);
+    }
+    50% { transform: rotate(3deg) translateY(3px); }
+    100% { 
+      transform: rotate(-3deg) translateY(-3px);
+    }
+  }
+}

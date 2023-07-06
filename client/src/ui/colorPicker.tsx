@@ -37,7 +37,7 @@ export const ColorPickerPopup = ({
 
     const ColorButton = () => {
         return (
-            <button style={{ backgroundColor: color }} id='add_workspace_choose_color' onClick={() => { DisplayPopupAnimation(true) }}></button>
+            <div style={{ backgroundColor: color }} id='color_picker_button' onClick={() => { DisplayPopupAnimation(true) }}></div>
         )
     }
 
