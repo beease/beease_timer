@@ -1,7 +1,7 @@
 import { useRef } from 'react';
 import {wait} from '../utils/function'
 import {colors} from '../libs/colors'
-interface Props {
+interface Props extends React.HTMLAttributes<HTMLDivElement>{
     setColor: (color: string) => void;
     colorPopup: boolean;
     setColorPopup: (etat: boolean) => void;
@@ -12,7 +12,8 @@ export const ColorPickerPopup = ({
     setColor,
     colorPopup,
     setColorPopup,
-    color
+    color,
+    ...props
 }: Props) => {
     const colorPopupRef = useRef<HTMLDivElement | null>(null);
 
@@ -37,7 +38,7 @@ export const ColorPickerPopup = ({
 
     const ColorButton = () => {
         return (
-            <div style={{ backgroundColor: color }} id='color_picker_button' onClick={() => { DisplayPopupAnimation(true) }}></div>
+            <div {...props} style={{ backgroundColor: color, ...props.style }} id='color_picker_button' onClick={() => { DisplayPopupAnimation(true) }}></div>
         )
     }
 

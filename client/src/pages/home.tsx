@@ -17,7 +17,9 @@ export function Home() {
         <div id="workspaces_cont">
         {
           isAddingNewWorkspace &&
-          <AddWorkspace />
+          <AddWorkspace 
+            setIsAddingNewWorkspace={setIsAddingNewWorkspace}
+          />
           // :
           // <Workspace />
         }

@@ -40,7 +40,7 @@ const NUM_STARS = 50;
 const NUM_SPEEDS = 3;
 const MAX_STAR_SIZE = 1;
 const MIN_STAR_SIZE = 0.5;
-const CANVA_SIZE = { width: 400, height: 128 };
+const CANVA_SIZE = { width: 300, height: 96 };
 const PIXELS_TO_MOVE = 2;
 const PARALLAX_AMOUNT = 3;
 const NAVETTE_BASE_POSITION = { x: 100, y: 50, direction: 0 };
@@ -84,14 +84,12 @@ export const AnimationCard = ({isStarted}: Props) => {
     drawPoints(points);
     navetteImage.current.src = navette;
     const handleStart = async () => {
-      await wait(100);
+      await wait(0);
       startAnimation();
-      console.log
     }
     const startAnimation = () => {
       if (!isAnimating) {
         lastRenderTime = Date.now();
-        console.log('startAnimation')
         tick();
         setIsAnimating(true);
       }
@@ -387,17 +385,15 @@ export const AnimationCard = ({isStarted}: Props) => {
   };
 
   return (
-    <div>
       <canvas
         className={"animationCard"}
         ref={canvasRef}
         width={CANVA_SIZE.width}
         height={CANVA_SIZE.height}
         style={{ 
-          width: "200px", 
-          height: "64px",
+          width: `${CANVA_SIZE.width / 2}px` , 
+          height: `${CANVA_SIZE.height / 2}px`
          }}
       />
-    </div>
   );
 };

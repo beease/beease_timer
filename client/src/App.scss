@@ -3,7 +3,7 @@ $second-bg-color: #6783ff;
 $tree-bg-color: #99acff;
 $quad-bg-color: #d9e0ff;
 $red-bg-color: rgb(255, 85, 85);
-$green-bg-color: #6be65b;
+$green-bg-color: #50C878;
 $grey-1: rgb(247, 248, 252);
 $grey-2: rgb(233, 234, 240);
 $grey-3: rgb(225, 226, 233);
@@ -23,7 +23,7 @@ $transition-1: all ease-in-out 0.2s;
 
 @mixin button-base {
   border: none;
-  border-radius: 5px;
+  border-radius: 4px;
   cursor: pointer;
   transition: all ease-in-out 0.2s;
   outline: none;
@@ -52,9 +52,10 @@ $transition-1: all ease-in-out 0.2s;
 
 body {
   background-color: $grey-1;
+  display: block !important;
   width: 500px;
   height: auto;
-  min-height: 0 !important;
+  min-height: 300px !important;
 }
 
 .white {
@@ -98,6 +99,37 @@ body {
   display: flex;
   gap: 8px;
   @include action_card;
+  .addWorkspace_name_input{
+    height: 48px;
+    flex: 1;
+    border: none;
+    border-radius: 4px;
+    padding: 8px;
+    outline: none;
+    font-size: 16px;
+    box-sizing: border-box;
+    font-weight: 500;
+  }
+  .addWorkspace_action{
+    @include flex-center;
+    @include button-base;
+    height: 48px;
+    width: 48px;
+    img{
+      height: 20px;
+      width: 20px;
+    }
+    &.cancel{
+      background-color: $grey-3;
+      img{
+        opacity: 0.6;
+      }
+    }
+    &.confirm{
+      background-color: $green-bg-color;
+    }
+  }
+
 }
 
 
@@ -195,7 +227,7 @@ body {
   img{
     height: 20px;
     width: 20px;
-    opacity: 0.7;
+    opacity: 0.6;
   }
   &:hover{
     opacity: 0.8;

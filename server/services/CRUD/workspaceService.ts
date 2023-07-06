@@ -11,7 +11,7 @@ export const createWorkspace = async (name:string, color:string, userId:string) 
             data: ({
                 name: name,
                 color: color,
-                userIds:[userId],
+                userId:userId,
             })
         })
     )
