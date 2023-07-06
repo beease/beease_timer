@@ -4,14 +4,14 @@ import { asyncFunctionErrorCatcher } from "../utils/errorHandler";
 import { signJwt } from "../auth/jwt";
 const prisma = new PrismaClient();
 
-export const createWorkspace = async (name:string, color:string) => {
+export const createWorkspace = async (name:string, color:string, userId:string) => {
 
     return asyncFunctionErrorCatcher(
         () => prisma.workspace.create({
             data: ({
-                createdAt: new Date(),
                 name: name,
                 color: color,
+                userIds:[userId],
             })
         })
     )
