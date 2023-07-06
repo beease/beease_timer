@@ -39,3 +39,13 @@ export const Switch = ({options, width, height, color, currentOption, setCurrent
         </div>
     );
 };
+
+// const [currentOption, setCurrentOption] = useState<number>(0);
+// <Switch
+// width={200}
+// height={48}
+// options={["En cours", "Archives"]}
+// color={"#4969fb"}
+// currentOption={currentOption}
+// setCurrentOption={setCurrentOption}
+// />

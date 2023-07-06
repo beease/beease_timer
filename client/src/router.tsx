@@ -8,7 +8,7 @@ export function AppRouter() {
 
   return (
     <>
-   {isLogged ? <Home/> : <Sign/>}
+      {isLogged ? <Home/> : <Sign/>}
     </>
   );
 }

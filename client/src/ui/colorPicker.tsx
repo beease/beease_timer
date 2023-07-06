@@ -62,3 +62,14 @@ export const ColorPickerPopup = ({
         </>
     )
 }
+
+
+{/* 
+  const [colorWorkSpace, setColorWorkSpace] = useState("");
+  const [colorWorkSpacePopup, setColorWorkSpacePopup] = useState(false);
+<ColorPickerPopup
+            setColor={setColorWorkSpace}
+            colorPopup={colorWorkSpacePopup}
+            setColorPopup={setColorWorkSpacePopup}
+            color={colorWorkSpace || "#4969fb"}
+          /> */}
