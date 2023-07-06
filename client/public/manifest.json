@@ -10,12 +10,16 @@
       "32": "./time_machine_off.png"
     },
     "default_popup": "index.html",
-    "default_title": "Open"
+    "default_title": "Beease Timer"
   },
+  "host_permissions": [
+    "http://localhost:3000/"
+  ],
   "permissions": [
     "scripting",
     "identity",
-    "storage"
+    "storage",
+    "cookies"
   ],
   "content_security_policy":{
     "extension_page": "script-src 'self' 'unsafe-eval' https://apis.google.com; object-src 'self'; script-src-elem 'self' 'unsafe-eval' https://apis.google.com"

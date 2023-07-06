@@ -1,20 +1,11 @@
 /* global chrome */
 export const clearAuth = () => {
     chrome.storage.local.get(['googleToken']).then((result) => {
-        chrome.identity.removeCachedAuthToken({token: result.googleToken}, function(){
-          //call call back
-        });
+        chrome.identity.removeCachedAuthToken({token: result.googleToken});
         const revokeUrl = 'https://accounts.google.com/o/oauth2/revoke?token=' + result.googleToken;
         fetch(revokeUrl, {
           method: 'POST'
         })
-        .then(response => {
-          console.log('User disconnected');
-          // effectuer des actions supplémentaires si nécessaire
-        })
-        .catch(error => {
-          console.error(error);
-        });
     })
 }
 

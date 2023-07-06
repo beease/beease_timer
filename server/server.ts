@@ -1,40 +1,64 @@
-import { inferAsyncReturnType, initTRPC } from '@trpc/server';
-import {
-  CreateHTTPContextOptions,
-  createHTTPServer,
-} from '@trpc/server/adapters/standalone';
-import { z } from 'zod';
-const PORT = Number(process.env.PORT) || 3001
-// Initialize a context for the server
-function createContext(opts: CreateHTTPContextOptions) {
-  return {};
-}
+import express, { Request, Response, NextFunction } from "express";
+import * as trpcExpress from "@trpc/server/adapters/express";
+import appRouter from "./routers/router";
+import http from "http";
+import { createContext } from './trpc';
 
-// Get the context type
-type Context = inferAsyncReturnType<typeof createContext>;
+const app = express();
+const PORT = process.env.PORT || 3001;
 
-// Initialize tRPC
-const t = initTRPC.context<Context>().create();
+app.options("*", (_req, res) => {
+  res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS, PUT, PATCH, DELETE");
+  res.setHeader("Access-Control-Allow-Headers", "X-Requested-With, Content-Type, Authorization");
+  res.setHeader("Access-Control-Allow-Credentials", "true");
+  res.setHeader("Access-Control-Allow-Origin", String(process.env.ORIGIN_URL));
 
-// Create main router
-const appRouter = t.router({
-  // Greeting procedure
-  greeting: t.procedure
-    .input(
-      z.object({
-        name: z.string(),
-      }),
-    )
-    .query(({ input }) => `Hello, ${input.name}!`),
+  res.sendStatus(200);
 });
 
-// Export the app router type to be imported on the client side
-export type AppRouter = typeof appRouter;
-
-// Create HTTP server
-const { listen } = createHTTPServer({
-  router: appRouter,
-  createContext,
+app.use(function (req: Request, res: Response, next: NextFunction) {
+  //utf8 setter
+  res.setHeader("Content-Type", "application/json; charset=utf-8");
+  // Website you wish to allow to connect
+  res.setHeader("Access-Control-Allow-Origin", String(process.env.ORIGIN_URL));
+  // Request methods you wish to allow
+  res.setHeader(
+    "Access-Control-Allow-Methods",
+    "GET, POST, OPTIONS, PUT, PATCH, DELETE"
+  );
+  // Request headers you wish to allow
+  res.setHeader("Access-Control-Allow-Headers", "X-Requested-With, Content-Type, Authorization");
+  // Set to true if you need the website to include cookies in the requests sent
+  // to the API (e.g. in case you use sessions)
+  res.setHeader("Access-Control-Allow-Credentials", "true");
+  // Pass to next layer of middleware
+  next();
 });
 
-listen(PORT);
+
+app.use(express.urlencoded({ extended: true }));
+app.use(express.json());
+app.use((req:Request, res:Response, next: NextFunction) => {
+  // request logger
+  console.log("⬅️ ", req.method, req.path, req.body || req.query);
+  
+  next();
+});
+
+app.use(
+  "/api",
+  trpcExpress.createExpressMiddleware({
+    router: appRouter,
+    createContext,
+  })
+);
+
+app.get("/", (_req, res) => res.send("hello"));
+
+const server = http.createServer(app);
+
+server.listen(PORT, () => {
+  console.log(`listening on port ${PORT}`);
+});
+
+
