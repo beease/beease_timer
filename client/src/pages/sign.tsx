@@ -1,14 +1,12 @@
-/* global chrome */
-import '../App.scss';
-import { getGoogleToken,setAuthCookie } from '../utils/Auth/Auth';
-//import { useState, useContext } from 'react';
-//import { AuthContext } from '../App';
+import { getGoogleToken } from '../utils/Auth/Auth';
+import { useContext } from 'react';
+import { AuthContext } from '../App';
 import Logo from '../assets/google.png'; 
 import { trpc } from '../trpc';
 
 export function Sign() {
   
-  //const {login} = useContext(AuthContext);
+  const {login} = useContext(AuthContext);
   const mutation = trpc.user.loginByGoogleToken.useMutation();
   const handleLogin = async () => {
     getGoogleToken().then((googleAuthResult) => {
@@ -16,12 +14,9 @@ export function Sign() {
       if (token) {
         mutation.mutate({ google_token: token }, {
           onSuccess: (data) => {
-            setAuthCookie(data.token)
-            //setAuthCookieToken(data.token)
-            //login(data.token)
+            login(data.token)
           },
           onError: (error) => {
-            // Handle the error here
             console.log(error);
           }
         }); 
