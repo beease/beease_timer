@@ -120,7 +120,15 @@ import { getAuthCookie } from './utils/Auth/Auth';
 
 export function App() {
 
-  const [queryClient] = useState(() => new QueryClient());
+  const [queryClient] = useState(() => new QueryClient({
+    defaultOptions: {
+      queries: {
+        staleTime: 5 * 1000,
+        cacheTime: 5 * 1000,
+        refetchOnWindowFocus: true,
+      },
+    },
+  }));
   const [authCookieToken, setAuthCookieToken] = useState<string>("");
   const [trpcClient, setTrpcClient] = useState<any | null>(null);
   const [isLogged,setIsLogged] = useState<boolean>(false)

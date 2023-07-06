@@ -14,227 +14,291 @@ $grey-9: rgb(85, 85, 91);
 $grey-10: rgb(52, 52, 59);
 
 @mixin flex-center {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-  }
-
-  @mixin button-base {
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    transition: all ease-in-out 0.2s;
-    outline: none;
-  }
-
-body{
-    background-color: $grey-1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
+
+@mixin button-base {
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: all ease-in-out 0.2s;
+  outline: none;
+  &:hover {
+    opacity: 0.8;
+  }
+}
+
+@mixin border-r1 {
+  border-radius: 4px;
+}
+@mixin border-r2 {
+  border-radius: 8px;
+}
+
+body {
+  background-color: $grey-1;
+  width: 500px;
+}
+
 .white {
   filter: brightness(0) invert(1) grayscale(1);
 }
+
 .black {
   filter: brightness(0) invert(0) grayscale(1);
 }
 
+
+//Home
+#home {
+  display: flex;
+}
+
+//Navigation
+#navigation {
+  width: 80px;
+
+  background-color: $grey-2;
+}
+
+
 // UI switch
-.ui_switch_cont{
-    background-color: white;
+.ui_switch_cont {
+  background-color: white;
+  border-radius: 4px;
+  padding: 8px;
+  box-sizing: border-box;
+
+  .ui_switch_text_cont {
+    position: relative;
+    z-index: 2;
+    display: flex;
+
+    .ui_switch_text {
+      width: 50%;
+      height: 100%;
+      text-align: center;
+      transition: all 0.2s ease-in-out;
+      cursor: pointer;
+    }
+
+    .selected {
+      color: white;
+      cursor: default;
+    }
+  }
+
+  .ui_switch_colored_button {
+    height: 100%;
+    width: 50%;
+    margin: 8px 0;
+    position: relative;
     border-radius: 4px;
-    padding: 8px;
-    box-sizing: border-box;
-    .ui_switch_text_cont{
-        position: relative;
-        z-index: 2;
-        display: flex;
-        .ui_switch_text{
-            width: 50%;
-            height: 100%;
-            text-align: center;
-            transition: all 0.2s ease-in-out;
-            cursor: pointer;
-        }
-        .selected{
-            color: white;
-            cursor: default;
-        }
-    }
-    .ui_switch_colored_button{
-        height: 100%;
-        width: 50%;
-        margin: 8px 0;
-        position: relative;
-        border-radius: 4px;
-        transition: all 0.2s ease-in-out;
-    }
+    transition: all 0.2s ease-in-out;
+  }
 }
 
 
 //color picker
 #popup_color {
-    opacity: 0;
-    z-index: 100;
-    top: 0px;
-    left: 0px;
-    background-color: #ffffff66;
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    @include flex-center;
-    transition: all ease-in-out 0.2s;
+  opacity: 0;
+  z-index: 100;
+  top: 0px;
+  left: 0px;
+  background-color: #ffffff66;
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  @include flex-center;
+  transition: all ease-in-out 0.2s;
+}
+
+.color_picker {
+  display: flex;
+  flex-wrap: wrap;
+  width: 190px;
+  height: 190px;
+  gap: 10px;
+  padding: 10px;
+  border-radius: 10px;
+  background-color: $grey-1;
+  box-shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;
+}
+
+.color_nuance {
+  height: 40px;
+  width: 40px;
+  @include button-base;
+
+  &:hover {
+    opacity: 0.8;
   }
-  .color_picker {
+}
+
+#color_picker_button {
+  height: 42px;
+  width: 42px;
+  border: 4px solid $grey-4;
+  border-radius: 4px;
+  cursor: pointer;
+  box-sizing: border-box;
+}
+
+
+//project card
+.ProjectCard {
+  height: 64px;
+  width: 100%;
+  background-color: white;
+  border-radius: 8px;
+  transition: all 0.1s ease-in-out;
+
+  .ProjectCard_top {
+    padding: 8px;
     display: flex;
-    flex-wrap: wrap;
-    width: 190px;
-    height: 190px;
-    gap: 10px;
-    padding: 10px;
-    border-radius: 10px;
-    background-color: $grey-1;
-    box-shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;
-  }
-  .color_nuance {
-    height: 40px;
-    width: 40px;
-    @include button-base;
-    &:hover {
-      opacity: 0.8;
+    gap: 8px;
+
+    .ProjectCard_top_more_infos,
+    .ProjectCard_top_play {
+      height: 48px;
+      width: 48px;
+      border-radius: 4px;
+      @include button-base;
+      @include flex-center;
+
+      img {
+        height: 22px;
+        transition: all 0.1s ease-in-out;
+      }
+    }
+
+    .ProjectCard_top_infos {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      justify-content: space-between;
+
+      .ProjectCard_top_infos_title {
+        font-size: 14px;
+        font-weight: 700;
+        color: $grey-10;
+      }
+
+      .ProjectCard_top_infos_timer {
+        background-color: $grey-1;
+        height: 24px;
+        font-size: 14px;
+        line-height: 24px;
+        padding: 0 8px;
+        border-radius: 4px;
+        letter-spacing: 2px;
+        color: $grey-5;
+      }
     }
   }
 
-  #color_picker_button{
-    height: 42px;
-    width: 42px;
-    border: 4px solid $grey-4;
-    border-radius: 4px;
-    cursor: pointer;
-    box-sizing: border-box;
-  }
-  
-
-  //project card
-  .ProjectCard{
-    height: 64px;
-    width: 100%;
-    background-color: white;
-    border-radius: 8px;
+  .ProjectCard_moreInfos {
+    opacity: 0;
     transition: all 0.1s ease-in-out;
-    .ProjectCard_top{
-      padding: 8px;
+    height: 100px;
+    background-color: white;
+    width: 100%;
+
+    .ProjectCard_moreInfos_menu {
       display: flex;
+      flex-direction: column;
       gap: 8px;
-      .ProjectCard_top_more_infos, .ProjectCard_top_play{
+      margin: 0 0 8px 8px;
+
+      button {
         height: 48px;
         width: 48px;
-        border-radius: 4px;
-        @include button-base;
         @include flex-center;
-        img{
+        @include button-base;
+
+        img {
           height: 22px;
-          transition: all 0.1s ease-in-out;
+
+          path {
+            fill: white;
+          }
         }
       }
 
-      .ProjectCard_top_infos{
-        flex: 1;
-        display: flex;
-        flex-direction: column;
-        align-items: flex-start;
-        justify-content: space-between;
-        .ProjectCard_top_infos_title{
-          font-size: 14px;
-          font-weight: 700;
-          color: $grey-10;
-        }
-        .ProjectCard_top_infos_timer{
-          background-color: $grey-1;
-          height: 24px;
-          font-size: 14px;
-          line-height: 24px;
-          padding: 0 8px;
-          border-radius: 4px;
-          letter-spacing: 2px;
-          color: $grey-5;
-        }
-      }      
-    }
-    .ProjectCard_moreInfos{
-      opacity: 0;
-      transition: all 0.1s ease-in-out;
-      height: 100px;
-      background-color: white;
-      width: 100%;
-      .ProjectCard_moreInfos_menu{
-        display: flex;
-        flex-direction: column;
-        gap: 8px;
-        margin: 0 0 8px 8px;
-        button{
-          height: 48px;
-          width: 48px;
-          @include flex-center;
-          @include button-base;
-          img{
-            height: 22px;
-            path{
-              fill: white;
-            }
-          }
-        }
-        button.selected{
-          width: 56px;
-          padding: 0 8px 0 0;
-          border-radius: 5px 0px 0px 5px;
-        }
+      button.selected {
+        width: 56px;
+        padding: 0 8px 0 0;
+        border-radius: 5px 0px 0px 5px;
       }
     }
   }
+}
 
-.animationCard{
+.animationCard {
   height: 64px;
   width: 200px;
-  background: rgb(2,0,36);
-background: linear-gradient(193deg, rgba(2,0,36,1) 0%, rgba(7,30,148,1) 49%, rgba(0,112,255,1) 100%);
+  background: rgb(2, 0, 36);
+  background: linear-gradient(193deg, rgba(2, 0, 36, 1) 0%, rgba(7, 30, 148, 1) 49%, rgba(0, 112, 255, 1) 100%);
   border-radius: 8px;
-  .stars{
-    .star_cont{
+
+  .stars {
+    .star_cont {
       height: 0px;
       width: 0px;
     }
-    .star{
+
+    .star {
       background-color: white;
       border-radius: 50%;
       animation: brillance 1s infinite;
       position: relative;
       box-shadow: 0px 0px 5px 0px rgba(255, 255, 255, 1), 0px 0px 1px 0px rgba(255, 255, 255, 1);
     }
+
     @keyframes brillance {
-      0% { opacity: 1; }
-      50% { opacity: 0.5; }
-      0% { opacity: 1; }
+      0% {
+        opacity: 1;
+      }
+
+      50% {
+        opacity: 0.5;
+      }
+
+      0% {
+        opacity: 1;
+      }
     }
   }
 }
-.navette{
+
+.navette {
   height: 0px;
   width: 0px;
   position: relative;
   z-index: 10;
   left: 20px;
   top: 10px;
-  img{
+
+  img {
     height: 40px;
     animation: wiggle 6s infinite;
     animation-timing-function: ease-in-out;
     transform-origin: 10px;
   }
+
   @keyframes wiggle {
-    0% { 
+    0% {
       transform: rotate(-3deg) translateY(-3px);
     }
-    50% { transform: rotate(3deg) translateY(3px); }
-    100% { 
+
+    50% {
+      transform: rotate(3deg) translateY(3px);
+    }
+
+    100% {
       transform: rotate(-3deg) translateY(-3px);
     }
   }
