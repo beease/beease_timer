@@ -2,6 +2,8 @@ import "../App.scss";
 import { useState } from "react";
 import { Navigation } from "../components/navigation/navigation";
 import { AddWorkspace } from "../components/workspace/addWorkspace";
+import { Workspace } from "../components/workspace/workspace";
+
 
 export function Home() {
     const [selectedWorkspace, setSelectedWorkspace] = useState<string>("")
@@ -16,12 +18,14 @@ export function Home() {
         />
         <div id="workspaces_cont">
         {
-          isAddingNewWorkspace &&
+          isAddingNewWorkspace ?
           <AddWorkspace 
             setIsAddingNewWorkspace={setIsAddingNewWorkspace}
           />
-          // :
-          // <Workspace />
+          : selectedWorkspace &&
+          <Workspace 
+            selectedWorkspace={selectedWorkspace}
+          />
         }
         </div>
         

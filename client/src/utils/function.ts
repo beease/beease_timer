@@ -9,3 +9,18 @@ export const colorByLetter = (letter: string) => {
     const index = letter.toLowerCase().charCodeAt(0) % colors.length;
     return colors[index];
   }
+
+export const formatTimestamp = (timestamp: number) => {
+  const totalSeconds = Math.floor(timestamp / 1000);
+  const totalMinutes = Math.floor(totalSeconds / 60);
+  const hours = Math.floor(totalMinutes / 60);
+  
+  const seconds = totalSeconds % 60;
+  const minutes = totalMinutes % 60;
+  
+  const formattedHours = hours.toString().padStart(2, '0');
+  const formattedMinutes = minutes.toString().padStart(2, '0');
+  const formattedSeconds = seconds.toString().padStart(2, '0');
+
+  return `${formattedHours}:${formattedMinutes}:${formattedSeconds}`;
+}

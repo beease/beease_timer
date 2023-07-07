@@ -1,8 +1,8 @@
 import { useState } from "react";
-import { ColorPickerPopup } from "../../ui/colorPicker";
+import { ColorPickerPopup } from "../ui/colorPicker";
 import check from "../../assets/check_w.svg";
 import cross from "../../assets/cross.svg";
-import { AnimationCard } from "../animationCard";
+import { BasicButton } from "../ui/basicButton";
 
 interface Props {
   setIsAddingNewWorkspace: (isAddingNewWorkspace: boolean) => void;
@@ -26,22 +26,20 @@ export const AddWorkspace = ({ setIsAddingNewWorkspace }: Props) => {
           height: "48px",
         }}
       />
-      <div
+      <BasicButton 
         onClick={() => {
           setIsAddingNewWorkspace(false);
         }}
-        className="addWorkspace_action cancel"
-      >
-        <img src={cross} />
-      </div>
-      <div
-        className="addWorkspace_action confirm"
-        onClick={() => {
+        variant='grey'
+        icon={cross}
+      />
+      <BasicButton 
+         // onClick={() => {
           
-        }}
-      >
-        <img src={check} />
-      </div>
+        // }}
+        variant='confirm'
+        icon={check}
+      />
     </div>
   );
 };

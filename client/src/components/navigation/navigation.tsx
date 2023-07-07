@@ -18,9 +18,11 @@ export const Navigation = ({selectedWorkspace, setSelectedWorkspace, setIsAdding
       <WorkspacesList
         selectedWorkspace={selectedWorkspace}
         setSelectedWorkspace={setSelectedWorkspace}
+        setIsAddingNewWorkspace={setIsAddingNewWorkspace}
       />
       <AddWorkspaceButton 
         setIsAddingNewWorkspace={setIsAddingNewWorkspace}
+        setSelectedWorkspace={setSelectedWorkspace}
       />
     </div>
   )

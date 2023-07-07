@@ -4,7 +4,7 @@ import { wait } from "../utils/function";
 
 // Type Definitions
 type Props = {
-  isStarted: boolean;
+  isStarted: null | string;
 }
 type Point = {
   x: number;
@@ -37,15 +37,15 @@ type Speed = {
 
 // Constants
 const NUM_STARS = 50;
-const NUM_SPEEDS = 3;
+const NUM_SPEEDS = 5;
 const MAX_STAR_SIZE = 1;
 const MIN_STAR_SIZE = 0.5;
-const CANVA_SIZE = { width: 300, height: 96 };
-const PIXELS_TO_MOVE = 2;
+const CANVA_SIZE = { width: 465, height: 96 };
+const PIXELS_TO_MOVE = 5;
 const PARALLAX_AMOUNT = 3;
-const NAVETTE_BASE_POSITION = { x: 100, y: 50, direction: 0 };
+const NAVETTE_BASE_POSITION = { x: 170, y: 50, direction: 0 };
 
-export const AnimationCard = ({isStarted}: Props) => {
+export const AnimationCard = React.memo(function AnimationCard({isStarted}: Props) {
   // State
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const animationFrameId = useRef(0);
@@ -396,4 +396,4 @@ export const AnimationCard = ({isStarted}: Props) => {
          }}
       />
   );
-};
+})

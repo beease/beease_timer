@@ -5,26 +5,39 @@ import beeaseLogo from '../../assets/logo_beease.svg';
 interface Props {
   selectedWorkspace: string;
   setSelectedWorkspace: (workspace: string) => void;
+  setIsAddingNewWorkspace: (workspace: boolean) => void;
 }
 
-export const WorkspacesList = ({selectedWorkspace, setSelectedWorkspace}: Props) => {
-  const { data: workspaces, error, isLoading } = trpc.workspace.getMyWorkspaces.useQuery();
+export const WorkspacesList = ({selectedWorkspace, setSelectedWorkspace, setIsAddingNewWorkspace}: Props) => {
+  // const { data, error, isLoading } = trpc.workspace.getMyWorkspaces.useQuery();
   
-  if (error) {
-    console.log(error)
-    return <div>error</div>;
-  }
+  const workspaces = [{
+    id: 'aZERAZERQSDF342',
+    name: 'beease test',
+    color: '#FF9E4C'
+  }]
+  
 
-  if (isLoading) {
-    return <div className="logout_picture skeleton"></div>;
-  }
+  // if (error) {
+  //   console.log(error)
+  //   return <div>error</div>;
+  // }
+
+  // if (isLoading) {
+  //   return <div className="logout_picture skeleton"></div>;
+  // }
 
   if (workspaces) {
+      const handleSelectWorkspace = (id: string) => {
+        setSelectedWorkspace(id)
+        setIsAddingNewWorkspace(false)
+      }
+
       const WorkspaceMiniature = ({workspace}: {workspace: typeof workspaces[number] })  => {
         return(
         <div 
           className={`workspaceMiniature ${workspace.id === selectedWorkspace && 'selected'}`}
-          onClick={() => setSelectedWorkspace(workspace.id)}
+          onClick={() => handleSelectWorkspace(workspace.id)}
           style={{
             backgroundColor: workspace.color,
           }}
