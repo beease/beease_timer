@@ -7,6 +7,14 @@ import edit from "../../assets/edit.svg";
 import { BasicButton } from "../ui/basicButton";
 import { Filters } from "../../libs/interfaces";
 import { memo } from "react";
+import {
+  FiltersState,
+  filtersStore,
+} from "../../stores/filterStore";
+import {
+  projectStore, 
+  ProjectStore,
+} from "../../stores/projectStore";
 
 interface Props {
   workspace: {
@@ -14,47 +22,36 @@ interface Props {
     color: string;
     id: string;
   };
-  isStarted: null | string;
-  setIsStarted: (isStarted: null | string) => void;
-  setWorkspaceFilter: (status: Filters) => void;
-  workspaceFilter: Filters;
 }
 
 interface ContentProps {
   workspaceName: string;
-  isStarted: null | string;
 }
 
 const Content = memo(function Content({
   workspaceName,
-  isStarted,
 }: ContentProps) {
-  console.log("content rerender");
+  const isPlaying = projectStore((state: ProjectStore) => state.PlayingProjectId);
+
   return (
     <div className="WorkspaceHeader_content">
       <TitleTimer title={workspaceName} timestamp={0} />
-      <AnimationCard isStarted={isStarted} />
+      <AnimationCard isStarted={isPlaying} />
     </div>
   );
 });
 
 export const WorkspaceHeader = ({
   workspace,
-  setWorkspaceFilter,
-  workspaceFilter,
-  isStarted,
-  setIsStarted,
 }: Props) => {
+
+
+  const setFilters = filtersStore((state: FiltersState) => state.setFilters);
+  const filters = filtersStore((state: FiltersState) => state.filters);
+
   const [isDotsButtonActive, setIsDotsButtonActive] = useState(false);
 
   const MoreInfos = () => {
-    const handleFilters = (filterName: keyof Filters) => {
-      setWorkspaceFilter({
-        ...workspaceFilter,
-        [filterName]: !workspaceFilter[filterName],
-      });
-    };
-
     return (
       <div className="WorkspaceHeader_moreInfos">
         <BasicButton
@@ -67,17 +64,17 @@ export const WorkspaceHeader = ({
         <div className="WorkspaceHeader_moreInfos_filter">
           <div
             className={`WorkspaceHeader_moreInfos_filter_item ${
-              workspaceFilter.archives && "selected"
+              filters.archives && "selected"
             }`}
-            onClick={() => handleFilters("archives")}
+            onClick={() => setFilters("archives")}
           >
             Archives
           </div>
           <div
             className={`WorkspaceHeader_moreInfos_filter_item ${
-              workspaceFilter.enCours && "selected"
+              filters.current && "selected"
             }`}
-            onClick={() => handleFilters("enCours")}
+            onClick={() => setFilters("current")}
           >
             En cours
           </div>
@@ -107,7 +104,7 @@ export const WorkspaceHeader = ({
         }}
       >
         <MoreInfos />
-        <Content workspaceName={workspace.name} isStarted={isStarted} />
+        <Content workspaceName={workspace.name} />
       </div>
     </div>
   );

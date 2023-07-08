@@ -3,15 +3,12 @@ import { ColorPickerPopup } from "../ui/colorPicker";
 import check from "../../assets/check_w.svg";
 import cross from "../../assets/cross.svg";
 import { BasicButton } from "../ui/basicButton";
+import { workspaceStore, WorkspaceState } from "../../stores/workspaceStore";
 
-interface Props {
-  setIsAddingNewWorkspace: (isAddingNewWorkspace: boolean) => void;
-}
-
-export const AddWorkspace = ({ setIsAddingNewWorkspace }: Props) => {
+export const AddWorkspace = () => {
   const [colorWorkSpace, setColorWorkSpace] = useState("");
   const [colorWorkSpacePopup, setColorWorkSpacePopup] = useState(false);
-
+  const setAddingWorkspace = workspaceStore((state: WorkspaceState) => state.setAddingWorkspace);
   return (
     <div className="addWorkspace">
       <input className="addWorkspace_name_input" type="text" placeholder="Workspace name" />
@@ -28,7 +25,7 @@ export const AddWorkspace = ({ setIsAddingNewWorkspace }: Props) => {
       />
       <BasicButton 
         onClick={() => {
-          setIsAddingNewWorkspace(false);
+          setAddingWorkspace(false);
         }}
         variant='grey'
         icon={cross}

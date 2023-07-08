@@ -1,4 +1,4 @@
 export interface Filters {
     archives: boolean,
-    enCours: boolean,
+    current: boolean,
 }

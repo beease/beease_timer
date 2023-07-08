@@ -3,19 +3,16 @@ import { useRef, useEffect, useState } from "react";
 import play from "../../assets/play_w.svg";
 import history from "../../assets/history.svg";
 import setting from "../../assets/setting.svg";
-import stop from "../../assets/stop_w.svg"
+import stop from "../../assets/stop_w.svg";
 import { wait } from "../../utils/function";
 import { DotsButton } from "../ui/dotsButton";
 import { TitleTimer } from "../ui/titleTimer";
 import { ProjectSettings } from "./projectSettings";
 import { BasicButton } from "../ui/basicButton";
+import { projectStore, ProjectStore } from "../../stores/projectStore";
 
 interface Props {
-  setProjectMoreInfos: (status: string | null) => void;
-  projectMoreInfos: null | string;
   project: any;
-  isStarted: null | string;
-  setIsStarted: (isStarted: null | string) => void;
 }
 
 interface ButtonProps {
@@ -23,13 +20,20 @@ interface ButtonProps {
   icon: string;
 }
 
-export const ProjectCard = ({
-  projectMoreInfos,
-  setProjectMoreInfos,
-  project,
-  isStarted,
-  setIsStarted,
-}: Props) => {
+export const ProjectCard = ({ project }: Props) => {
+  const toggleIsPlaying = projectStore(
+    (state: ProjectStore) => state.toggleIsPlaying
+  );
+  const PlayingProjectId = projectStore(
+    (state: ProjectStore) => state?.PlayingProjectId
+  );
+  const MoreInfoProjectId = projectStore(
+    (state: ProjectStore) => state?.MoreInfoProjectId
+  );
+  const toggleMoreInfo = projectStore(
+    (state: ProjectStore) => state.toggleMoreInfo
+  );
+
   const [selectedButton, setSelectedButton] = useState<"history" | "setting">(
     "history"
   );
@@ -41,7 +45,7 @@ export const ProjectCard = ({
   useEffect(() => {
     const transition = async () => {
       if (
-        projectMoreInfos === project.id &&
+        MoreInfoProjectId === project.id &&
         moreInfos.current &&
         projectCard.current
       ) {
@@ -58,21 +62,21 @@ export const ProjectCard = ({
       }
     };
     transition();
-  }, [projectMoreInfos, project.id]);
+  }, [MoreInfoProjectId, project.id]);
 
   useEffect(() => {
     if (isDotsButtonActive) {
-      setProjectMoreInfos(project.id);
-    } else if (projectMoreInfos === project.id) {
-      setProjectMoreInfos(null);
+      toggleMoreInfo(project.id);
+    } else if (MoreInfoProjectId === project.id) {
+      toggleMoreInfo(project.id);
     }
-  }, [isDotsButtonActive, project.id, setProjectMoreInfos]);
+  }, [isDotsButtonActive, project.id, toggleMoreInfo]);
 
   useEffect(() => {
-    if (projectMoreInfos !== project.id && isDotsButtonActive) {
+    if (MoreInfoProjectId !== project.id && isDotsButtonActive) {
       setIsDotsButtonActive(false);
     }
-  }, [projectMoreInfos]);
+  }, [MoreInfoProjectId]);
 
   const Button = ({ title, icon }: ButtonProps) => {
     const isSelected = selectedButton === title;
@@ -94,14 +98,6 @@ export const ProjectCard = ({
     return <div></div>;
   };
 
-  const handleStartStopProject = () => {
-    if(!(isStarted === project.id)){
-        setIsStarted(project.id)
-        return
-    }
-    setIsStarted(null)
-  }
-
   return (
     <div ref={projectCard} className="ProjectCard">
       <div className="ProjectCard_top">
@@ -115,12 +111,12 @@ export const ProjectCard = ({
 
         <TitleTimer title={project.name} timestamp={12341234} />
         <BasicButton
-          icon={isStarted === project.id ? stop : play}
+          icon={PlayingProjectId === project.id ? stop : play}
           style={{
             backgroundColor: project.color,
           }}
           onClick={() => {
-            handleStartStopProject()         
+            toggleIsPlaying(project.id);
           }}
         />
       </div>

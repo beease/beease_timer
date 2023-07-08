@@ -1,20 +1,13 @@
 import plus from '../../assets/plus.svg';
+import { workspaceStore, WorkspaceState } from '../../stores/workspaceStore';
 
-interface Props {
-    setIsAddingNewWorkspace: (isAddingNewWorkspace: boolean) => void;
-    setSelectedWorkspace: (workspace: string) => void;
-}
-
-export const AddWorkspaceButton = ({setIsAddingNewWorkspace, setSelectedWorkspace}: Props) => {
-  const handleAddWorkspace = () => {
-    setIsAddingNewWorkspace(true)
-    setSelectedWorkspace("")
-  }
+export const AddWorkspaceButton = () => {
+  const setAddingWorkspace = workspaceStore((state: WorkspaceState) => state.setAddingWorkspace);
   
   return (
     <div 
         id="addWorkspaceButton"
-        onClick={handleAddWorkspace}
+        onClick={() => setAddingWorkspace(true)}
     >
         <img src={plus} />
     </div>

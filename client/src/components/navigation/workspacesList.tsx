@@ -1,14 +1,10 @@
 
 import { trpc } from "../../trpc";
 import beeaseLogo from '../../assets/logo_beease.svg';
+import { workspaceStore, WorkspaceState } from "../../stores/workspaceStore";
 
-interface Props {
-  selectedWorkspace: string;
-  setSelectedWorkspace: (workspace: string) => void;
-  setIsAddingNewWorkspace: (workspace: boolean) => void;
-}
 
-export const WorkspacesList = ({selectedWorkspace, setSelectedWorkspace, setIsAddingNewWorkspace}: Props) => {
+export const WorkspacesList = () => {
   // const { data, error, isLoading } = trpc.workspace.getMyWorkspaces.useQuery();
   
   const workspaces = [{
@@ -16,6 +12,9 @@ export const WorkspacesList = ({selectedWorkspace, setSelectedWorkspace, setIsAd
     name: 'beease test',
     color: '#FF9E4C'
   }]
+  
+  const setSelectedWorkspaceId = workspaceStore((state: WorkspaceState) => state.setSelectedWorkspaceId);
+  const selectedWorkspaceId = workspaceStore((state: WorkspaceState) => state.selectedWorkspaceId);
   
 
   // if (error) {
@@ -28,16 +27,11 @@ export const WorkspacesList = ({selectedWorkspace, setSelectedWorkspace, setIsAd
   // }
 
   if (workspaces) {
-      const handleSelectWorkspace = (id: string) => {
-        setSelectedWorkspace(id)
-        setIsAddingNewWorkspace(false)
-      }
-
       const WorkspaceMiniature = ({workspace}: {workspace: typeof workspaces[number] })  => {
         return(
         <div 
-          className={`workspaceMiniature ${workspace.id === selectedWorkspace && 'selected'}`}
-          onClick={() => handleSelectWorkspace(workspace.id)}
+          className={`workspaceMiniature ${workspace.id === selectedWorkspaceId && 'selected'}`}
+          onClick={() => setSelectedWorkspaceId(workspace.id)}
           style={{
             backgroundColor: workspace.color,
           }}

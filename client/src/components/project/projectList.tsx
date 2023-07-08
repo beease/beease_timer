@@ -4,11 +4,9 @@ import { ProjectAdd } from "./projectAdd";
 
 interface Props {
   projects?: any;
-  isStarted: null | string;
-  setIsStarted: (isStarted: null | string) => void;
 }
 
-export const ProjectList = ({ projects, isStarted, setIsStarted }: Props) => {
+export const ProjectList = ({ projects }: Props) => {
   projects = [
     {
       id: "1234FDQZSR1234",
@@ -30,17 +28,13 @@ export const ProjectList = ({ projects, isStarted, setIsStarted }: Props) => {
     },
   ];
 
-  const [projectMoreInfos, setProjectMoreInfos] = useState<string | null>(null);
+
   return (
     <div className="ProjectList">
       {projects.map((project: any, index: number) => (
         <ProjectCard
           key={index}
-          projectMoreInfos={projectMoreInfos}
-          setProjectMoreInfos={setProjectMoreInfos}
           project={project}
-          isStarted={isStarted}
-          setIsStarted={setIsStarted}
         />
       ))}
       <ProjectAdd />

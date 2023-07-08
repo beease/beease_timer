@@ -1,22 +1,26 @@
-import { getGoogleToken } from '../utils/Auth/Auth';
-import { useContext } from 'react';
-import { AuthContext } from '../App';
-import Logo from '../assets/google.png'; 
-import { trpc } from '../trpc';
+import { getGoogleToken } from "../utils/Auth/Auth";
+import { useContext } from "react";
+import { AuthContext } from "../App";
+import Logo from "../assets/google.png";
+import { trpc } from "../trpc";
 
 export function Sign() {
-  
-  const {login} = useContext(AuthContext);
-  const {mutate, data:userAuthData, error, isLoading } = trpc.user.loginByGoogleToken.useMutation();
+  const { login } = useContext(AuthContext);
+  const {
+    mutate,
+    data: userAuthData,
+    error,
+    isLoading,
+  } = trpc.user.loginByGoogleToken.useMutation();
   const handleLogin = async () => {
-   const googleToken =  (await getGoogleToken()).token
-      if (googleToken) {
-        mutate({ google_token: googleToken })
-      }
+    const googleToken = (await getGoogleToken()).token;
+    if (googleToken) {
+      mutate({ google_token: googleToken });
+    }
   };
 
-  if(userAuthData?.token){
-    login(userAuthData.token)
+  if (userAuthData?.token) {
+    login(userAuthData.token);
   }
 
   // if(error){
@@ -29,22 +33,28 @@ export function Sign() {
 
   const LoginButton = () => {
     return (
-      <div id='app_logout'>
-        <button id='google_connect' onClick={() => {handleLogin()}}>
-            {
-                <div className='google_connect_cont'>
-                  <img alt='google_logo' src={Logo} />
-                  <div id='google_connect_text'>Connexion avec google</div>
-                </div>           
-            }
+      <div id="app_logout">
+        <button
+          id="google_connect"
+          onClick={() => {
+            handleLogin();
+          }}
+        >
+          {
+            <div className="google_connect_cont">
+              <img alt="google_logo" src={Logo} />
+              <div id="google_connect_text">Connexion avec google</div>
+            </div>
+          }
         </button>
-      </div>)
-  }
+      </div>
+    );
+  };
   return (
-    <div id='app'>       
-        <div id='app_logout'>
-           <LoginButton/>
-        </div>  
+    <div id="app">
+      <div id="app_logout">
+        <LoginButton />
+      </div>
     </div>
   );
 }
