@@ -7,13 +7,9 @@ interface Props {
 }
 
 export const DisplayMyPicture = ({ className }: Props) => {
-  const {
-    data: user,
-    error,
-    isLoading,
-  } = trpc.user.getMyUser.useQuery(undefined, {
-    staleTime: cachingTimes.myUserPicture,
-    cacheTime: cachingTimes.myUserPicture,
+  const { data: user, error, isLoading, } = trpc.user.getMyUser.useQuery(undefined, {
+    staleTime: cachingTimes.myUserPicture.staleTime,
+    cacheTime: cachingTimes.myUserPicture.cachingTimes,
   });
 
   if (isLoading) {

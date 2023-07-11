@@ -70,10 +70,10 @@ input {
 
 @keyframes skeleton-loading {
   0% {
-    background-color: $grey-1;
-  }
-
-  100% {
     background-color: $grey-3;
+  }
+  
+  100% {
+    background-color: $grey-1;
   }
 }

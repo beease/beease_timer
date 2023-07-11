@@ -2,7 +2,7 @@ import React from 'react'
 
 interface Props extends React.HTMLAttributes<HTMLButtonElement>{
     icon: string;
-    variant?: 'confirm' | 'cancel' | 'grey' | 'clear' | 'darkGrey';
+    variant?: 'confirm' | 'cancel' | 'grey' | 'clear' | 'darkGrey' | 'alert';
     size?: 'small' | 'medium' | 'large';
 }
 

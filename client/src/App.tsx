@@ -30,8 +30,8 @@ export function App() {
       new QueryClient({
         defaultOptions: {
           queries: {
-            staleTime: cachingTimes.global,
-            cacheTime: cachingTimes.global,
+            staleTime: cachingTimes.global.staleTime,
+            cacheTime: cachingTimes.global.cachingTimes,
             refetchOnWindowFocus: true,
           },
         },

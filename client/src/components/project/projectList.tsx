@@ -4,15 +4,15 @@ import { ProjectAdd } from "./projectAdd";
 import { workspaceStore, WorkspaceState } from "../../stores/workspaceStore";
 
 interface Props {
-  projects?: any;
+  selectedWorkspaceId: string;
 }
 
-export const ProjectList = ({ projects }: Props) => {
+export const ProjectList = ({ selectedWorkspaceId }: Props) => {
   const isStatisticActive = workspaceStore(
     (state: WorkspaceState) => state.isStatisticActive
   );
 
-  projects = [
+  const projects = [
     {
       id: "1234FDQZSR1234",
       name: "project test1",

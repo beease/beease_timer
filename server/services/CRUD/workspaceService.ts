@@ -26,7 +26,7 @@ export const createWorkspace = async (
         userId: userId,
       },
     });
-    return [workspace, memberWorkspace];
+    return workspace;
   } catch (err) {
     throw new Error(`Failed creating workspace : ${err}`);
   }
