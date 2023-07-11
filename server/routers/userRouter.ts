@@ -24,13 +24,6 @@ export const userRouter = router({
   getUserList: publicProcedure.query(async () => {
     return await userService.getUserList();
   }),
-  getWorkspacesById: publicProcedure
-    // .use(isAuthed)
-    .input(z.object({ id: z.string() }))
-    .query(async (opts) => {
-      const { id } = opts.input;
-      return await userService.getWorkspacesByUserId(id);
-    }),
   updateUserById: publicProcedure
     .use(isAuthed)
     .input(

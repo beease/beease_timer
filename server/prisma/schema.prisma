@@ -33,7 +33,7 @@ model User {
 model Credential {
   id       String   @id @default(cuid())
   user     User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId   String            @unique
+  userId   String   @unique
   password String
 }
 

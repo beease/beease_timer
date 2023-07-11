@@ -83,3 +83,24 @@ export const deleteWorkspace = async (id: string) => {
     "Failed to delete user by id with Prisma."
   );
 };
+
+export const getMyWorkspaces = async (id: string) => {
+  try {
+    const user = await prisma.user.findUnique({
+      where: {
+        id,
+      },
+      include: {
+        memberWorkspaces: {
+          include: {
+            workspace: true,
+          },
+        },
+      },
+    });
+    const workspaces = user?.memberWorkspaces.map((mw) => mw.workspace) ?? [];
+    return workspaces;
+  } catch (err) {
+    throw new Error(`Failed to get workspaces user by id : ${err}`);
+  }
+};

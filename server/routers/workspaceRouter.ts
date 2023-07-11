@@ -16,6 +16,12 @@ export const workspaceRouter = router({
         opts.input.userId
       );
     }),
+  getMyWorkspaces: publicProcedure.use(isAuthed).query(async (opts) => {
+    const { ctx } = opts;
+    if (ctx.tokenPayload) {
+      return await workspaceService.getMyWorkspaces(ctx.tokenPayload.userId);
+    }
+  }),
   getWorkspaceById: publicProcedure
     .use(isAuthed)
     .input(z.object({ workspaceId: z.string() }))
