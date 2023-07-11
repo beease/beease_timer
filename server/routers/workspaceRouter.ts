@@ -34,6 +34,23 @@ export const workspaceRouter = router({
       return await workspaceService.getWorkspaceList(ctx.tokenPayload.userId);
     }
   }),
+  updateWorkspace: publicProcedure
+    .use(isAuthed)
+    .input(
+      z.object({
+        id: z.string(),
+        data: z
+          .object({
+            name: z.string().optional(),
+            color: z.string().optional(),
+          })
+          .required(),
+      })
+    )
+    .mutation(async (opts) => {
+      const { id, data } = opts.input;
+      return await workspaceService.updateWorkspace(id, data);
+    }),
   deleteWorkspace: publicProcedure
     .use(isAuthed)
     .input(
