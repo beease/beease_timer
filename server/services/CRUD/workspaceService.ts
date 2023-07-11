@@ -1,53 +1,85 @@
-import { PrismaClient, Prisma } from "@prisma/client";
-import { fetchGoogleUserInfo } from "../google/googleApis";
+import { PrismaClient, Prisma, Role } from "@prisma/client";
 import { asyncFunctionErrorCatcher } from "../utils/errorHandler";
-import { signJwt } from "../auth/jwt";
+import {
+  deleteProjectsByWorkspaceId,
+  getProjectsByWorkspaceId,
+} from "./projectService";
+import { getSessionsByProjectId } from "./sessionService";
 const prisma = new PrismaClient();
 
-export const createWorkspace = async (name:string, color:string, userId:string) => {
-
-    return asyncFunctionErrorCatcher(
-        () => prisma.workspace.create({
-            data: ({
-                name: name,
-                color: color,
-                userId:userId,
-            })
-        })
-    )
-
+export const createWorkspace = async (
+  name: string,
+  color: string,
+  userId: string
+) => {
+  try {
+    const workspace = await prisma.workspace.create({
+      data: {
+        name: name,
+        color: color,
+      },
+    });
+    const memberWorkspace = await prisma.memberWorkspace.create({
+      data: {
+        role: Role.OWNER,
+        workspaceId: workspace.id,
+        userId: userId,
+      },
+    });
+    return [workspace, memberWorkspace];
+  } catch (err) {
+    throw new Error(`Failed creating workspace : ${err}`);
+  }
 };
 
-export const getWorkspaceById = async (id:string) => {
-    return asyncFunctionErrorCatcher(
-        () =>
-        prisma.workspace.findUnique({
-            where: {
-                id: id,
-            },
-            select: {
-                id: true,
-                name: true,
-                createdAt: true,
-                color: true,     
-                projects: true           
-            },
-        }),
-        
-    );
+export const getWorkspaceById = async (id: string) => {
+  return asyncFunctionErrorCatcher(
+    () =>
+      prisma.workspace.findUnique({
+        where: {
+          id: id,
+        },
+        select: {
+          id: true,
+          name: true,
+          color: true,
+        },
+      }),
+    "Failed to get workspace by id"
+  );
 };
 
+export const getWorkspaceList = async (workspaceId: string) => {
+  try {
+    const fullWorkspace = await prisma.workspace.findUnique({
+      where: {
+        id: workspaceId,
+      },
+      include: {
+        projects: {
+          include: {
+            memberSessions: true,
+          },
+        },
+      },
+    });
 
-export const updateWorkspace = async () => {}
+    return fullWorkspace;
+  } catch (err) {
+    throw new Error(`Failed to get workspace list : ${err}`);
+  }
+};
+
+export const updateWorkspace = async () => {};
 
 export const deleteWorkspace = async (id: string) => {
-    return asyncFunctionErrorCatcher(
-        () =>
-        prisma.workspace.delete({
-            where: {
-             id,
-            },
-        }),
-        "Failed to delete user by id with Prisma."
-    );
-}
+  return asyncFunctionErrorCatcher(
+    () =>
+      prisma.workspace.delete({
+        where: {
+          id,
+        },
+      }),
+    "Failed to delete user by id with Prisma."
+  );
+};
