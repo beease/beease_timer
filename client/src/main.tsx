@@ -1,7 +1,6 @@
 import React,{ useState } from 'react'
 import ReactDOM from 'react-dom/client'
 import { App } from './App.tsx'
-import './index.css'
 
 // const queryClient = new QueryClient({
 //   defaultOptions: {

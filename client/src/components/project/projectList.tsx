@@ -1,12 +1,17 @@
 import { useState } from "react";
 import { ProjectCard } from "./projectCard";
 import { ProjectAdd } from "./projectAdd";
+import { workspaceStore, WorkspaceState } from "../../stores/workspaceStore";
 
 interface Props {
   projects?: any;
 }
 
 export const ProjectList = ({ projects }: Props) => {
+  const isStatisticActive = workspaceStore(
+    (state: WorkspaceState) => state.isStatisticActive
+  );
+
   projects = [
     {
       id: "1234FDQZSR1234",
@@ -28,7 +33,12 @@ export const ProjectList = ({ projects }: Props) => {
     },
   ];
 
-
+  if(isStatisticActive) {
+    return(
+      <div>stats</div>
+    )
+  }
+  
   return (
     <div className="ProjectList">
       {projects.map((project: any, index: number) => (

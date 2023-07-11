@@ -46,6 +46,11 @@ export const ProjectAdd = () => {
       <BasicButton
         icon={isAddWorkspaceDisplay ? less : plus}
         variant="grey"
+        size="small"
+        style={{
+          width: "48px !important",
+            height: "48px !important",
+        }}
         onClick={() => {
           setIsAddWorkspaceDisplay(!isAddWorkspaceDisplay);
         }}

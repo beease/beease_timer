@@ -24,3 +24,7 @@ export const formatTimestamp = (timestamp: number) => {
 
   return `${formattedHours}:${formattedMinutes}:${formattedSeconds}`;
 }
+
+export const randomValue = (min: number, max: number) => {
+  return Math.floor(Math.random() * (max - min + 1) + min);
+}

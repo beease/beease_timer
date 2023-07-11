@@ -1,17 +1,27 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { ColorPickerPopup } from "../ui/colorPicker";
 import check from "../../assets/check_w.svg";
 import cross from "../../assets/cross.svg";
 import { BasicButton } from "../ui/basicButton";
 import { workspaceStore, WorkspaceState } from "../../stores/workspaceStore";
 
-export const AddWorkspace = () => {
-  const [colorWorkSpace, setColorWorkSpace] = useState("");
+interface Props {
+  variant: 'add' | 'edit';
+  workspace?: any;
+}
+
+export const WorkspaceAddEdit = ({variant, workspace}: Props) => {
+  const [colorWorkSpace, setColorWorkSpace] = useState('');
   const [colorWorkSpacePopup, setColorWorkSpacePopup] = useState(false);
-  const setAddingWorkspace = workspaceStore((state: WorkspaceState) => state.setAddingWorkspace);
+  const setSettingWorkspace = workspaceStore((state: WorkspaceState) => state.setSettingWorkspace);
+
+  useEffect(() => {
+    setColorWorkSpace(workspace?.color)
+  }, [variant, workspace?.color]);
+  
   return (
     <div className="addWorkspace">
-      <input className="addWorkspace_name_input" type="text" placeholder="Workspace name" />
+      <input className="addWorkspace_name_input" type="text" placeholder="Workspace name" value={variant === 'edit' ? workspace?.name : ''}/>
 
       <ColorPickerPopup
         setColor={setColorWorkSpace}
@@ -25,7 +35,7 @@ export const AddWorkspace = () => {
       />
       <BasicButton 
         onClick={() => {
-          setAddingWorkspace(false);
+          setSettingWorkspace(null);
         }}
         variant='grey'
         icon={cross}

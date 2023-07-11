@@ -1,0 +1,181 @@
+@import '../Mixin.scss';
+@import '../Var.scss';
+
+.ProjectList {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.ProjectAdd {
+    background-color: $grey-2;
+    width: 64px;
+    height: 64px;
+    padding: 8px;
+    box-sizing: border-box;
+    border-radius: 8px;
+    display: flex;
+    gap: 8px;
+    @include card-shadow;
+    transition: $transition-1;
+
+    .ProjectAdd_form {
+        transition: $transition-1;
+        display: flex;
+        gap: 8px;
+        flex: 1;
+        display: none;
+
+        input {
+            @include input-font;
+            @include input;
+            padding: 0 8px;
+            flex: 1;
+        }
+    }
+}
+
+.ProjectSettings {
+    height: 100%;
+    background-color: $grey-1;
+    padding: 8px;
+    box-sizing: border-box;
+    border-radius: 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+
+    .ProjectSettings_line {
+        display: flex;
+        gap: 8px;
+        flex: 1;
+
+        input {
+            @include input-font;
+            @include input;
+            padding: 0 8px;
+            height: 42px;
+            box-sizing: border-box;
+        }
+    }
+
+    .ProjectSettings_name {
+        flex: 1;
+    }
+
+    .ProjectSettings_number {
+        width: 100px;
+    }
+}
+
+.ProjectSessions {
+    height: 100%;
+    background-color: $grey-1;
+    padding: 8px;
+    box-sizing: border-box;
+    border-radius: 0 8px 8px 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+
+    .ProjectSessions_line {
+        height: 36px;
+        display: flex;
+        gap: 8px;
+
+        .ProjectSessions_picture {
+            width: 36px;
+            height: 36px;
+            border-radius: 4px;
+        }
+
+        input {
+            @include input-font;
+            @include input;
+            height: 36px;
+            width: calc((100% - 104px) / 3);
+            padding: 0 8px;
+            box-sizing: border-box;
+        }
+
+        .ProjectSessions_time {
+            width: calc((100% - 104px) / 3);
+            white-space: nowrap;
+            text-overflow: ellipsis;
+            overflow: hidden;
+            background-color: $grey-2;
+            border-radius: 4px;
+            box-sizing: border-box;
+            @include little-font;
+            @include flex-center;
+        }
+
+        .ProjectSessions_date {
+            flex: 1;
+            background-color: $grey-2;
+            border-radius: 4px;
+            box-sizing: border-box;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+            @include little-font;
+            @include flex-center;
+        }
+    }
+}
+
+.ProjectCard {
+    @include card-shadow;
+    height: 64px;
+    width: 100%;
+    background-color: white;
+    border-radius: 8px;
+    transition: all 0.1s ease-in-out;
+    overflow: hidden;
+
+    .ProjectCard_top {
+        padding: 8px;
+        display: flex;
+        gap: 8px;
+    }
+
+    .ProjectCard_moreInfos {
+        opacity: 0;
+        transition: all 0.1s ease-in-out;
+        height: 100px;
+        background-color: white;
+        margin: 0 8px;
+
+        .ProjectCard_moreInfos_content {
+            height: 160px;
+            flex: 1;
+        }
+
+        .ProjectCard_moreInfos_menu {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+
+            button {
+                height: 48px;
+                width: 48px;
+                @include flex-center;
+                @include button-base;
+
+                img {
+                    height: 20px;
+
+                    path {
+                        fill: white;
+                    }
+                }
+            }
+
+            button.selected {
+                background-color: $grey-1;
+                width: 56px;
+                padding: 0 8px 0 0;
+                border-radius: 5px 0px 0px 5px;
+            }
+        }
+    }
+}

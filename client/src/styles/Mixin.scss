@@ -1,0 +1,55 @@
+@mixin flex-center {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+@mixin button-base {
+  padding: 0;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all ease-in-out 0.2s;
+
+  &:hover {
+    opacity: 0.8;
+  }
+}
+
+@mixin input {
+  border: none;
+  border-radius: 4px;
+}
+
+@mixin action_card {
+  background-color: $grey-2;
+  border-radius: 8px;
+  padding: 8px;
+  box-sizing: border-box;
+}
+
+@mixin border-r1 {
+  border-radius: 4px;
+}
+
+@mixin border-r2 {
+  border-radius: 8px;
+}
+
+@mixin card-shadow {
+  box-shadow: rgb(0 0 0 / 10%) 1px 1px 3px 0px;
+}
+
+@mixin card-shadow15 {
+  box-shadow: rgb(0 0 0 / 15%) 1px 1px 3px 0px;
+}
+
+@mixin input-font {
+  font-size: 12px;
+  font-weight: 500;
+}
+
+@mixin little-font {
+  font-size: 11px;
+  font-weight: 400;
+}
