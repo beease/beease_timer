@@ -4,24 +4,34 @@ import { projectStore } from "./projectStore";
 export interface WorkspaceState {
   selectedWorkspaceId: string | null;
   setSelectedWorkspaceId: (workspaceId: string) => void;
-  isAddingWorkspace: boolean;
-  setAddingWorkspace: (status: boolean) => void;
+  isSettingWorkspace: "edit" | "add" | null;
+  setSettingWorkspace: (status: "edit" | "add" | null) => void;
+  isStatisticActive: boolean;
+  toggleStatisticActive: () => void;
 }
 
 export const workspaceStore = create<WorkspaceState>((set) => ({
-  isAddingWorkspace: false,
+  isSettingWorkspace: null,
   selectedWorkspaceId: null,
-  setSelectedWorkspaceId: (workspaceId: string) =>
-    set(() => {
-      projectStore.getState().toggleMoreInfo(null);
+  isStatisticActive: false,
+  setSelectedWorkspaceId: (workspaceId) =>
+    set((state) => {
+      if (workspaceId !== state.selectedWorkspaceId) {
+        projectStore.getState().toggleMoreInfo(null);
+      }
       return {
         selectedWorkspaceId: workspaceId,
-        isAddingWorkspace: false,
+        isSettingWorkspace: null,
+        isStatisticActive: false,
       };
     }),
-  setAddingWorkspace: (status) =>
+  setSettingWorkspace: (status) =>
     set((state) => ({
-      isAddingWorkspace: status,
-      selectedWorkspaceId: status ? null : state.selectedWorkspaceId,
+      isSettingWorkspace: status,
+      selectedWorkspaceId: status === "edit" ? state.selectedWorkspaceId : null,
+    })),
+  toggleStatisticActive: () =>
+    set((state) => ({
+      isStatisticActive: !state.isStatisticActive,
     })),
 }));

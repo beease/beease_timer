@@ -1,0 +1,79 @@
+@import './Mixin.scss';
+@import './Var.scss';
+@import './components/ui.scss';
+@import './components/navigation.scss';
+@import './components/workspace.scss';
+@import './components/project.scss';
+
+#root {
+  width: 100%;
+}
+
+body {
+  margin: 0;
+  background-color: $grey-1;
+  width: 500px;
+  min-height: 300px;
+  height: auto;
+}
+
+button {
+  outline: none !important;
+}
+
+input {
+  outline: none !important;
+}
+
+.white {
+  filter: brightness(0) invert(1) grayscale(1);
+}
+
+.black {
+  filter: brightness(0) invert(0) grayscale(1);
+}
+
+.scroll {
+  overflow-y: scroll;
+  padding-right: 0 !important;
+
+  &::-webkit-scrollbar-thumb {
+    border-radius: 10px;
+    background: $grey-3;
+    width: 6px;
+    border: 7px solid transparent;
+    background-clip: content-box;
+  }
+
+  &::-webkit-scrollbar {
+    position: absolute;
+    width: 20px;
+    overflow: overlay;
+  }
+
+  &::-webkit-scrollbar-track {
+    margin-right: 3px;
+    padding-right: 3px;
+    width: 4px;
+  }
+}
+
+#home {
+  display: flex;
+  width: 100%;
+  align-items: flex-start;
+}
+
+.skeleton {
+  animation: skeleton-loading 1s linear infinite alternate;
+}
+
+@keyframes skeleton-loading {
+  0% {
+    background-color: $grey-1;
+  }
+
+  100% {
+    background-color: $grey-3;
+  }
+}

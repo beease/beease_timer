@@ -1,5 +1,5 @@
-
-import { trpc } from "../../trpc";
+import { trpc } from "../../trpc"
+import { useEffect } from "react";
 import beeaseLogo from '../../assets/logo_beease.svg';
 import { workspaceStore, WorkspaceState } from "../../stores/workspaceStore";
 
@@ -15,7 +15,13 @@ export const WorkspacesList = () => {
   
   const setSelectedWorkspaceId = workspaceStore((state: WorkspaceState) => state.setSelectedWorkspaceId);
   const selectedWorkspaceId = workspaceStore((state: WorkspaceState) => state.selectedWorkspaceId);
-  
+  const isSettingWorkspace = workspaceStore((state: WorkspaceState) => state.isSettingWorkspace);
+
+  useEffect(() => {
+    if(!selectedWorkspaceId && !isSettingWorkspace) {
+      setSelectedWorkspaceId(workspaces[0].id)
+    }
+  }, [isSettingWorkspace, selectedWorkspaceId, setSelectedWorkspaceId])
 
   // if (error) {
   //   console.log(error)
@@ -30,7 +36,7 @@ export const WorkspacesList = () => {
       const WorkspaceMiniature = ({workspace}: {workspace: typeof workspaces[number] })  => {
         return(
         <div 
-          className={`workspaceMiniature ${workspace.id === selectedWorkspaceId && 'selected'}`}
+          className={`workspaceMiniature ${selectedWorkspaceId === workspace.id && 'selected'}`}
           onClick={() => setSelectedWorkspaceId(workspace.id)}
           style={{
             backgroundColor: workspace.color,

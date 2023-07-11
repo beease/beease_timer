@@ -10,6 +10,7 @@ import {
   removeAuthCookie,
 } from "./utils/Auth/Auth";
 import { cachingTimes } from "./libs/cachingTimes";
+import "./styles/App.scss";
 
 interface AuthContextProps {
   logout: () => void;
