@@ -1,20 +1,20 @@
-import { mergeRouters, router  } from '../trpc';
+import { mergeRouters, router } from "../trpc";
 
-import * as userServices from './userRouter';
-import * as workspaceService from './workspaceRouter';
-import * as projectService from './projectRouter';
-import * as memberService from './memberRouter';
-import * as credetialService from './credentialRouter';
-import * as sessionService from './sessionRouter'; 
+import { userRouter } from "./userRouter";
+import { workspaceRouter } from "./workspaceRouter";
+import { projectRouter } from "./projectRouter";
+import { memeberRouter } from "./memberWorkspace";
+import { credentialRouter } from "./credentialRouter";
+import { sessionRouter } from "./sessionRouter";
 
 const appRouter = router({
-  user : userServices.userRouter, 
-  workspace : workspaceService.workspaceRouter, 
-  project : projectService.projectRouter, 
-  member : memberService.memeberRouter, 
-  credential : credetialService.credentialRouter, 
-  session : sessionService.sessionRouter,
-  });
+  user: userRouter,
+  workspace: workspaceRouter,
+  project: projectRouter,
+  member: memeberRouter,
+  credential: credentialRouter,
+  session: sessionRouter,
+});
 
 export type AppRouter = typeof appRouter;
 export default appRouter;
