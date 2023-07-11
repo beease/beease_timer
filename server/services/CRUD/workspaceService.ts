@@ -7,6 +7,11 @@ import {
 import { getSessionsByProjectId } from "./sessionService";
 const prisma = new PrismaClient();
 
+type WorkspaceUpdateData = {
+  name?: string;
+  color: string;
+};
+
 export const createWorkspace = async (
   name: string,
   color: string,
@@ -70,7 +75,21 @@ export const getWorkspaceList = async (workspaceId: string) => {
   }
 };
 
-export const updateWorkspace = async () => {};
+export const updateWorkspace = async (
+  id: string,
+  data: WorkspaceUpdateData
+) => {
+  return asyncFunctionErrorCatcher(
+    () =>
+      prisma.workspace.update({
+        where: {
+          id: id,
+        },
+        data,
+      }),
+    "Failed to update workspace"
+  );
+};
 
 export const deleteWorkspace = async (id: string) => {
   return asyncFunctionErrorCatcher(
@@ -80,7 +99,7 @@ export const deleteWorkspace = async (id: string) => {
           id,
         },
       }),
-    "Failed to delete user by id with Prisma."
+    "Failed to delete user by id"
   );
 };
 

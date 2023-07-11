@@ -29,11 +29,28 @@ export const workspaceRouter = router({
     .query(async (opts) => {
       return await workspaceService.getWorkspaceById(opts.input.workspaceId);
     }),
-  getWorkspaceList: publicProcedure
+  getWorkspaceList: publicProcedure.use(isAuthed).query(async (opts) => {
+    const { ctx } = opts;
+    if (ctx.tokenPayload) {
+      return await workspaceService.getWorkspaceList(ctx.tokenPayload.userId);
+    }
+  }),
+  updateWorkspace: publicProcedure
     .use(isAuthed)
-    .input(z.object({ workspaceId: z.string() }))
-    .query(async (opts) => {
-      return await workspaceService.getWorkspaceList(opts.input.workspaceId);
+    .input(
+      z.object({
+        id: z.string(),
+        data: z
+          .object({
+            name: z.string().optional(),
+            color: z.string().optional(),
+          })
+          .required(),
+      })
+    )
+    .mutation(async (opts) => {
+      const { id, data } = opts.input;
+      return await workspaceService.updateWorkspace(id, data);
     }),
   deleteWorkspace: publicProcedure
     .use(isAuthed)

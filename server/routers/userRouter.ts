@@ -9,6 +9,7 @@ export const userRouter = router({
     .mutation(async (opts) => {
       return await userService.loginByGoogleToken(opts.input.google_token);
     }),
+
   getMyUser: publicProcedure.use(isAuthed).query(async (opts) => {
     if (opts.ctx.tokenPayload) {
       return await userService.getUserById(opts.ctx.tokenPayload.userId);
@@ -24,6 +25,7 @@ export const userRouter = router({
   getUserList: publicProcedure.query(async () => {
     return await userService.getUserList();
   }),
+
   updateUserById: publicProcedure
     .use(isAuthed)
     .input(
