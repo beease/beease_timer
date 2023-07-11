@@ -26,7 +26,7 @@ model User {
   picture          String?
   locale           String?
   google_id        String?           @unique
-  credential       Credential?       @relation(fields: [credentialId], references: [id])
+  credential       Credential?       @relation(fields: [credentialId], references: [id], onDelete: Cascade)
   credentialId     String            @unique
   memberWorkspaces memberWorkspace[]
 }
@@ -39,7 +39,6 @@ model Credential {
 
 model Workspace {
   id               String            @id @default(cuid())
-  createdAt        DateTime          @default(now())
   name             String
   projects         Project[]
   color            String
@@ -48,10 +47,8 @@ model Workspace {
 
 model Project {
   id             String          @id @default(cuid())
-  createdAt      DateTime        @default(now())
   name           String
-  description    String?
-  workspace      Workspace       @relation(fields: [workspaceId], references: [id])
+  workspace      Workspace       @relation(fields: [workspaceId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   workspaceId    String
   memberSessions memberSession[]
   dailyPrice     Float           @default(0)
@@ -61,20 +58,20 @@ model Project {
 
 model memberWorkspace {
   id             String          @id @default(cuid())
-  createdAt      DateTime        @default(now())
   role           Role            @default(MEMBER)
-  workspace      Workspace       @relation(fields: [workspaceId], references: [id])
+  workspace      Workspace       @relation(fields: [workspaceId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   workspaceId    String
-  user           User            @relation(fields: [userId], references: [id])
+  user           User            @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId         String
   memberSessions memberSession[]
 }
 
 model memberSession {
   id                String           @id @default(cuid())
-  createdAt         DateTime         @default(now())
-  Project           Project?         @relation(fields: [projectId], references: [id])
+  startedAt         DateTime         @default(now())
+  endedAt           DateTime?
+  Project           Project?         @relation(fields: [projectId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   projectId         String?
-  memberWorkspace   memberWorkspace? @relation(fields: [memberWorkspaceId], references: [id])
+  memberWorkspace   memberWorkspace? @relation(fields: [memberWorkspaceId], references: [id], onDelete: Cascade)
   memberWorkspaceId String?
 }
