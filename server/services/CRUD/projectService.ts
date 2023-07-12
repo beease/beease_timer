@@ -9,6 +9,16 @@ type updateProjectData = {
   dailyPrice?: number;
 };
 
+export const getProject = async (id: string) => {
+  return asyncFunctionErrorCatcher(() =>
+    prisma.project.findUnique({
+      where: {
+        id: id,
+      },
+    })
+  );
+};
+
 export const getProjectsByWorkspaceId = async (workspaceId: string) => {
   return asyncFunctionErrorCatcher(() =>
     prisma.project.findMany({
