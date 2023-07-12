@@ -6,6 +6,22 @@ type updateMemberWorkspaceData = {
   role?: Role;
 };
 
+export const createMemberWorkspace = async (
+  userId: string,
+  workspaceId: string
+) => {
+  return asyncFunctionErrorCatcher(
+    () =>
+      prisma.memberWorkspace.create({
+        data: {
+          userId: userId,
+          workspaceId: workspaceId,
+        },
+      }),
+    "Failed to add member to workspace"
+  );
+};
+
 export const getMembersWorkspaceByWorkspaceId = async (workspaceId: string) => {
   return asyncFunctionErrorCatcher(
     () =>
