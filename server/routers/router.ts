@@ -5,9 +5,7 @@ import { workspaceRouter } from "./workspaceRouter";
 import { projectRouter } from "./projectRouter";
 import { memberWorkspaceRouter } from "./memberWorkspaceRouter";
 import { credentialRouter } from "./credentialRouter";
-import { sessionRouter } from "./sessionRouter";
-import { sendEmail } from "../services/utils/sendEmail";
-import { z } from "zod";
+import { memberSessionRouter } from "./memberSessionRouter";
 import { emailRouter } from "./emailRouter";
 
 const appRouter = router({
@@ -15,9 +13,9 @@ const appRouter = router({
   email: emailRouter,
   workspace: workspaceRouter,
   project: projectRouter,
-  member: memberWorkspaceRouter,
+  memberWorkspace: memberWorkspaceRouter,
   credential: credentialRouter,
-  session: sessionRouter,
+  memberSession: memberSessionRouter,
 });
 
 export type AppRouter = typeof appRouter;

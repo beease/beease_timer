@@ -2,7 +2,15 @@ import { PrismaClient, Prisma, Role } from "@prisma/client";
 import { asyncFunctionErrorCatcher } from "../utils/errorHandler";
 const prisma = new PrismaClient();
 
-export const createSession = async (userId: string, projectId: string) => {
+type updateMemberSessionData = {
+  startedAt?: Date;
+  endedAt: Date;
+};
+
+export const createMemberSession = async (
+  userId: string,
+  projectId: string
+) => {
   const getMemberWorkspace = await prisma.memberWorkspace.findFirst({
     where: {
       userId: userId,
@@ -19,7 +27,7 @@ export const createSession = async (userId: string, projectId: string) => {
     "Failed to create session"
   );
 };
-export const deleteSession = async (sessionId: string) => {
+export const deleteMemberSession = async (sessionId: string) => {
   return asyncFunctionErrorCatcher(
     () =>
       prisma.memberSession.delete({
@@ -31,7 +39,7 @@ export const deleteSession = async (sessionId: string) => {
   );
 };
 
-export const getSessionsByProjectId = async (projectId: string) => {
+export const getMemberSessionsByProjectId = async (projectId: string) => {
   return asyncFunctionErrorCatcher(() =>
     prisma.memberSession.findMany({
       where: {
@@ -41,7 +49,7 @@ export const getSessionsByProjectId = async (projectId: string) => {
   );
 };
 
-export const getSessionById = async (sessionId: string) => {
+export const getMemberSessionById = async (sessionId: string) => {
   return asyncFunctionErrorCatcher(
     () =>
       prisma.memberSession.findUnique({
@@ -57,3 +65,8 @@ export const getSessionById = async (sessionId: string) => {
     "Failed to get session by id"
   );
 };
+
+export const updateSession = async (
+  sessionId: string,
+  data: updateMemberSessionData
+) => {};

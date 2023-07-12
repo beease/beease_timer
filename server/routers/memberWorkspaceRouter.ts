@@ -3,10 +3,10 @@ import { router, publicProcedure } from "../trpc";
 import { Prisma, PrismaClient, Role } from "@prisma/client";
 import {
   getMembersWorkspaceByWorkspaceId,
-  updateMemberWorkspace,
+  updateRoleMemberWorkspace,
 } from "../services/CRUD/memberWorkspaceService";
 
-const ROLES = ["OWNER", "MEMBER"] as const;
+const ROLES = ["OWNER", "ADMIN", "MEMBER"] as const;
 
 export const memberWorkspaceRouter = router({
   getMembersWorkspaceByWorkspaceId: publicProcedure
@@ -17,10 +17,14 @@ export const memberWorkspaceRouter = router({
     }),
   updateMemberWorkspace: publicProcedure
     .input(
-      z.object({ id: z.string(), data: z.object({ role: z.enum(ROLES) }) })
+      z.object({
+        emitterId: z.string(),
+        id: z.string(),
+        data: z.object({ role: z.enum(ROLES) }),
+      })
     )
     .mutation(async (opts) => {
-      const { id, data } = opts.input;
-      return await updateMemberWorkspace(id, data);
+      const { emitterId, id, data } = opts.input;
+      return await updateRoleMemberWorkspace(emitterId, id, data);
     }),
 });
