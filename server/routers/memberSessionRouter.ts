@@ -6,6 +6,7 @@ import {
   deleteMemberSession,
   getMemberSessionById,
   getMemberSessionsByProjectId,
+  updateSession,
 } from "../services/CRUD/memberSessionService";
 
 const prisma = new PrismaClient();
@@ -32,12 +33,22 @@ export const memberSessionRouter = router({
       const { sessionId } = opts.input;
       return await deleteMemberSession(sessionId);
     }),
-  updateSession: authorizedProcedure.input(
-    z.object({
-      sessionId: z.string(),
-      data: z.object({}),
-    })
-  ),
+  updateSession: authorizedProcedure
+    .input(
+      z.object({
+        sessionId: z.string(),
+        data: z.object({}),
+      })
+    )
+    .mutation(async (opts) => {
+      const { ctx } = opts;
+      const { sessionId, data } = opts.input;
+
+      if (ctx.tokenPayload) {
+        const emitterId = ctx.tokenPayload.userId;
+        return await updateSession(emitterId, sessionId, data);
+      }
+    }),
   getSessionsByProjectId: authorizedProcedure
     .input(
       z.object({
