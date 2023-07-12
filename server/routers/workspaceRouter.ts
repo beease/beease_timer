@@ -33,10 +33,10 @@ export const workspaceRouter = router({
       return await workspaceService.getWorkspaceById(opts.input.workspaceId);
     }),
   getWorkspaceList: authorizedProcedure
-  .input(z.object({ workspaceId: z.string() }))
-  .query(async (opts) => {
+    .input(z.object({ workspaceId: z.string() }))
+    .query(async (opts) => {
       return await workspaceService.getWorkspaceList(opts.input.workspaceId);
-  }),
+    }),
   updateWorkspace: authorizedProcedure
     .input(
       z.object({
@@ -51,7 +51,11 @@ export const workspaceRouter = router({
     )
     .mutation(async (opts) => {
       const { id, data } = opts.input;
-      return await workspaceService.updateWorkspace(id, data);
+      const { ctx } = opts;
+      if (ctx.tokenPayload) {
+        const emitterId = ctx.tokenPayload.userId;
+        return await workspaceService.updateWorkspace(emitterId, id, data);
+      }
     }),
   deleteWorkspace: authorizedProcedure
     .input(
@@ -60,8 +64,12 @@ export const workspaceRouter = router({
       })
     )
     .mutation(async (opts) => {
+      const { ctx } = opts;
       const { id } = opts.input;
-      return await workspaceService.deleteWorkspace(id);
+      if (ctx.tokenPayload) {
+        const emitterId = ctx.tokenPayload.userId;
+        return await workspaceService.deleteWorkspace(emitterId, id);
+      }
     }),
 });
 

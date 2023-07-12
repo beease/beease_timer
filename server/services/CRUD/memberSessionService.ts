@@ -4,7 +4,7 @@ const prisma = new PrismaClient();
 
 type updateMemberSessionData = {
   startedAt?: Date;
-  endedAt: Date;
+  endedAt?: Date;
 };
 
 export const createMemberSession = async (
@@ -67,6 +67,23 @@ export const getMemberSessionById = async (sessionId: string) => {
 };
 
 export const updateSession = async (
+  emitterId: string,
   sessionId: string,
   data: updateMemberSessionData
-) => {};
+) => {
+  const memberWorkspace = await prisma.memberWorkspace.findFirst({
+    where: {
+      userId: emitterId,
+    },
+  });
+  return asyncFunctionErrorCatcher(
+    () =>
+      prisma.memberSession.update({
+        where: {
+          id: sessionId,
+        },
+        data: data,
+      }),
+    "Failed to update session"
+  );
+};

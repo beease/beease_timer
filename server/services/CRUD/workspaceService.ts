@@ -74,9 +74,16 @@ export const getWorkspaceList = async (workspaceId: string) => {
 };
 
 export const updateWorkspace = async (
+  emitterId: string,
   id: string,
   data: WorkspaceUpdateData
 ) => {
+  const memberWorkspaceEmitter = await prisma.memberWorkspace.findFirst({
+    where: {
+      userId: emitterId,
+      workspaceId: id,
+    },
+  });
   return asyncFunctionErrorCatcher(
     () =>
       prisma.workspace.update({
@@ -89,16 +96,24 @@ export const updateWorkspace = async (
   );
 };
 
-export const deleteWorkspace = async (id: string) => {
-  return asyncFunctionErrorCatcher(
-    () =>
-      prisma.workspace.delete({
-        where: {
-          id,
-        },
-      }),
-    "Failed to delete user by id"
-  );
+export const deleteWorkspace = async (emitterId: string, id: string) => {
+  const memberWorkspaceEmitter = await prisma.memberWorkspace.findFirst({
+    where: {
+      userId: emitterId,
+      workspaceId: id,
+    },
+  });
+  if (memberWorkspaceEmitter && memberWorkspaceEmitter.role === "OWNER") {
+    return asyncFunctionErrorCatcher(
+      () =>
+        prisma.workspace.delete({
+          where: {
+            id,
+          },
+        }),
+      "Failed to delete user by id"
+    );
+  }
 };
 
 export const getMyWorkspaces = async (id: string) => {

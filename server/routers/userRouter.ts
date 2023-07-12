@@ -49,7 +49,6 @@ export const userRouter = router({
     .mutation(async (opts) => {
       const { ctx } = opts;
       const { data } = opts.input;
-      console.log("ctx : ", ctx, data);
       if (ctx.tokenPayload) {
         return await userService.updateUserById(ctx.tokenPayload.userId, data);
       }

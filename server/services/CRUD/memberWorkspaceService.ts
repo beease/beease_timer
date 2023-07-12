@@ -22,6 +22,41 @@ export const createMemberWorkspace = async (
   );
 };
 
+export const deleteMemberWorkspace = async (
+  emitterId: string,
+  userId: string,
+  workspaceId: string
+) => {
+  const memberWorkspaceEmitter = await prisma.memberWorkspace.findFirst({
+    where: {
+      userId: emitterId,
+      workspaceId: workspaceId,
+    },
+  });
+  if (
+    memberWorkspaceEmitter &&
+    (memberWorkspaceEmitter.role === "OWNER" ||
+      memberWorkspaceEmitter.role === "ADMIN")
+  ) {
+    return asyncFunctionErrorCatcher(
+      () =>
+        prisma.memberWorkspace.delete({
+          where: {
+            workspaceId_userId: {
+              userId: userId,
+              workspaceId: workspaceId,
+            },
+          },
+        }),
+      "Failed to delete member from workspace"
+    );
+  } else {
+    throw new Error(
+      "Failed to delete member from workspace : Emitter is not allowed to delete member from workspace"
+    );
+  }
+};
+
 export const getMembersWorkspaceByWorkspaceId = async (workspaceId: string) => {
   return asyncFunctionErrorCatcher(
     () =>

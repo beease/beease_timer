@@ -32,6 +32,12 @@ export const memberSessionRouter = router({
       const { sessionId } = opts.input;
       return await deleteMemberSession(sessionId);
     }),
+  updateSession: authorizedProcedure.input(
+    z.object({
+      sessionId: z.string(),
+      data: z.object({}),
+    })
+  ),
   getSessionsByProjectId: authorizedProcedure
     .input(
       z.object({
