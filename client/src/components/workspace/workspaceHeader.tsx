@@ -13,9 +13,9 @@ interface Props{
 
 export const WorkspaceHeader = ({selectedWorkspaceId}: Props) => {
   const [isDotsButtonActive, setIsDotsButtonActive] = useState(false);
-  const {data: workspace, error, isLoading} = trpc.workspace.getWorkspaceById.useQuery({
-    workspaceId: selectedWorkspaceId
-  })
+  const {data: workspaces, error, isLoading} = trpc.workspace.getMyWorkspaces.useQuery()
+
+  const workspace = workspaces ? workspaces.find(ws => ws.id === selectedWorkspaceId) : null;
 
   const isPlaying = projectStore(
     (state: ProjectStore) => state.PlayingProjectId

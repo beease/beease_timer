@@ -5,7 +5,13 @@ import less from "../../assets/Less.svg";
 import check from "../../assets/check_w.svg";
 import { ColorPickerPopup } from "../ui/colorPicker";
 import { wait } from "../../utils/function";
-export const ProjectAdd = () => {
+import { trpc } from '../../trpc';
+
+interface Props{
+  selectedWorkspaceId: string;
+}
+
+export const ProjectAdd = ({selectedWorkspaceId}: Props) => {
   const [isAddWorkspaceDisplay, setIsAddWorkspaceDisplay] = useState(false);
   const [colorProject, setColorProject] = useState("#4969fb");
   const [colorProjectPopup, setColorProjectPopup] = useState(false);
@@ -13,6 +19,29 @@ export const ProjectAdd = () => {
   const addProjectFormRef = useRef<HTMLDivElement>(null);
   const addProjectInputRef = useRef<HTMLInputElement>(null);
   const addProjectContRef = useRef<HTMLDivElement>(null);
+
+  const utils = trpc.useContext();
+  // const mutation = trpc.project.
+
+  const handleAddProject = () => {
+    const projectName = addProjectInputRef.current?.value;
+    if (!projectName) return;
+    mutation.mutate(
+      {
+        name: projectName,
+        color: colorProject,
+      },
+      {
+        onSuccess: (newProject) => {
+          if(!newProject) return;
+          console.log(newProject)
+          utils.workspace.getWorkspaceList.setData({workspaceId: selectedWorkspaceId}, (oldQueryData: any) => {
+            return oldQueryData.projects.push(newProject)
+          })
+        },
+      }
+    );
+  };
 
   useEffect(() => {
     const animation = async () => {
@@ -71,7 +100,13 @@ export const ProjectAdd = () => {
             height: "48px",
           }}
         />
-        <BasicButton icon={check} variant="confirm" />
+        <BasicButton 
+        icon={check} 
+        onClick={() => {
+          handleAddProject()
+        }}
+        variant="confirm"
+         />
       </div>
     </div>
   );

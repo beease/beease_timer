@@ -29,12 +29,12 @@ export const workspaceRouter = router({
     .query(async (opts) => {
       return await workspaceService.getWorkspaceById(opts.input.workspaceId);
     }),
-  getWorkspaceList: publicProcedure.use(isAuthed).query(async (opts) => {
-    const { ctx } = opts;
-    if (ctx.tokenPayload) {
-      return await workspaceService.getWorkspaceList(ctx.tokenPayload.userId);
-    }
-  }),
+  getWorkspaceList: publicProcedure
+    .use(isAuthed)
+    .input(z.object({ workspaceId: z.string() }))
+    .query(async (opts) => {
+        return await workspaceService.getWorkspaceList(opts.input.workspaceId);
+    }),
   updateWorkspace: publicProcedure
     .use(isAuthed)
     .input(

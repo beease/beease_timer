@@ -4,58 +4,105 @@ import check from "../../assets/check_w.svg";
 import bin from "../../assets/bin.svg";
 import { BasicButton } from "../ui/basicButton";
 import { workspaceStore, WorkspaceState } from "../../stores/workspaceStore";
-import { trpc } from '../../trpc';
+import { trpc } from "../../trpc";
 import { ConfirmationPopup } from "../ui/comfirmationPopup";
 
 interface Props {
   selectedWorkspaceId: string;
 }
 
-export const WorkspaceEdit = ({selectedWorkspaceId}: Props) => {
-  const [colorWorkSpace, setColorWorkSpace] = useState('');
+export const WorkspaceEdit = ({ selectedWorkspaceId }: Props) => {
+  const [colorWorkSpace, setColorWorkSpace] = useState("");
   const [colorWorkSpacePopup, setColorWorkSpacePopup] = useState(false);
-  const [isConfirmationPopupActive, setIsConfirmationPopupActive] = useState(false);
+  const [isConfirmationPopupActive, setIsConfirmationPopupActive] =
+    useState(false);
 
-  const setSettingWorkspace = workspaceStore((state: WorkspaceState) => state.setSettingWorkspace);
-  const setSelectedWorkspaceId = workspaceStore((state: WorkspaceState) => state.setSelectedWorkspaceId);
+  const setSettingWorkspace = workspaceStore(
+    (state: WorkspaceState) => state.setSettingWorkspace
+  );
+  const setSelectedWorkspaceId = workspaceStore(
+    (state: WorkspaceState) => state.setSelectedWorkspaceId
+  );
 
   const utils = trpc.useContext();
   const mutationDelete = trpc.workspace.deleteWorkspace.useMutation();
+  const mutationUpdate = trpc.workspace.updateWorkspace.useMutation();
 
   const inputRef = useRef<HTMLInputElement>(null);
 
-  const {data: workspace, error, isLoading} = trpc.workspace.getWorkspaceById.useQuery({
-    workspaceId: selectedWorkspaceId
-  })
+  const {data: workspaces, error, isLoading} = trpc.workspace.getMyWorkspaces.useQuery()
+
+  const workspace = workspaces ? workspaces.find(ws => ws.id === selectedWorkspaceId) : null;
   
   useEffect(() => {
-    setColorWorkSpace(workspace?.color || '#4969fb')
+    setColorWorkSpace(workspace?.color || "#4969fb");
   }, [workspace?.color]);
 
   const handleDeleteWorkspace = () => {
     mutationDelete.mutate(
-      {id: selectedWorkspaceId},
+      { id: selectedWorkspaceId },
       {
         onSuccess: (newWorkspace) => {
-          if(!newWorkspace) return;
-          utils.workspace.getMyWorkspaces.setData(undefined, (oldQueryData = []) => {
-            return oldQueryData.filter((workspace) => workspace.id !== newWorkspace.id)
-          })
+          if (!newWorkspace) return;
+          utils.workspace.getMyWorkspaces.setData(
+            undefined,
+            (oldQueryData = []) => {
+              return oldQueryData.filter(
+                (workspace) => workspace.id !== newWorkspace.id
+              );
+            }
+          );
           setSettingWorkspace(null);
-          setSelectedWorkspaceId(null)
+          setSelectedWorkspaceId(null);
         },
       }
     );
   };
 
-  if(error) return;
+  const handleUpdateWorkspace = () => {
+    const workspaceName = inputRef.current?.value;
+    if (!workspaceName) return;
+    if (workspaceName === workspace?.name && colorWorkSpace === workspace?.color) {
+      setSettingWorkspace(null);
+      setSelectedWorkspaceId(workspace.id);
+      return;
+    }
+    mutationUpdate.mutate(
+      {
+        id: selectedWorkspaceId,
+        data: {
+          name: workspaceName,
+          color: colorWorkSpace,
+        },
+      },
+      {
+        onSuccess: (newWorkspace) => {
+          if (!newWorkspace) return;
+          utils.workspace.getMyWorkspaces.setData(
+            undefined,
+            (oldQueryData = []) => oldQueryData.map(workspace => workspace.id === newWorkspace.id ? newWorkspace : workspace)
+          );
+          setSettingWorkspace(null);
+          setSelectedWorkspaceId(newWorkspace.id);
+        },
+      }
+    );
+  };
 
-  if(isLoading) return <div className="addWorkspace skeleton"></div>
+  if (error) return;
 
-  if(workspace){
+  if (isLoading) return <div className="addWorkspace skeleton"></div>;
+
+  if (workspace) {
     return (
       <div className="addWorkspace">
-        <input ref={inputRef} className="addWorkspace_name_input" type="text" placeholder="Workspace name" defaultValue={workspace?.name}/>
+        <input
+          ref={inputRef}
+          className="addWorkspace_name_input"
+          type="text"
+          placeholder="Workspace name"
+          defaultValue={workspace?.name}
+        />
 
         <ColorPickerPopup
           setColor={setColorWorkSpace}
@@ -67,29 +114,30 @@ export const WorkspaceEdit = ({selectedWorkspaceId}: Props) => {
             height: "48px",
           }}
         />
-        <BasicButton 
+        <BasicButton
           onClick={() => {
-            setIsConfirmationPopupActive(true)
+            setIsConfirmationPopupActive(true);
             // handleDeleteWorkspace();
           }}
-          variant='grey'
+          variant="grey"
           icon={bin}
         />
-        <BasicButton 
+        <BasicButton
           onClick={() => {
-            // handleAddWorkspace()
+            handleUpdateWorkspace();
           }}
-          variant='confirm'
+          variant="confirm"
           icon={check}
         />
-       { isConfirmationPopupActive &&
-        <ConfirmationPopup
-          open={isConfirmationPopupActive}
-          setOpen={setIsConfirmationPopupActive}
-          text={`Delete ${workspace.name}?`}
-          onConfirm={handleDeleteWorkspace}
-        />}
+        {isConfirmationPopupActive && (
+          <ConfirmationPopup
+            open={isConfirmationPopupActive}
+            setOpen={setIsConfirmationPopupActive}
+            text={`Delete ${workspace.name}?`}
+            onConfirm={handleDeleteWorkspace}
+          />
+        )}
       </div>
     );
-}
+  }
 };
