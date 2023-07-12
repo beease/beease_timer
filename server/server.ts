@@ -2,14 +2,20 @@ import express, { Request, Response, NextFunction } from "express";
 import * as trpcExpress from "@trpc/server/adapters/express";
 import appRouter from "./routers/router";
 import http from "http";
-import { createContext } from './trpc';
+import { createContext } from "./trpc";
 
 const app = express();
 const PORT = process.env.PORT || 3001;
 
 app.options("*", (_req, res) => {
-  res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS, PUT, PATCH, DELETE");
-  res.setHeader("Access-Control-Allow-Headers", "X-Requested-With, Content-Type, Authorization");
+  res.setHeader(
+    "Access-Control-Allow-Methods",
+    "GET, POST, OPTIONS, PUT, PATCH, DELETE"
+  );
+  res.setHeader(
+    "Access-Control-Allow-Headers",
+    "X-Requested-With, Content-Type, Authorization"
+  );
   res.setHeader("Access-Control-Allow-Credentials", "true");
   res.setHeader("Access-Control-Allow-Origin", String(process.env.ORIGIN_URL));
 
@@ -27,7 +33,10 @@ app.use(function (req: Request, res: Response, next: NextFunction) {
     "GET, POST, OPTIONS, PUT, PATCH, DELETE"
   );
   // Request headers you wish to allow
-  res.setHeader("Access-Control-Allow-Headers", "X-Requested-With, Content-Type, Authorization");
+  res.setHeader(
+    "Access-Control-Allow-Headers",
+    "X-Requested-With, Content-Type, Authorization"
+  );
   // Set to true if you need the website to include cookies in the requests sent
   // to the API (e.g. in case you use sessions)
   res.setHeader("Access-Control-Allow-Credentials", "true");
@@ -35,13 +44,12 @@ app.use(function (req: Request, res: Response, next: NextFunction) {
   next();
 });
 
-
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
-app.use((req:Request, res:Response, next: NextFunction) => {
+app.use((req: Request, res: Response, next: NextFunction) => {
   // request logger
   console.log("⬅️ ", req.method, req.path, req.body || req.query);
-  
+
   next();
 });
 
@@ -53,12 +61,13 @@ app.use(
   })
 );
 
-app.get("/", (_req, res) => res.send("hello"));
+app.get("/renderVerifiedEmail", async (req, res) => {
+  console.log("hello world ! ");
+  res.render("server/emailConfirmed.ejs");
+});
 
 const server = http.createServer(app);
 
 server.listen(PORT, () => {
   console.log(`listening on port ${PORT}`);
 });
-
-

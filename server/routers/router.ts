@@ -3,19 +3,19 @@ import { mergeRouters, publicProcedure, router } from "../trpc";
 import { userRouter } from "./userRouter";
 import { workspaceRouter } from "./workspaceRouter";
 import { projectRouter } from "./projectRouter";
-import { memeberRouter } from "./memberWorkspace";
+import { memberWorkspaceRouter } from "./memberWorkspaceRouter";
 import { credentialRouter } from "./credentialRouter";
 import { sessionRouter } from "./sessionRouter";
 import { sendEmail } from "../services/utils/sendEmail";
+import { z } from "zod";
+import { emailRouter } from "./emailRouter";
 
 const appRouter = router({
-  greeting: publicProcedure.query(async () => {
-    await sendEmail();
-  }),
   user: userRouter,
+  email: emailRouter,
   workspace: workspaceRouter,
   project: projectRouter,
-  member: memeberRouter,
+  member: memberWorkspaceRouter,
   credential: credentialRouter,
   session: sessionRouter,
 });

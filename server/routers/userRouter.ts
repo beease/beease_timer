@@ -1,5 +1,10 @@
 import { z } from "zod";
-import { router, publicProcedure, isAuthed } from "../trpc";
+import {
+  router,
+  publicProcedure,
+  isAuthed,
+  authorizedProcedure,
+} from "../trpc";
 import * as userService from "../services/CRUD/userService";
 import { Prisma } from "@prisma/client";
 
@@ -10,24 +15,22 @@ export const userRouter = router({
       return await userService.loginByGoogleToken(opts.input.google_token);
     }),
 
-  getMyUser: publicProcedure.use(isAuthed).query(async (opts) => {
+  getMyUser: authorizedProcedure.query(async (opts) => {
     if (opts.ctx.tokenPayload) {
       return await userService.getUserById(opts.ctx.tokenPayload.userId);
     }
   }),
-  getUserById: publicProcedure
-    .use(isAuthed)
+  getUserById: authorizedProcedure
     .input(z.object({ id: z.string() }))
     .query(async (opts) => {
       const { id } = opts.input;
       return await userService.getUserById(id);
     }),
-  getUserList: publicProcedure.query(async () => {
+  getUserList: authorizedProcedure.query(async () => {
     return await userService.getUserList();
   }),
 
-  updateUserById: publicProcedure
-    .use(isAuthed)
+  updateUserById: authorizedProcedure
     .input(
       z.object({
         id: z.string(),
@@ -51,7 +54,7 @@ export const userRouter = router({
         return await userService.updateUserById(ctx.tokenPayload.userId, data);
       }
     }),
-  deleteUserById: publicProcedure
+  deleteUserById: authorizedProcedure
     .input(z.object({ id: z.string() }))
     .mutation(async (opts) => {
       const { id } = opts.input;

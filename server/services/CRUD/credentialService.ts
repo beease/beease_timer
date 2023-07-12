@@ -6,8 +6,26 @@ import {
   functionErrorCatcher,
 } from "../utils/errorHandler";
 import argon2 from "argon2";
+import { sendEmailTo } from "./emailService";
 
 const prisma = new PrismaClient();
+
+export const verifyEmail = async (email: string, isVerified: boolean) => {
+  if (isVerified) {
+    await asyncFunctionErrorCatcher(
+      () =>
+        prisma.user.update({
+          where: {
+            email: email,
+          },
+          data: {
+            verified_email: isVerified,
+          },
+        }),
+      "Email not verified."
+    );
+  }
+};
 
 export const getTokenByCredential = async (email: string, password: string) => {
   const user = await asyncFunctionErrorCatcher(
@@ -29,7 +47,10 @@ export const getTokenByCredential = async (email: string, password: string) => {
       }),
     "Failed to find user from prisma."
   );
-  if (!user?.verified_email) throw new Error("Email not verified"); //TODO: send email verification again
+  if (!user?.verified_email) {
+    await sendEmailTo(email);
+    throw new Error("Email not verified");
+  }
   if (user?.credential) {
     //compare the provided password with the hashed password
     const isMatch = await argon2.verify(user.credential.password, password);
@@ -69,6 +90,6 @@ export const registerByEmail = async (email: string, password: string) => {
       },
     })
   );
-  //TODO: send email verification
+  await sendEmailTo(email);
   return signJwt(user.id, user.given_name);
 };

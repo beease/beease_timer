@@ -1,11 +1,15 @@
 import { z } from "zod";
-import { router, publicProcedure, isAuthed } from "../trpc";
+import {
+  router,
+  publicProcedure,
+  isAuthed,
+  authorizedProcedure,
+} from "../trpc";
 import * as workspaceService from "../services/CRUD/workspaceService";
 import * as userService from "../services/CRUD/userService";
 
 export const workspaceRouter = router({
-  createWorkspace: publicProcedure
-    .use(isAuthed)
+  createWorkspace: authorizedProcedure
     .input(z.object({ name: z.string(), color: z.string() }))
     .mutation(async (opts) => {
       const { ctx } = opts;
@@ -17,26 +21,23 @@ export const workspaceRouter = router({
         );
       }
     }),
-  getMyWorkspaces: publicProcedure.use(isAuthed).query(async (opts) => {
+  getMyWorkspaces: authorizedProcedure.query(async (opts) => {
     const { ctx } = opts;
     if (ctx.tokenPayload) {
       return await workspaceService.getMyWorkspaces(ctx.tokenPayload.userId);
     }
   }),
-  getWorkspaceById: publicProcedure
-    .use(isAuthed)
+  getWorkspaceById: authorizedProcedure
     .input(z.object({ workspaceId: z.string() }))
     .query(async (opts) => {
       return await workspaceService.getWorkspaceById(opts.input.workspaceId);
     }),
-  getWorkspaceList: publicProcedure
-    .use(isAuthed)
-    .input(z.object({ workspaceId: z.string() }))
-    .query(async (opts) => {
-        return await workspaceService.getWorkspaceList(opts.input.workspaceId);
-    }),
-  updateWorkspace: publicProcedure
-    .use(isAuthed)
+  getWorkspaceList: authorizedProcedure
+  .input(z.object({ workspaceId: z.string() }))
+  .query(async (opts) => {
+      return await workspaceService.getWorkspaceList(opts.input.workspaceId);
+  }),
+  updateWorkspace: authorizedProcedure
     .input(
       z.object({
         id: z.string(),
@@ -52,8 +53,7 @@ export const workspaceRouter = router({
       const { id, data } = opts.input;
       return await workspaceService.updateWorkspace(id, data);
     }),
-  deleteWorkspace: publicProcedure
-    .use(isAuthed)
+  deleteWorkspace: authorizedProcedure
     .input(
       z.object({
         id: z.string(),
