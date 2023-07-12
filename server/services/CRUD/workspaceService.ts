@@ -4,7 +4,6 @@ import {
   deleteProjectsByWorkspaceId,
   getProjectsByWorkspaceId,
 } from "./projectService";
-import { getSessionsByProjectId } from "./sessionService";
 const prisma = new PrismaClient();
 
 type WorkspaceUpdateData = {

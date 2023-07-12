@@ -34,16 +34,26 @@ export const getMembersWorkspaceByWorkspaceId = async (workspaceId: string) => {
   );
 };
 
-export const updateMemberWorkspace = async (
+export const updateRoleMemberWorkspace = async (
+  emitterUserId: string,
   memberWorkspaceId: string,
   data: updateMemberWorkspaceData
 ) => {
-  return asyncFunctionErrorCatcher(() =>
-    prisma.memberWorkspace.update({
-      where: {
-        id: memberWorkspaceId,
-      },
-      data: data,
-    })
-  );
+  const memberWorkspaceEmitter = await prisma.memberWorkspace.findFirst({
+    where: {
+      id: emitterUserId,
+    },
+  });
+  if (memberWorkspaceEmitter && memberWorkspaceEmitter.role === "OWNER") {
+    return asyncFunctionErrorCatcher(() =>
+      prisma.memberWorkspace.update({
+        where: {
+          id: memberWorkspaceId,
+        },
+        data: data,
+      })
+    );
+  } else {
+    throw new Error("Emitter is not allowed to change role of an user");
+  }
 };
