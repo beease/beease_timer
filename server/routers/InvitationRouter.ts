@@ -45,7 +45,7 @@ export const invitationRouter = router({
             inviterUser.family_name + " " + inviterUser.name
           }.</p>
           <p style="font-size: 16px; color: #666666;">Cliquez sur le bouton ci-dessous pour accepter l'invitation :</p>
-          <p><a href="{{lienAcceptation}}" target="_blank" style="display: inline-block; background-color: #4CAF50; color: white; padding: 10px 20px; text-decoration: none; font-size: 16px; border-radius: 4px; transition: background-color 0.3s ease;">Accepter l'invitation</a></p>
+          <p><a href="http://localhost:3001/api/acceptInvitation?fromUser=${inviterUser}&toUser=${invitedUser}&at=${workspaceId}" target="_blank" style="display: inline-block; background-color: #4CAF50; color: white; padding: 10px 20px; text-decoration: none; font-size: 16px; border-radius: 4px; transition: background-color 0.3s ease;">Accepter l'invitation</a></p>
           <p style="font-size: 16px; color: #666666;">Si vous avez des questions ou besoin d'aide, n'hésitez pas à nous contacter.</p>
           <p style="font-size: 16px; color: #666666;">Merci !</p>
           <p style="font-size: 16px; color: #666666;">L'équipe de Beease Timer</p>
@@ -53,7 +53,7 @@ export const invitationRouter = router({
         });
       } else {
         throw new Error(
-          "Invitation email failed  : not enough information provided."
+          "Invitation email failed  : incorrect informations provided."
         );
       }
     }),

@@ -20,3 +20,30 @@ export const sendInvitationService = async (
     "Failed to create invitation."
   );
 };
+
+export const acceptInvitation = async (
+  inviterId: string,
+  invitedId: string,
+  workspaceId: string
+) => {
+  try {
+    const acceptInvitationFn = prisma.invitation.delete({
+      where: {
+        invitedId_inviterId_workspaceId: {
+          invitedId: invitedId,
+          inviterId: inviterId,
+          workspaceId: workspaceId,
+        },
+      },
+    });
+    const addToWorkspace = prisma.memberWorkspace.create({
+      data: {
+        userId: invitedId,
+        workspaceId: workspaceId,
+      },
+    });
+    return await prisma.$transaction([acceptInvitationFn, addToWorkspace]);
+  } catch (err) {
+    throw new Error(`Accept invitation failed : ${err}`);
+  }
+};

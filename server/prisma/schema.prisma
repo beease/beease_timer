@@ -54,8 +54,8 @@ model Project {
   workspace      Workspace       @relation(fields: [workspaceId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   workspaceId    String
   memberSessions memberSession[]
-  dailyPrice     Float           @default(0)
-  hourByDay      Float           @default(0)
+  dailyPrice     Float?       
+  hourByDay      Float?          
   color          String
   isArchived     Boolean        @default(false)
 }
@@ -68,6 +68,8 @@ model memberWorkspace {
   user           User            @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId         String
   memberSessions memberSession[]
+
+  @@unique([workspaceId, userId])
 }
 
 model memberSession {
@@ -90,4 +92,6 @@ model Invitation {
   inviterId   String
   workspace   Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   workspaceId String
+
+  @@unique([invitedId, inviterId, workspaceId])
 }
