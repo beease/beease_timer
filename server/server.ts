@@ -60,10 +60,19 @@ app.use(
     createContext,
   })
 );
-
+app.set("views", __dirname + "/views");
+app.set("view engine", "ejs");
 app.get("/renderVerifiedEmail", async (req, res) => {
-  console.log("hello world ! ");
-  res.render("server/emailConfirmed.ejs");
+  const email = req.query?.emailTo;
+  console.log("email : ", email);
+  if (!email)
+    return res
+      .status(404)
+      .json({ message: "Failed to render verified email : email not found" });
+  res.render("emailConfirmed", { emailTo: email }, (err: any, html: any) => {
+    if (err) return res.status(500).json({ message: err.message });
+    res.status(200).send(html);
+  });
 });
 
 const server = http.createServer(app);
