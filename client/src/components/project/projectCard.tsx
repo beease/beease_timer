@@ -5,9 +5,10 @@ import { wait } from "../../utils/function";
 import { projectStore, ProjectStore } from "../../stores/projectStore";
 import { ProjectMoreInfos } from "./projectCardMoreInfos";
 import { ProjectCardTop } from "./projectCardTop";
+import type { Project } from "../../libs/interfaces";
 
 interface Props {
-  project: any;
+  project: Project;
 }
 
 export const ProjectCard = ({ project }: Props) => {
@@ -58,7 +59,7 @@ export const ProjectCard = ({ project }: Props) => {
   }, [MoreInfoProjectId]);
 
   return (
-    <div ref={projectCard} className="ProjectCard" key={project.id}>
+    <div ref={projectCard} className="ProjectCard">
       <ProjectCardTop 
           project={project}
           setIsDotsButtonActive={setIsDotsButtonActive}

@@ -5,28 +5,28 @@ interface Props extends React.HTMLAttributes<HTMLDivElement>{
     height: number;
     options: [string, string]; 
     color: string;
-    currentOption: number;
-    setCurrentOption: (option: number) => void;
+    currentOption: boolean;
+    setCurrentOption: (option: boolean) => void;
 }
 
 export const Switch = ({options, width, height, color, currentOption, setCurrentOption, ...props}: Props) => {
     const lineHeight = `${height - 16}px`;
-    const buttonPosition = `${currentOption === 1 ?(width / 2) * currentOption - 4 : 0}px`;
+    const buttonPosition = `${currentOption === true ?(width / 2) * 1 - 4 : 0}px`;
 
     return (
         <div {...props} className='ui_switch_cont' style={{width: `${width}px`, height: `${height}px`}}>
             <div className='ui_switch_text_cont'>
                 <div
-                    className={`ui_switch_text ${currentOption === 0 && 'selected'}`}
+                    className={`ui_switch_text ${currentOption === false && 'selected'}`}
                     style={{lineHeight}}
-                    onClick={() => setCurrentOption(0)}
+                    onClick={() => setCurrentOption(false)}
                 >
                     {options[0]}
                 </div>
                 <div
-                    className={`ui_switch_text ${currentOption === 1 && 'selected'}`}
+                    className={`ui_switch_text ${currentOption === true && 'selected'}`}
                     style={{lineHeight}}
-                    onClick={() => setCurrentOption(1)}
+                    onClick={() => setCurrentOption(true)}
                 >
                     {options[1]}
                 </div>

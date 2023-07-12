@@ -18,13 +18,13 @@ export const ProjectSettings = ({ project }: Props) => {
   const [name, setName] = useState<string>(project.name);
   const [dailyPrice, setDailyPrice] = useState<number | null>(project.dailyPrice);
   const [hourByDay, setHourByDay] = useState<number | null>(project.hourByDay);
-  const [colorProject, setColorProject] = useState(project.color);
-  const [currentOption, setCurrentOption] = useState<number>(0);
+  const [colorProject, setColorProject] = useState<string>(project.color);
+  const [isArchived, setIsArchived] = useState<boolean>(project.isArchived);
   
-  const [isValuesChanged, setIsValueChanged] = useState(false);
+  const [isValuesChanged, setIsValueChanged] = useState<boolean>(false);
 
-  const [colorProjectPopup, setColorProjectPopup] = useState(false);
-  const [isConfirmationPopupActive, setIsConfirmationPopupActive] = useState(false);
+  const [colorProjectPopup, setColorProjectPopup] = useState<boolean>(false);
+  const [isConfirmationPopupActive, setIsConfirmationPopupActive] = useState<boolean>(false);
   
   const selectedWorkspaceId = workspaceStore((state: WorkspaceState) => state.selectedWorkspaceId);
 
@@ -63,7 +63,8 @@ export const ProjectSettings = ({ project }: Props) => {
           name: name,
           color: colorProject,
           dailyPrice: dailyPrice ? +dailyPrice : undefined,
-          hourByDay: hourByDay ? +hourByDay : undefined ,
+          hourByDay: hourByDay ? +hourByDay : undefined,
+          isArchived: isArchived
         },
       },
       {
@@ -86,12 +87,12 @@ export const ProjectSettings = ({ project }: Props) => {
       name !== project.name ||
       dailyPrice !== project.dailyPrice ||
       hourByDay !== project.hourByDay ||
-      colorProject !== project.color
+      colorProject !== project.color ||
+      isArchived !== project.isArchived
     );
     setIsValueChanged(hasValueChanged);
-  }, [name, dailyPrice, hourByDay, colorProject, project.name, project.dailyPrice, project.hourByDay, project.color]);
+  }, [name, dailyPrice, hourByDay, colorProject, isArchived, project.name, project.dailyPrice, project.hourByDay, project.color, project.isArchived]);
   
-
   return (
     <div className="ProjectSettings">
       <div className="ProjectSettings_line">
@@ -164,8 +165,8 @@ export const ProjectSettings = ({ project }: Props) => {
           height={42}
           options={["En cours", "Archives"]}
           color={project.color}
-          currentOption={currentOption}
-          setCurrentOption={setCurrentOption}
+          currentOption={isArchived}
+          setCurrentOption={setIsArchived}
         />
         <BasicButton
           icon={check}

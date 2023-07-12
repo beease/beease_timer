@@ -2,6 +2,7 @@ import { useState } from "react";
 import { ProjectCard } from "./projectCard";
 import { ProjectAdd } from "./projectAdd";
 import { workspaceStore, WorkspaceState } from "../../stores/workspaceStore";
+import { filtersStore, FiltersState } from "../../stores/filterStore";
 import { trpc } from "../../trpc";
 
 interface Props {
@@ -16,6 +17,7 @@ export const ProjectList = ({ selectedWorkspaceId }: Props) => {
   const isStatisticActive = workspaceStore(
     (state: WorkspaceState) => state.isStatisticActive
   );
+  const filters = filtersStore((state: FiltersState) => state.filters);
 
   if(error) return;
 
@@ -28,6 +30,10 @@ export const ProjectList = ({ selectedWorkspaceId }: Props) => {
   )
 
   if(worspace){
+    const filteredProjects = worspace.projects.filter(project =>
+      (project.isArchived && filters.archives) || (!project.isArchived && filters.current)
+    );
+
     if(isStatisticActive) {
       return(
         <div>stats</div>
@@ -35,8 +41,9 @@ export const ProjectList = ({ selectedWorkspaceId }: Props) => {
     }
     return (
       <div className="ProjectList">
-        {worspace.projects.map((project) => (
+        {filteredProjects.map((project) => (
           <ProjectCard
+            key={project.id}
             project={project}
           />
         ))}

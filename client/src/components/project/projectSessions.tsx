@@ -4,9 +4,10 @@ import plus from "../../assets/plus_w.svg";
 import { DisplayMyPicture } from "../ui/displayMyPicture";
 import { DisplayUserPicture } from "../ui/displayUserPicture";
 import { ProjectSessionsLine } from "./projectSessionsLine";
+import type { Project } from "../../libs/interfaces";
 
 interface Props {
-  project: any;
+  project: Project;
 }
 
 const sessions = [

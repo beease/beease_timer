@@ -3,6 +3,7 @@ import { ProjectSettings } from "./projectCardSettings";
 import history from "../../assets/history.svg";
 import setting from "../../assets/setting.svg";
 import { ProjectSessions } from "./projectSessions";
+import type { Project } from "../../libs/interfaces";
 
 interface ButtonProps {
   title: "history" | "setting";
@@ -10,7 +11,7 @@ interface ButtonProps {
 }
 
 interface Props {
-  project: any;
+  project: Project;
 }
 
 export const ProjectMoreInfos = ({ project }: Props) => {

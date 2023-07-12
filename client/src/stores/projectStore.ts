@@ -1,4 +1,5 @@
 import { create } from 'zustand'
+import { trpc } from '../trpc';
 
 export interface ProjectStore {
     PlayingProjectId: string | null;
@@ -6,6 +7,8 @@ export interface ProjectStore {
     toggleMoreInfo: (projectId: string | null) => void;
     toggleIsPlaying: (projectId: string) => void;
 } 
+
+// const mutation = trpc.session.
 
 export const projectStore = create<ProjectStore>((set) => ({
     PlayingProjectId: null,
