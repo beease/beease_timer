@@ -10,20 +10,18 @@ import { sendEmailTo } from "./emailService";
 
 const prisma = new PrismaClient();
 
-export const verifyEmail = async (email: string, isVerified: boolean) => {
-  if (isVerified) {
-    await asyncFunctionErrorCatcher(
-      () =>
-        prisma.user.update({
-          where: {
-            email: email,
-          },
-          data: {
-            verified_email: isVerified,
-          },
-        }),
-      "Email not verified."
-    );
+export const verifyEmail = async (email: string) => {
+  try {
+    await prisma.user.update({
+      where: {
+        email: email,
+      },
+      data: {
+        verified_email: true,
+      },
+    });
+  } catch (err) {
+    throw new Error(`Error while verifying email : ${err}`);
   }
 };
 
@@ -48,7 +46,16 @@ export const getTokenByCredential = async (email: string, password: string) => {
     "Failed to find user from prisma."
   );
   if (!user?.verified_email) {
-    await sendEmailTo(email);
+    await sendEmailTo(email, {
+      subject: "Beease Timer - Confirmation Adresse mail.",
+      html: `<body>
+      <h1 style="color: #333333;">Veuillez confirmer votre adresse e-mail</h1>
+      <p style="color: #666666;">Merci de vous être inscrit. Veuillez confirmer votre adresse e-mail en cliquant sur le lien ci-dessous :</p>
+      <a href="http://localhost:3001/renderVerifiedEmail?emailTo=${email}" style="display: inline-block; margin-top: 20px; padding: 10px 20px; background-color: #4caf50; color: #ffffff; text-decoration: none; border-radius: 4px;">Confirmer</a>
+      <p style="color: #666666;">Si vous n'avez pas créé de compte sur notre site, veuillez ignorer cet e-mail.</p>
+      <p style="color: #333333;">Cordialement,<br>Votre équipe Beease</p>
+    </body>`,
+    });
     throw new Error("Email not verified");
   }
   if (user?.credential) {
@@ -90,6 +97,15 @@ export const registerByEmail = async (email: string, password: string) => {
       },
     })
   );
-  await sendEmailTo(email);
+  await sendEmailTo(email, {
+    subject: "Beease Timer - Confirmation Adresse mail.",
+    html: `<body>
+    <h1 style="color: #333333;">Veuillez confirmer votre adresse e-mail</h1>
+    <p style="color: #666666;">Merci de vous être inscrit. Veuillez confirmer votre adresse e-mail en cliquant sur le lien ci-dessous :</p>
+    <a href="http://localhost:3001/renderVerifiedEmail?emailTo=${email}" style="display: inline-block; margin-top: 20px; padding: 10px 20px; background-color: #4caf50; color: #ffffff; text-decoration: none; border-radius: 4px;">Confirmer</a>
+    <p style="color: #666666;">Si vous n'avez pas créé de compte sur notre site, veuillez ignorer cet e-mail.</p>
+    <p style="color: #333333;">Cordialement,<br>Votre équipe Beease</p>
+  </body>`,
+  });
   return signJwt(user.id, user.given_name);
 };

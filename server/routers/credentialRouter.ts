@@ -26,11 +26,10 @@ export const credentialRouter = router({
     .input(
       z.object({
         email: z.string().email(),
-        isVerified: z.boolean(),
       })
     )
-    .query(async (opts) => {
-      const { email, isVerified } = opts.input;
-      return await credentialService.verifyEmail(email, isVerified);
+    .mutation(async (opts) => {
+      const { email } = opts.input;
+      return await credentialService.verifyEmail(email);
     }),
 });

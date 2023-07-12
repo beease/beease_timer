@@ -26,6 +26,8 @@ model User {
   picture          String?
   locale           String?
   google_id        String?           @unique
+  Inviter          Invitation[]      @relation("InviterUser")
+  Invited          Invitation[]      @relation("InvitedUser")
   credential       Credential?       
   memberWorkspaces memberWorkspace[]
 }
@@ -43,6 +45,7 @@ model Workspace {
   projects         Project[]
   color            String
   membersWorkspace memberWorkspace[]
+  Invitation       Invitation[] 
 }
 
 model Project {
@@ -54,6 +57,7 @@ model Project {
   dailyPrice     Float           @default(0)
   hourByDay      Float           @default(0)
   color          String
+  isArchived     Boolean        @default(false)
 }
 
 model memberWorkspace {
@@ -74,4 +78,16 @@ model memberSession {
   projectId         String?
   memberWorkspace   memberWorkspace? @relation(fields: [memberWorkspaceId], references: [id], onDelete: Cascade)
   memberWorkspaceId String?
+}
+
+
+model Invitation {
+  id          String @id @default(cuid())
+  date        DateTime @default(now())
+  invited     User  @relation("InvitedUser", fields: [invitedId], references: [id], onDelete: Cascade)
+  invitedId   String
+  inviter     User  @relation("InviterUser", fields: [inviterId], references: [id], onDelete: Cascade)
+  inviterId   String
+  workspace   Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  workspaceId String
 }
