@@ -4,6 +4,7 @@ import { Prisma, PrismaClient } from "@prisma/client";
 import {
   deleteProject,
   deleteProjectsByWorkspaceId,
+  getProject,
   getProjectsByWorkspaceId,
   updateProject,
 } from "../services/CRUD/projectService";
@@ -15,6 +16,16 @@ export const projectRouter = router({
     .query(async (opts) => {
       const { workspaceId } = opts.input;
       return await getProjectsByWorkspaceId(workspaceId);
+    }),
+  getProject: authorizedProcedure
+    .input(
+      z.object({
+        id: z.string(),
+      })
+    )
+    .query(async (opts) => {
+      const { id } = opts.input;
+      return await getProject(id);
     }),
   updateProject: authorizedProcedure
     .input(
