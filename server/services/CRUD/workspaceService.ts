@@ -9,7 +9,7 @@ const prisma = new PrismaClient();
 
 type WorkspaceUpdateData = {
   name?: string;
-  color: string;
+  color?: string;
 };
 
 export const createWorkspace = async (
