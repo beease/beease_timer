@@ -9,6 +9,30 @@ type updateProjectData = {
   dailyPrice?: number;
 };
 
+export const createProject = async (
+  name: string,
+  color: string,
+  workspaceId: string,
+) => {
+  try {
+    const Project = await prisma.project.create({
+      data: {
+        name: name,
+        color: color,
+        workspaceId: workspaceId,
+      },
+      include: {
+        memberSessions: true,
+      }
+    });
+
+    return Project;
+  } catch (err) {
+    throw new Error(`Failed creating project : ${err}`);
+  }
+};
+
+
 export const getProject = async (id: string) => {
   return asyncFunctionErrorCatcher(() =>
     prisma.project.findUnique({
@@ -39,7 +63,10 @@ export const updateProject = async (
         where: {
           id: projectId,
         },
-        data: data,
+        data,
+        include: {
+          memberSessions: true,
+        }
       }),
     "Failed to update project."
   );

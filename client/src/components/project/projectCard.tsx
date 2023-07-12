@@ -58,7 +58,7 @@ export const ProjectCard = ({ project }: Props) => {
   }, [MoreInfoProjectId]);
 
   return (
-    <div ref={projectCard} className="ProjectCard">
+    <div ref={projectCard} className="ProjectCard" key={project.id}>
       <ProjectCardTop 
           project={project}
           setIsDotsButtonActive={setIsDotsButtonActive}

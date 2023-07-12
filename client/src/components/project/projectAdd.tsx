@@ -15,29 +15,33 @@ export const ProjectAdd = ({selectedWorkspaceId}: Props) => {
   const [isAddWorkspaceDisplay, setIsAddWorkspaceDisplay] = useState(false);
   const [colorProject, setColorProject] = useState("#4969fb");
   const [colorProjectPopup, setColorProjectPopup] = useState(false);
+  const [name, setName] = useState<string>("");
 
   const addProjectFormRef = useRef<HTMLDivElement>(null);
   const addProjectInputRef = useRef<HTMLInputElement>(null);
   const addProjectContRef = useRef<HTMLDivElement>(null);
 
   const utils = trpc.useContext();
-  // const mutation = trpc.project.
+  const mutation = trpc.project.createWorkspace.useMutation()
 
   const handleAddProject = () => {
-    const projectName = addProjectInputRef.current?.value;
-    if (!projectName) return;
+    if (!name) return;
     mutation.mutate(
       {
-        name: projectName,
+        name: name,
         color: colorProject,
+        workspaceId: selectedWorkspaceId,
       },
       {
         onSuccess: (newProject) => {
           if(!newProject) return;
-          console.log(newProject)
-          utils.workspace.getWorkspaceList.setData({workspaceId: selectedWorkspaceId}, (oldQueryData: any) => {
-            return oldQueryData.projects.push(newProject)
-          })
+          utils.workspace.getWorkspaceList.setData(
+            {workspaceId: selectedWorkspaceId}, 
+            (oldQueryData) => oldQueryData && {
+              ...oldQueryData,
+              projects: [...oldQueryData.projects, newProject]
+            })
+          setIsAddWorkspaceDisplay(false)
         },
       }
     );
@@ -86,6 +90,10 @@ export const ProjectAdd = ({selectedWorkspaceId}: Props) => {
       />
       <div ref={addProjectFormRef} className="ProjectAdd_form">
         <input
+          onChange={(e) => {
+            setName(e.target.value);
+          }}
+          value={name}
           ref={addProjectInputRef}
           className="ProjectAdd_input"
           placeholder="Mon top projet :3"
@@ -102,10 +110,12 @@ export const ProjectAdd = ({selectedWorkspaceId}: Props) => {
         />
         <BasicButton 
         icon={check} 
+        variant={
+          name ? "confirm" : "grey"
+        }
         onClick={() => {
-          handleAddProject()
+          name && handleAddProject()
         }}
-        variant="confirm"
          />
       </div>
     </div>

@@ -68,7 +68,6 @@ export const getWorkspaceList = async (workspaceId: string) => {
         },
       },
     });
-
     return fullWorkspace;
   } catch (err) {
     throw new Error(`Failed to get workspace list : ${err}`);

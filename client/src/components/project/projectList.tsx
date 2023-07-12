@@ -17,39 +17,26 @@ export const ProjectList = ({ selectedWorkspaceId }: Props) => {
     (state: WorkspaceState) => state.isStatisticActive
   );
 
-  // const projects = [
-  //   {
-  //     id: "1234FDQZSR1234",
-  //     name: "project test1",
-  //     description: "azerihaopzier hazerh",
-  //     color: "#add8ab",
-  //   },
-  //   {
-  //     id: "12345EZR",
-  //     name: "gms industrie",
-  //     description: "azerihaopzier hazerh",
-  //     color: "#5ac5d5",
-  //   },
-  //   {
-  //     id: "zert342345",
-  //     name: "gms industrie",
-  //     description: "azerihaopzier hazerh",
-  //     color: "#5ac5d5",
-  //   },
-  // ];
+  if(error) return;
 
-  if(isStatisticActive) {
-    return(
-      <div>stats</div>
-    )
-  }
-  
+  if(isLoading) return (
+    <div className="ProjectList">
+      <div className="ProjectCard skeleton"></div>
+      <div className="ProjectCard skeleton"></div>
+      <div className="ProjectCard skeleton"></div>
+    </div>
+  )
+
   if(worspace){
+    if(isStatisticActive) {
+      return(
+        <div>stats</div>
+      )
+    }
     return (
       <div className="ProjectList">
-        {worspace.projects.map((project: any, index: number) => (
+        {worspace.projects.map((project) => (
           <ProjectCard
-            key={index}
             project={project}
           />
         ))}

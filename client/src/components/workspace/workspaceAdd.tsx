@@ -9,6 +9,8 @@ import { trpc } from '../../trpc';
 export const WorkspaceAdd = () => {
   const [colorWorkSpace, setColorWorkSpace] = useState('#4969fb');
   const [colorWorkSpacePopup, setColorWorkSpacePopup] = useState(false);
+  const [name, setName] = useState<string>("");
+
   const setSettingWorkspace = workspaceStore((state: WorkspaceState) => state.setSettingWorkspace);
   const setSelectedWorkspaceId = workspaceStore((state: WorkspaceState) => state.setSelectedWorkspaceId);
 
@@ -18,11 +20,10 @@ export const WorkspaceAdd = () => {
   const mutation = trpc.workspace.createWorkspace.useMutation();
   
   const handleAddWorkspace = () => {
-    const workspaceName = inputRef.current?.value;
-    if (!workspaceName) return;
+    if (!name) return;
     mutation.mutate(
       {
-        name: workspaceName,
+        name: name,
         color: colorWorkSpace,
       },
       {
@@ -43,7 +44,16 @@ export const WorkspaceAdd = () => {
 
   return (
     <div className="addWorkspace">
-      <input ref={inputRef} className="addWorkspace_name_input" type="text" placeholder="Workspace name"/>
+      <input 
+        onChange={(e) => {
+          setName(e.target.value);
+        }}
+        value={name}
+        ref={inputRef} 
+        className="addWorkspace_name_input" 
+        type="text" 
+        placeholder="Workspace name"
+      />
 
       <ColorPickerPopup
         setColor={setColorWorkSpace}
@@ -65,9 +75,11 @@ export const WorkspaceAdd = () => {
       />
       <BasicButton 
          onClick={() => {
-          handleAddWorkspace()
+          name && handleAddWorkspace()
         }}
-        variant='confirm'
+        variant={
+          name ? "confirm" : "grey"
+        }
         icon={check}
       />
     </div>

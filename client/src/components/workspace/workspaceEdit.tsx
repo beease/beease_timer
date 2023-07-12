@@ -17,6 +17,8 @@ export const WorkspaceEdit = ({ selectedWorkspaceId }: Props) => {
   const [isConfirmationPopupActive, setIsConfirmationPopupActive] =
     useState(false);
 
+  const inputRef = useRef<HTMLInputElement>(null);
+
   const setSettingWorkspace = workspaceStore(
     (state: WorkspaceState) => state.setSettingWorkspace
   );
@@ -28,12 +30,10 @@ export const WorkspaceEdit = ({ selectedWorkspaceId }: Props) => {
   const mutationDelete = trpc.workspace.deleteWorkspace.useMutation();
   const mutationUpdate = trpc.workspace.updateWorkspace.useMutation();
 
-  const inputRef = useRef<HTMLInputElement>(null);
-
   const {data: workspaces, error, isLoading} = trpc.workspace.getMyWorkspaces.useQuery()
 
   const workspace = workspaces ? workspaces.find(ws => ws.id === selectedWorkspaceId) : null;
-  
+
   useEffect(() => {
     setColorWorkSpace(workspace?.color || "#4969fb");
   }, [workspace?.color]);
