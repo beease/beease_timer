@@ -3,13 +3,6 @@ import { ProjectList } from "../project/projectList";
 import { workspaceStore, WorkspaceState } from "../../stores/workspaceStore";
 import { WorkspaceAdd } from "./workspaceAdd";
 import { WorkspaceEdit } from "./workspaceEdit";
-import { trpc } from '../../trpc';
-
-// const workspace = {
-//   id: "aZERAZERQSDF342",
-//   name: "beease test",
-//   color: "#FF9E4C",
-// };
 
 export const Workspace = () => {
   

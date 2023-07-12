@@ -6,8 +6,6 @@ import { projectRouter } from "./projectRouter";
 import { memberWorkspaceRouter } from "./memberWorkspaceRouter";
 import { credentialRouter } from "./credentialRouter";
 import { sessionRouter } from "./sessionRouter";
-import { sendEmail } from "../services/utils/sendEmail";
-import { z } from "zod";
 import { emailRouter } from "./emailRouter";
 
 const appRouter = router({

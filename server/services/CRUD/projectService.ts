@@ -7,6 +7,7 @@ type updateProjectData = {
   color?: string;
   hourByDay?: number;
   dailyPrice?: number;
+  isArchived?: boolean;
 };
 
 export const createProject = async (
@@ -25,7 +26,6 @@ export const createProject = async (
         memberSessions: true,
       }
     });
-
     return Project;
   } catch (err) {
     throw new Error(`Failed creating project : ${err}`);

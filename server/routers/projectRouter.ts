@@ -50,6 +50,7 @@ export const projectRouter = router({
           color: z.string().optional(),
           hourByDay: z.number().optional(),
           dailyPrice: z.number().optional(),
+          isArchived: z.boolean().optional(),
         }),
       })
     )
