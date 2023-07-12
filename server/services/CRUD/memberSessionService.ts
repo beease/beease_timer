@@ -9,7 +9,8 @@ type updateMemberSessionData = {
 
 export const createMemberSession = async (
   userId: string,
-  projectId: string
+  projectId: string,
+  startedAt: string,
 ) => {
   const getMemberWorkspace = await prisma.memberWorkspace.findFirst({
     where: {
@@ -22,6 +23,7 @@ export const createMemberSession = async (
         data: {
           memberWorkspaceId: getMemberWorkspace?.id,
           projectId: projectId,
+          startedAt: startedAt,
         },
       }),
     "Failed to create session"
@@ -66,10 +68,10 @@ export const getMemberSessionById = async (sessionId: string) => {
   );
 };
 
-export const updateSession = async (
+export const stopSession = async (
   emitterId: string,
-  sessionId: string,
-  data: updateMemberSessionData
+  projectId: string,
+  endedAt: string,
 ) => {
   const memberWorkspace = await prisma.memberWorkspace.findFirst({
     where: {
@@ -78,11 +80,15 @@ export const updateSession = async (
   });
   return asyncFunctionErrorCatcher(
     () =>
-      prisma.memberSession.update({
+      prisma.memberSession.updateMany({
         where: {
-          id: sessionId,
+          projectId: projectId,
+          memberWorkspaceId: memberWorkspace?.id,
+          endedAt: null
         },
-        data: data,
+        data: {
+          endedAt: endedAt,
+        },
       }),
     "Failed to update session"
   );

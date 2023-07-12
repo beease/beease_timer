@@ -8,5 +8,4 @@ export interface Filters {
 
 export type Project = Extract<inferRouterOutputs<WorkspaceRouter>['getWorkspaceList'], { projects: object[] }>['projects'][number];
 
-
-
+export type Session = Project['memberSessions'][number];

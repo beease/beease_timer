@@ -71,6 +71,12 @@ export const workspaceRouter = router({
         return await workspaceService.deleteWorkspace(emitterId, id);
       }
     }),
+  getUsersWithSessions: authorizedProcedure
+    .input(z.object({ workspaceId: z.string() }))
+    .query(async (opts) => {
+      const { workspaceId } = opts.input;
+      return await workspaceService.getUsersWithSessions(workspaceId);
+    }),
 });
 
 export type WorkspaceRouter = typeof workspaceRouter;

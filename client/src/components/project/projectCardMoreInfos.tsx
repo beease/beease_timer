@@ -4,7 +4,7 @@ import history from "../../assets/history.svg";
 import setting from "../../assets/setting.svg";
 import { ProjectSessions } from "./projectSessions";
 import type { Project } from "../../libs/interfaces";
-
+import { workspaceStore, WorkspaceState } from "../../stores/workspaceStore";
 interface ButtonProps {
   title: "history" | "setting";
   icon: string;
@@ -18,6 +18,10 @@ export const ProjectMoreInfos = ({ project }: Props) => {
   const [selectedButton, setSelectedButton] = useState<"history" | "setting">(
     "history"
   );
+  const selectedWorkspaceId = workspaceStore(
+    (state: WorkspaceState) => state.selectedWorkspaceId
+  );
+
   const History = () => {
     return <div></div>;
   };
@@ -45,7 +49,7 @@ export const ProjectMoreInfos = ({ project }: Props) => {
         <Button title={"setting"} icon={setting} />
       </div>
       <div className="ProjectCard_moreInfos_content">
-        {selectedButton === "history" && <ProjectSessions project={project} />}
+        {selectedButton === "history" && selectedWorkspaceId && <ProjectSessions project={project} selectedWorkspaceId={selectedWorkspaceId}/>}
         {selectedButton === "setting" && <ProjectSettings project={project} />}
       </div>
     </>

@@ -6,7 +6,7 @@ import {
   deleteMemberSession,
   getMemberSessionById,
   getMemberSessionsByProjectId,
-  updateSession,
+  stopSession,
 } from "../services/CRUD/memberSessionService";
 
 const prisma = new PrismaClient();
@@ -15,13 +15,17 @@ export const memberSessionRouter = router({
   createSession: authorizedProcedure
     .input(
       z.object({
-        userId: z.string(),
         projectId: z.string(),
+        startedAt: z.string(),
       })
     )
     .mutation(async (opts) => {
-      const { userId, projectId } = opts.input;
-      return await createMemberSession(userId, projectId);
+      const { ctx } = opts;
+      if (ctx.tokenPayload) {
+        const { projectId, startedAt } = opts.input;
+        const emitterId = ctx.tokenPayload.userId;
+        return await createMemberSession(emitterId, projectId, startedAt);
+      }
     }),
   deleteSession: authorizedProcedure
     .input(
@@ -33,20 +37,20 @@ export const memberSessionRouter = router({
       const { sessionId } = opts.input;
       return await deleteMemberSession(sessionId);
     }),
-  updateSession: authorizedProcedure
+  stopSession: authorizedProcedure
     .input(
       z.object({
-        sessionId: z.string(),
-        data: z.object({}),
+        projectId: z.string(),
+        endedAt: z.string(),
       })
     )
     .mutation(async (opts) => {
       const { ctx } = opts;
-      const { sessionId, data } = opts.input;
+      const { projectId, endedAt } = opts.input;
 
       if (ctx.tokenPayload) {
         const emitterId = ctx.tokenPayload.userId;
-        return await updateSession(emitterId, sessionId, data);
+        return await stopSession(emitterId, projectId, endedAt);
       }
     }),
   getSessionsByProjectId: authorizedProcedure

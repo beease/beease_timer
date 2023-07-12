@@ -23,7 +23,21 @@ export const createProject = async (
         workspaceId: workspaceId,
       },
       include: {
-        memberSessions: true,
+        memberSessions:{
+          include: {
+            memberWorkspace: {
+              select: {
+                user: {
+                  select: {
+                    id: true,
+                    given_name: true,
+                    picture: true
+                  }
+                }
+              }
+            }
+          }
+        }
       }
     });
     return Project;
@@ -65,7 +79,21 @@ export const updateProject = async (
         },
         data,
         include: {
-          memberSessions: true,
+          memberSessions: {
+            include: {
+              memberWorkspace: {
+                select: {
+                  user: {
+                    select: {
+                      id: true,
+                      given_name: true,
+                      picture: true
+                    }
+                  }
+                }
+              }
+            }
+          }
         }
       }),
     "Failed to update project."

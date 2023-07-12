@@ -4,18 +4,20 @@ import { BasicButton } from "../ui/basicButton";
 import bin from "../../assets/bin.svg";
 import { formatTimestamp } from '../../utils/function';
 import dayjs from 'dayjs';
+import type { Session } from '../../libs/interfaces';
+
 interface Props {
-    session: any;
+    session: Session;
 }
 
-const getTimestampWithTwoDates = (date1: Date, date2: Date) => {
+const getTimestampWithTwoDates = (date1: string, date2: string) => {
     const day1 = dayjs(date1);
     const day2 = dayjs(date2);
     const diff = day2.diff(day1);
     return formatTimestamp(diff);
   }
 
-const formatTwoDates = (date1: Date, date2: Date): string => {
+const formatTwoDates = (date1: string, date2: string): string => {
     const formattedDate1 = dayjs(date1);
     const formattedDate2 = dayjs(date2);
 
@@ -29,12 +31,12 @@ const formatTwoDates = (date1: Date, date2: Date): string => {
 export const ProjectSessionsLine = ({session}: Props) => {    
     return(
         <div className="ProjectSessions_line">
-            <DisplayUserPicture className="ProjectSessions_picture" user={session.member} />
+            {session.memberWorkspace?.user && <DisplayUserPicture className="ProjectSessions_picture" user={session.memberWorkspace.user} />}
         <div className="ProjectSessions_time">
-            {getTimestampWithTwoDates(session.startedAt, session.endedAt)}
+            {session.startedAt && session.endedAt && getTimestampWithTwoDates(session.startedAt, session.endedAt)}
         </div>
         <div className="ProjectSessions_date">
-            {formatTwoDates(session.startedAt, session.endedAt)}
+            {session.startedAt && session.endedAt && formatTwoDates(session.startedAt, session.endedAt)}
         </div>
             <BasicButton
                 icon={bin}

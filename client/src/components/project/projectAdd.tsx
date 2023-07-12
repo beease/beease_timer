@@ -41,6 +41,8 @@ export const ProjectAdd = ({selectedWorkspaceId}: Props) => {
               ...oldQueryData,
               projects: [...oldQueryData.projects, newProject]
             })
+          setName("")
+          setColorProject("#4969fb")
           setIsAddWorkspaceDisplay(false)
         },
       }

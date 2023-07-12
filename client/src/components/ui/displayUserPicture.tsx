@@ -2,18 +2,21 @@ import { colorByLetter } from "../../utils/function";
 
 interface Props {
   className: string;
-  user: any;
+  user: {
+    picture?: string | null;
+    given_name?: string | null;
+  };
 }
 
 export const DisplayUserPicture = ({ className, user }: Props) => {
-  const { picture, name } = user;
+  const { picture, given_name } = user;
 
   if (picture) {
     return <img className={className} src={picture} />;
   }
 
-  if (name) {
-    const color = colorByLetter(name[0]);
+  if (given_name) {
+    const color = colorByLetter(given_name[0]);
     return (
       <div
         className={className}
@@ -21,7 +24,7 @@ export const DisplayUserPicture = ({ className, user }: Props) => {
           backgroundColor: color,
         }}
       >
-        {name[0]}
+        {given_name[0]}
       </div>
     );
   }

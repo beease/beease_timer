@@ -62,14 +62,54 @@ export const getWorkspaceList = async (workspaceId: string) => {
       include: {
         projects: {
           include: {
-            memberSessions: true,
+            memberSessions: {
+              include: {
+                memberWorkspace: {
+                  select: {
+                    user: {
+                      select: {
+                        given_name: true,
+                        picture: true
+                      }
+                    }
+                  }
+                }
+              }
+            },
           },
         },
       },
     });
+
     return fullWorkspace;
   } catch (err) {
     throw new Error(`Failed to get workspace list : ${err}`);
+  }
+};
+
+export const getUsersWithSessions = async (workspaceId: string) => {
+  try {
+    const sessions = await prisma.memberSession.findMany({
+      where: {
+        memberWorkspace: {
+          workspaceId: workspaceId,
+        },
+      },
+      include: {
+        memberWorkspace: {
+          include: {
+            user: true
+          }
+        }
+      }
+    });
+
+    const users = sessions.map(session => session.memberWorkspace?.user);
+    const uniqueUsers = Array.from(new Set(users.map(u => u?.id))).map(id => users.find(u => u?.id === id) || {});
+
+    return uniqueUsers;
+  } catch (err) {
+    throw new Error(`Failed to get users with sessions : ${err}`);
   }
 };
 

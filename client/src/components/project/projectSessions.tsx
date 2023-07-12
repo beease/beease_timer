@@ -5,55 +5,22 @@ import { DisplayMyPicture } from "../ui/displayMyPicture";
 import { DisplayUserPicture } from "../ui/displayUserPicture";
 import { ProjectSessionsLine } from "./projectSessionsLine";
 import type { Project } from "../../libs/interfaces";
+import { trpc } from "../../trpc";
 
 interface Props {
   project: Project;
+  selectedWorkspaceId: string;
 }
 
-const sessions = [
-  {
-    id: "12344123ZAERAZER",
-    startedAt: "2021-05-12T09:00:00.000Z",
-    endedAt: "2021-05-12T10:00:00.000Z",
-    member:{
-        id: "1234412erER",
-        name: "John Doe",
-        picture: "https://picsum.photos/200",
-    }
-  },
-  {
-    id: "12344123ZAERAZzertzeR",
-    startedAt: "2021-05-12T11:00:00.000Z",
-    endedAt: "2021-05-12T12:00:00.000Z",
-    member:   {
-        id: "1234412erER",
-        name: "John Doe",
-        picture: "https://picsum.photos/200",
-    }
-  },
-  {
-    id: "1234zertRAZzertzeR",
-    startedAt: "2021-05-12T11:00:00.000Z",
-    endedAt: "2021-05-12T12:00:00.000Z",
-    member:   {
-        id: "1234412erER",
-        name: "John Doe",
-        picture: "https://picsum.photos/200",
-    }
-  },
-  {
-    id: "123eee23ZAERAZzertzeR",
-    startedAt: "2021-05-12T11:00:00.000Z",
-    endedAt: "2021-05-12T12:00:00.000Z",
-    member:   {
-        id: "1234412erER",
-        name: "John Doe",
-        picture: "https://picsum.photos/200",
-    }
-  },
-];
+export const ProjectSessions = ({ project, selectedWorkspaceId }: Props) => {
+  const sessions = project.memberSessions;
 
-export const ProjectSessions = ({ project }: Props) => {
+  const {data: workspacePictures} = trpc.workspace.getUsersWithSessions.useQuery({
+    workspaceId: selectedWorkspaceId,
+  })
+
+  console.log(workspacePictures)
+
   return (
     <div className={`ProjectSessions ${sessions.length > 2 && 'scroll'}`}>
       <div className="ProjectSessions_line">
