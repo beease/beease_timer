@@ -5,7 +5,6 @@ import { WorkspaceAdd } from "./workspaceAdd";
 import { WorkspaceEdit } from "./workspaceEdit";
 
 export const Workspace = () => {
-  
   const isSettingWorkspace = workspaceStore(
     (state: WorkspaceState) => state.isSettingWorkspace
     );

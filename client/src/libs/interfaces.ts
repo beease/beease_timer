@@ -16,3 +16,5 @@ export type Project = Extract<
 >["projects"][number];
 
 export type Session = Project["memberSessions"][number];
+export type MemberWorkspace = NonNullable<Session["memberWorkspace"]>;
+export type User = MemberWorkspace["user"];

@@ -14,11 +14,11 @@ interface Props{
 export const WorkspaceHeader = ({selectedWorkspaceId}: Props) => {
   const [isDotsButtonActive, setIsDotsButtonActive] = useState(false);
   const {data: workspaces, error, isLoading} = trpc.workspace.getMyWorkspaces.useQuery()
-
+  
   const workspace = workspaces ? workspaces.find(ws => ws.id === selectedWorkspaceId) : null;
 
   const isPlaying = projectStore(
-    (state: ProjectStore) => state.PlayingProjectId
+    (state: ProjectStore) => state.PlayingProject
   );
 
   const bottomDistance = isDotsButtonActive ? "0" : "56";
@@ -44,7 +44,7 @@ export const WorkspaceHeader = ({selectedWorkspaceId}: Props) => {
           <WorkspaceMoreInfos/>
           <div className="WorkspaceHeader_content">
             <TitleTimer title={workspace.name} timestamp={0} />
-            <AnimationCard isStarted={isPlaying} color={workspace.color}/>
+            <AnimationCard isStarted={isPlaying?.workspaceId === selectedWorkspaceId} color={workspace.color}/>
           </div>
         </div>
       </div>

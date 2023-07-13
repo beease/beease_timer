@@ -24,8 +24,8 @@ export const ProjectCardTop = ({
   const toggleIsPlaying = projectStore(
     (state: ProjectStore) => state.toggleIsPlaying
   );
-  const PlayingProjectId = projectStore(
-    (state: ProjectStore) => state.PlayingProjectId
+  const PlayingProject = projectStore(
+    (state: ProjectStore) => state.PlayingProject
   );
   const selectedWorkspaceId = workspaceStore(
     (state: WorkspaceState) => state.selectedWorkspaceId
@@ -97,15 +97,18 @@ export const ProjectCardTop = ({
   };
 
   const handlePlayStop = async () => {
-    if (PlayingProjectId === project.id) {
+    if (PlayingProject?.projectId === project.id) {
       await StopSession(project.id);
-    } else if (PlayingProjectId === null) {
+    } else if (PlayingProject?.projectId === null) {
       await CreateSession(project.id);
-    } else if (PlayingProjectId !== project.id) {
-      await StopSession(PlayingProjectId);
+    } else if (PlayingProject?.projectId !== project.id && PlayingProject?.projectId) {
+      await StopSession(PlayingProject.projectId);
       await CreateSession(project.id);
     }
-    toggleIsPlaying(project.id);
+    selectedWorkspaceId && toggleIsPlaying({
+      projectId: project.id,
+      workspaceId: selectedWorkspaceId
+    })
   };
 
   return (
@@ -119,7 +122,7 @@ export const ProjectCardTop = ({
       />
       <TitleTimer title={project.name} timestamp={12341234} />
       <BasicButton
-        icon={PlayingProjectId === project.id ? stop : play}
+        icon={PlayingProject?.projectId === project.id ? stop : play}
         size="small"
         style={{
           backgroundColor: project.color,

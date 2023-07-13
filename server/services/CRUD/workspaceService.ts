@@ -66,6 +66,9 @@ export const getWorkspaceList = async (workspaceId: string) => {
                   select: {
                     user: {
                       select: {
+                        id: true,
+                        family_name: true,
+                        name: true,
                         given_name: true,
                         picture: true,
                       },
