@@ -11,17 +11,6 @@ export const credentialRouter = router({
       return true;
     }
   }),
-  loginByEmail: publicProcedure
-    .input(
-      z.object({
-        email: z.string().email(),
-        password: z.string(),
-      })
-    )
-    .query(async (opts) => {
-      const { email, password } = opts.input;
-      return await credentialService.getTokenByCredential(email, password);
-    }),
   verifyEmail: publicProcedure
     .input(
       z.object({

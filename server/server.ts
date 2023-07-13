@@ -86,7 +86,7 @@ app.use(
 app.set("views", __dirname + "/views");
 app.set("view engine", "ejs");
 
-app.get("/api/renderVerifiedEmail", async (req, res) => {
+app.get("/renderVerifiedEmail", async (req, res) => {
   const email = await emailSchema.parse(req.query?.emailTo);
   if (!email)
     return res
@@ -111,7 +111,7 @@ app.get("/api/renderVerifiedEmail", async (req, res) => {
   }
 });
 
-app.get("/api/invitationHandler", async (req, res) => {
+app.get("/invitationHandler", async (req, res) => {
   const { fromUser, toUser, at } = await invitationSchema.parse(req.query);
   if (!fromUser || !toUser || !at)
     return res

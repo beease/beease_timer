@@ -16,8 +16,10 @@
     "@trpc/react-query": "^10.33.0",
     "@trpc/server": "^10.33.0",
     "@types/chrome": "^0.0.238",
+    "chart.js": "^4.3.0",
     "dayjs": "^1.11.9",
     "react": "^18.2.0",
+    "react-chartjs-2": "^5.2.0",
     "react-dom": "^18.2.0",
     "zustand": "^4.3.9"
   },

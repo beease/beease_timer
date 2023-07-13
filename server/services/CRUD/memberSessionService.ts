@@ -5,22 +5,16 @@ import Dayjs from "dayjs";
 
 const prisma = new PrismaClient();
 
-type updateMemberSessionData = {
-  startedAt?: Date;
-  endedAt?: Date;
-};
-
 export const createMemberSession = async (
   userId: string,
   {
     projectId,
     startedAt,
     endedAt,
-  }:
-  {
-    projectId: string,
-    startedAt: string,
-    endedAt?: string,
+  }: {
+    projectId: string;
+    startedAt: string;
+    endedAt?: string;
   }
 ) => {
   const getMemberWorkspace = await prisma.memberWorkspace.findFirst({
@@ -130,7 +124,7 @@ export const getMemberSessionById = async (sessionId: string) => {
 export const stopSession = async (
   emitterId: string,
   projectId: string,
-  endedAt: string,
+  endedAt: string
 ) => {
   const memberWorkspace = await prisma.memberWorkspace.findFirst({
     where: {
@@ -141,31 +135,32 @@ export const stopSession = async (
     throw new Error("No member workspace found");
   }
   const sessionsToStop = await prisma.memberSession.findMany({
-     where: {
-       projectId: projectId,
-       memberWorkspaceId: memberWorkspace?.id,
-       endedAt: null
-     },
-   })
-   if (sessionsToStop.length === 0) {
+    where: {
+      projectId: projectId,
+      memberWorkspaceId: memberWorkspace?.id,
+      endedAt: null,
+    },
+  });
+  if (sessionsToStop.length === 0) {
     throw new Error("No sessions to stop");
   }
-   sessionsToStop.sort((a, b) => Dayjs(b.startedAt).unix() - Dayjs(a.startedAt).unix());
-   const [lastSession, ...otherSessions] = sessionsToStop;
-   if (otherSessions.length > 0) {
+  sessionsToStop.sort(
+    (a, b) => Dayjs(b.startedAt).unix() - Dayjs(a.startedAt).unix()
+  );
+  const [lastSession, ...otherSessions] = sessionsToStop;
+  if (otherSessions.length > 0) {
     await prisma.memberSession.updateMany({
-      where: { id: { in: otherSessions.map(session => session.id) } },
+      where: { id: { in: otherSessions.map((session) => session.id) } },
       data: { endedAt: endedAt },
     });
   }
   return asyncFunctionErrorCatcher(
     () =>
-
       prisma.memberSession.update({
         where: {
-          id: lastSession.id
+          id: lastSession.id,
         },
-        data:{
+        data: {
           endedAt: endedAt,
         },
         include: {
