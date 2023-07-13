@@ -30,7 +30,8 @@ export const ProjectSessions = ({ project, selectedWorkspaceId }: Props) => {
         if(!session.endedAt && session.memberWorkspace?.user.id === user?.id){
             toggleIsPlaying({
               projectId: project.id,
-              workspaceId: selectedWorkspaceId
+              workspaceId: selectedWorkspaceId,
+              startedAt: session.startedAt
             })
         }
       })

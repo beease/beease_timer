@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { ProjectCard } from "./projectCard";
 import { ProjectAdd } from "./projectAdd";
 import { workspaceStore, WorkspaceState } from "../../stores/workspaceStore";
@@ -13,7 +12,7 @@ export const ProjectList = ({ selectedWorkspaceId }: Props) => {
   const { data: worspace, error, isLoading } = trpc.workspace.getWorkspaceList.useQuery({
     workspaceId: selectedWorkspaceId
   });
-  
+
   const isStatisticActive = workspaceStore(
     (state: WorkspaceState) => state.isStatisticActive
   );

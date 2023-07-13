@@ -6,6 +6,7 @@ import {
   deleteMemberWorkspace,
   getMembersWorkspaceByWorkspaceId,
   updateRoleMemberWorkspace,
+  getUsersByWorkspaceId,
 } from "../services/CRUD/memberWorkspaceService";
 
 const ROLES = ["OWNER", "ADMIN", "MEMBER"] as const;
@@ -42,6 +43,12 @@ export const memberWorkspaceRouter = router({
     .query(async (opts) => {
       const { workspaceId } = opts.input;
       return await getMembersWorkspaceByWorkspaceId(workspaceId);
+    }),
+  getUserseByWorkspaceId: authorizedProcedure
+    .input(z.object({ workspaceId: z.string() }))
+    .query(async (opts) => {
+      const { workspaceId } = opts.input;
+      return await getUsersByWorkspaceId(workspaceId);
     }),
   updateRoleMemberWorkspace: authorizedProcedure
     .input(

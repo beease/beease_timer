@@ -68,22 +68,24 @@ export const formatDate = (date: string): string => {
 };
 
 
-export const useTimer = (session: Session) => {
+export const useTimer = (startedAt?: string | null, endedAt?: string | null) => {
   const [time, setTime] = useState("");
 
   useEffect(() => {
-      if (session.startedAt && !session.endedAt) {
-          setTime(timer(session.startedAt));
+      if (startedAt && !endedAt) {
+          setTime(timer(startedAt));
 
           const intervalId = setInterval(() => {
-              setTime(timer(session.startedAt));
+              setTime(timer(startedAt));
           }, 1000);
 
           return () => clearInterval(intervalId);
-      } else if (session.startedAt && session.endedAt){
-          setTime(getTimestampWithTwoDates(session.startedAt, session.endedAt))
+      } else if (startedAt && endedAt){
+          setTime(getTimestampWithTwoDates(startedAt, endedAt))
+      } else if (!startedAt){
+        setTime('00:00:00')
       }
-  }, [session]);
+  }, [startedAt, endedAt]);
 
   return time;
 };

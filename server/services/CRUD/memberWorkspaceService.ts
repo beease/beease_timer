@@ -69,6 +69,26 @@ export const getMembersWorkspaceByWorkspaceId = async (workspaceId: string) => {
   );
 };
 
+export const getUsersByWorkspaceId = async (workspaceId: string) => {
+  const membersWorkspace = await prisma.memberWorkspace.findMany({
+    where: {
+      workspaceId: workspaceId,
+    },
+  })
+  return asyncFunctionErrorCatcher(
+    () =>
+      prisma.user.findMany({
+        where: {
+          id: {
+            in: membersWorkspace.map(memberWorkspace => memberWorkspace.userId)
+          }
+        }
+      })
+    ,
+    "Failed to get members workspace by workspaceId"
+  );
+};
+
 export const updateRoleMemberWorkspace = async (
   emitterUserId: string,
   memberWorkspaceId: string,

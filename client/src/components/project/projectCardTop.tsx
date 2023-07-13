@@ -34,10 +34,10 @@ export const ProjectCardTop = ({
   const mutationCreateSession = trpc.memberSession.createSession.useMutation();
   const mutationStopSession = trpc.memberSession.stopSession.useMutation();
 
-  const CreateSession = async (projectId: string) => {
-    mutationCreateSession.mutateAsync({
+  const CreateSession = async (projectId: string, startedAt: string) => {
+    await mutationCreateSession.mutateAsync({
       projectId: projectId,
-      startedAt: dayjs().format(),
+      startedAt: startedAt,
     },
     {
       onSuccess: (newSession) => {
@@ -60,21 +60,21 @@ export const ProjectCardTop = ({
               ...oldQueryData,
               projects: newProjects
             }
-          })
-      }
+          })        
+        }
     }); 
   };
 
-  const StopSession = async (projectId: string) => {
-    mutationStopSession.mutateAsync({
+  const StopSession = async (projectId: string, endedAt: string, workspaceId: string) => {
+   await mutationStopSession.mutateAsync({
       projectId: projectId,
-      endedAt: dayjs().format(),
+      endedAt: endedAt,
     },
     {
       onSuccess: (newSession) => {
         if(!newSession || !selectedWorkspaceId) return;
         utils.workspace.getWorkspaceList.setData(
-          { workspaceId: selectedWorkspaceId },
+          { workspaceId: workspaceId },
           (oldQueryData) => {
             if(!oldQueryData) return;
             const newProjects = oldQueryData.projects.map((project) => {
@@ -97,17 +97,19 @@ export const ProjectCardTop = ({
   };
 
   const handlePlayStop = async () => {
-    if (PlayingProject?.projectId === project.id) {
-      await StopSession(project.id);
+    const now = dayjs().format()
+    if (PlayingProject?.projectId === project.id && selectedWorkspaceId) {
+       StopSession(project.id, now, selectedWorkspaceId);
     } else if (PlayingProject?.projectId === null) {
-      await CreateSession(project.id);
-    } else if (PlayingProject?.projectId !== project.id && PlayingProject?.projectId) {
-      await StopSession(PlayingProject.projectId);
-      await CreateSession(project.id);
+       CreateSession(project.id, now);
+    } else if (PlayingProject?.projectId !== project.id && PlayingProject?.projectId && PlayingProject.workspaceId) {
+      await StopSession(PlayingProject.projectId, now, PlayingProject.workspaceId);
+      CreateSession(project.id, now);
     }
-    selectedWorkspaceId && toggleIsPlaying({
+    toggleIsPlaying({
       projectId: project.id,
-      workspaceId: selectedWorkspaceId
+      workspaceId: selectedWorkspaceId,
+      startedAt: now
     })
   };
 
@@ -120,7 +122,9 @@ export const ProjectCardTop = ({
           backgroundColor: project.color,
         }}
       />
-      <TitleTimer title={project.name} timestamp={12341234} />
+      {
+        
+      }<TitleTimer title={project.name} isPlaying={PlayingProject.projectId === project.id} />
       <BasicButton
         icon={PlayingProject?.projectId === project.id ? stop : play}
         size="small"

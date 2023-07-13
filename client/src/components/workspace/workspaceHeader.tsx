@@ -41,9 +41,9 @@ export const WorkspaceHeader = ({selectedWorkspaceId}: Props) => {
             bottom: `${bottomDistance}px`,
           }}
         >
-          <WorkspaceMoreInfos/>
+          <WorkspaceMoreInfos workspace={workspace}/>
           <div className="WorkspaceHeader_content">
-            <TitleTimer title={workspace.name} timestamp={0} />
+            <TitleTimer title={workspace.name} isPlaying={isPlaying?.workspaceId === selectedWorkspaceId} />
             <AnimationCard isStarted={isPlaying?.workspaceId === selectedWorkspaceId} color={workspace.color}/>
           </div>
         </div>

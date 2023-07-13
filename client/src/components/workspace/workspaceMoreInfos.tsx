@@ -5,8 +5,14 @@ import { BasicButton } from "../ui/basicButton";
 import stats from "../../assets/stats.svg";
 import stats_w from "../../assets/stats_w.svg";
 import edit from "../../assets/edit.svg";
+import { WorkspaceInvitation } from "./workspaceInvitation";
+import { Workspace } from "../../libs/interfaces";
 
-export const WorkspaceMoreInfos = () => {
+interface Props{
+  workspace: Workspace;
+}
+
+export const WorkspaceMoreInfos = ({workspace}: Props) => {
   const setFilters = filtersStore((state: FiltersState) => state.setFilters);
   const filters = filtersStore((state: FiltersState) => state.filters);
   const setSettingWorkspace = workspaceStore((state: WorkspaceState) => state.setSettingWorkspace);
@@ -41,6 +47,7 @@ export const WorkspaceMoreInfos = () => {
           En cours
         </div>
       </div>
+      <WorkspaceInvitation />
       <BasicButton
         onClick={() => {
             setSettingWorkspace('edit')

@@ -1,6 +1,8 @@
+import { useEffect } from "react"
 import { WorkspaceHeader } from "./workspaceHeader";
 import { ProjectList } from "../project/projectList";
 import { workspaceStore, WorkspaceState } from "../../stores/workspaceStore";
+import { projectStore, ProjectStore } from "../../stores/projectStore";
 import { WorkspaceAdd } from "./workspaceAdd";
 import { WorkspaceEdit } from "./workspaceEdit";
 
