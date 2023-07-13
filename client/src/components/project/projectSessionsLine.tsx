@@ -1,47 +1,91 @@
-import React from 'react'
 import { DisplayUserPicture } from "../ui/displayUserPicture";
 import { BasicButton } from "../ui/basicButton";
 import bin from "../../assets/bin.svg";
-import { formatTimestamp } from '../../utils/function';
-import dayjs from 'dayjs';
+import { formatDate, formatTwoDates, useTimer } from '../../utils/function';
 import type { Session } from '../../libs/interfaces';
+import { trpc } from "../../trpc";
+import { workspaceStore, WorkspaceState } from "../../stores/workspaceStore";
+import { projectStore, ProjectStore } from '../../stores/projectStore';
 
 interface Props {
     session: Session;
+    projectId: string;
 }
 
-const getTimestampWithTwoDates = (date1: string, date2: string) => {
-    const day1 = dayjs(date1);
-    const day2 = dayjs(date2);
-    const diff = day2.diff(day1);
-    return formatTimestamp(diff);
-  }
+export const ProjectSessionsLine = ({session, projectId}: Props) => {    
+    const selectedWorkspaceId = workspaceStore((state: WorkspaceState) => state.selectedWorkspaceId);
+    const PlayingProjectId = projectStore((state: ProjectStore) => state.PlayingProjectId);
+    const toggleIsPlaying = projectStore((state: ProjectStore) => state.toggleIsPlaying);
 
-const formatTwoDates = (date1: string, date2: string): string => {
-    const formattedDate1 = dayjs(date1);
-    const formattedDate2 = dayjs(date2);
+    const utils = trpc.useContext();
+    const mutationDeleteSession = trpc.memberSession.deleteSession.useMutation()
 
-    const dateString = formattedDate1.format('YYYY-MM-DD');
-    const time1 = formattedDate1.format('HH:mm');
-    const time2 = formattedDate2.format('HH:mm');
+    const handleDeleteSession = async () => {
+        mutationDeleteSession.mutateAsync({
+            sessionId: session.id
+        },
+        {
+            onSuccess: (deletedSession) => {
+                if(!deletedSession || !selectedWorkspaceId) return;
+                utils.workspace.getWorkspaceList.setData(
+                  { workspaceId: selectedWorkspaceId },
+                  (oldQueryData) => {
+                    if(!oldQueryData) return;
+                    const newProjects = oldQueryData.projects.map((project) => {
+                      if(project.id === projectId){
+                        return {
+                          ...project,
+                          memberSessions: project.memberSessions.filter((session) => session.id !== deletedSession.id)
+                        }
+                      }else{
+                        return project
+                      }
+                    });
+                    return{
+                      ...oldQueryData,
+                      projects: newProjects
+                    }
+                  })
+                  if(PlayingProjectId === projectId && !deletedSession.endedAt){
+                    toggleIsPlaying(PlayingProjectId)
+                  }
+              }
+            }
+        )
+    }  
 
-    return `${dateString}   ${time1} - ${time2}`;
-};
+    const DisplayTimer = ({ session }: { session: Session }) => {
+        const time = useTimer(session);
+        return <div>{time}</div>;
+    };
 
-export const ProjectSessionsLine = ({session}: Props) => {    
+    const DisplayDate = ({ session }: { session: Session }) => {
+        const { startedAt, endedAt } = session
+        if(startedAt && endedAt){
+            const date = formatTwoDates(startedAt, endedAt)
+            return <>{date}</>;
+        }else if(startedAt){
+            const date = formatDate(startedAt)
+            return <>{date}</>;
+        }
+    };
+
     return(
         <div className="ProjectSessions_line">
             {session.memberWorkspace?.user && <DisplayUserPicture className="ProjectSessions_picture" user={session.memberWorkspace.user} />}
-        <div className="ProjectSessions_time">
-            {session.startedAt && session.endedAt && getTimestampWithTwoDates(session.startedAt, session.endedAt)}
+        <div className={`ProjectSessions_time ${!session.endedAt && 'skeleton'}`}>
+            <DisplayTimer session={session}/>
         </div>
-        <div className="ProjectSessions_date">
-            {session.startedAt && session.endedAt && formatTwoDates(session.startedAt, session.endedAt)}
+        <div className={`ProjectSessions_date ${!session.endedAt && 'skeleton'}`}>
+            <DisplayDate session={session}/>
         </div>
             <BasicButton
                 icon={bin}
                 variant="grey"
                 size='small'
+                onClick={() => {
+                    handleDeleteSession();
+                }}
                 style={{
                     height: "36px",
                     width: "36px",

@@ -6,6 +6,8 @@ import { DisplayUserPicture } from "../ui/displayUserPicture";
 import { ProjectSessionsLine } from "./projectSessionsLine";
 import type { Project } from "../../libs/interfaces";
 import { trpc } from "../../trpc";
+import { ProjectSessionsAdd } from "./projectSessionsAdd";
+import dayjs from 'dayjs';
 
 interface Props {
   project: Project;
@@ -23,24 +25,12 @@ export const ProjectSessions = ({ project, selectedWorkspaceId }: Props) => {
 
   return (
     <div className={`ProjectSessions ${sessions.length > 2 && 'scroll'}`}>
-      <div className="ProjectSessions_line">
-        <DisplayMyPicture className="ProjectSessions_picture" />
-        <input className="ProjectSessions_add_input" placeholder="Sec" />
-        <input className="ProjectSessions_add_input" placeholder="Min" />
-        <input className="ProjectSessions_add_input" placeholder="Hour" />
-        <BasicButton
-          icon={plus}
-          variant="confirm"
-          size='small'
-          style={{
-            height: "36px",
-            width: "36px",
-          }}
-        />
-      </div>
-      {sessions.map((session) => (
-        <ProjectSessionsLine session={session} />
-      ))}
+      <ProjectSessionsAdd projectId={project.id}/>
+      {sessions.sort((a, b) => dayjs(b.startedAt).unix() - dayjs(a.startedAt).unix())
+          .map((session) => (
+            <ProjectSessionsLine session={session} projectId={project.id} />
+          ))
+      }
     </div>
   );
 };

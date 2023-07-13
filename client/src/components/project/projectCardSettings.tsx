@@ -39,13 +39,13 @@ export const ProjectSettings = ({ project }: Props) => {
     mutationDelete.mutate(
       { id: project.id },
       {
-        onSuccess: (newProject) => {
-          if (!newProject ?? !selectedWorkspaceId) return;
+        onSuccess: (deletedProject) => {
+          if (!deletedProject ?? !selectedWorkspaceId) return;
           utils.workspace.getWorkspaceList.setData(
             { workspaceId: selectedWorkspaceId },
             (oldQueryData) => oldQueryData && {
               ...oldQueryData,
-              projects: oldQueryData.projects.filter((project) => project.id !== newProject.id)
+              projects: oldQueryData.projects.filter((project) => project.id !== deletedProject.id)
             }
           );
           toggleMoreInfo(null);

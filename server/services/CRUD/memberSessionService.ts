@@ -1,6 +1,8 @@
 import { PrismaClient, Prisma, Role } from "@prisma/client";
 import { asyncFunctionErrorCatcher } from "../utils/errorHandler";
 import { TRPCError } from "@trpc/server";
+import Dayjs from "dayjs";
+
 const prisma = new PrismaClient();
 
 type updateMemberSessionData = {
@@ -10,8 +12,16 @@ type updateMemberSessionData = {
 
 export const createMemberSession = async (
   userId: string,
-  projectId: string,
-  startedAt: string
+  {
+    projectId,
+    startedAt,
+    endedAt,
+  }:
+  {
+    projectId: string,
+    startedAt: string,
+    endedAt?: string,
+  }
 ) => {
   const getMemberWorkspace = await prisma.memberWorkspace.findFirst({
     where: {
@@ -25,6 +35,20 @@ export const createMemberSession = async (
           memberWorkspaceId: getMemberWorkspace?.id,
           projectId: projectId,
           startedAt: startedAt,
+          endedAt: endedAt,
+        },
+        include: {
+          memberWorkspace: {
+            select: {
+              user: {
+                select: {
+                  id: true,
+                  given_name: true,
+                  picture: true,
+                },
+              },
+            },
+          },
         },
       }),
     "Failed to create session"
@@ -105,49 +129,59 @@ export const getMemberSessionById = async (sessionId: string) => {
 
 export const stopSession = async (
   emitterId: string,
-  sessionId: string,
-  endedAt: string
+  projectId: string,
+  endedAt: string,
 ) => {
-  const memberSession = await prisma.memberSession.findFirst({
+  const memberWorkspace = await prisma.memberWorkspace.findFirst({
     where: {
-      id: sessionId,
+      userId: emitterId,
     },
   });
-  if (memberSession && memberSession.projectId) {
-    const project = await prisma.project.findFirst({
-      where: {
-        id: memberSession?.projectId,
-      },
-    });
-    if (project && project.workspaceId) {
-      const memberWorkspace = await prisma.memberWorkspace.findUnique({
-        where: {
-          workspaceId_userId: {
-            userId: emitterId,
-            workspaceId: project.workspaceId,
-          },
-        },
-      });
-      if (memberSession.memberWorkspaceId !== memberWorkspace?.id) {
-        throw new TRPCError({
-          code: "UNAUTHORIZED",
-          message:
-            "Unauthorized : member from workspace is not allowed to stop session",
-        });
-      }
-    }
+  if (!memberWorkspace?.id) {
+    throw new Error("No member workspace found");
   }
-
+  const sessionsToStop = await prisma.memberSession.findMany({
+     where: {
+       projectId: projectId,
+       memberWorkspaceId: memberWorkspace?.id,
+       endedAt: null
+     },
+   })
+   if (sessionsToStop.length === 0) {
+    throw new Error("No sessions to stop");
+  }
+   sessionsToStop.sort((a, b) => Dayjs(b.startedAt).unix() - Dayjs(a.startedAt).unix());
+   const [lastSession, ...otherSessions] = sessionsToStop;
+   if (otherSessions.length > 0) {
+    await prisma.memberSession.updateMany({
+      where: { id: { in: otherSessions.map(session => session.id) } },
+      data: { endedAt: endedAt },
+    });
+  }
   return asyncFunctionErrorCatcher(
     () =>
+
       prisma.memberSession.update({
         where: {
-          id: sessionId,
+          id: lastSession.id
         },
-        data: {
+        data:{
           endedAt: endedAt,
         },
+        include: {
+          memberWorkspace: {
+            select: {
+              user: {
+                select: {
+                  id: true,
+                  given_name: true,
+                  picture: true,
+                },
+              },
+            },
+          },
+        },
       }),
-    "Failed to stop session"
+    "Failed to update session"
   );
 };
