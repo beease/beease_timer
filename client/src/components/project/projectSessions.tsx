@@ -4,10 +4,12 @@ import plus from "../../assets/plus_w.svg";
 import { DisplayMyPicture } from "../ui/displayMyPicture";
 import { DisplayUserPicture } from "../ui/displayUserPicture";
 import { ProjectSessionsLine } from "./projectSessionsLine";
+import { projectStore, ProjectStore } from '../../stores/projectStore';
 import type { Project } from "../../libs/interfaces";
 import { trpc } from "../../trpc";
 import { ProjectSessionsAdd } from "./projectSessionsAdd";
 import dayjs from 'dayjs';
+import { useEffect } from "react";
 
 interface Props {
   project: Project;
@@ -17,11 +19,24 @@ interface Props {
 export const ProjectSessions = ({ project, selectedWorkspaceId }: Props) => {
   const sessions = project.memberSessions;
 
-  const {data: workspacePictures} = trpc.workspace.getUsersWithSessions.useQuery({
-    workspaceId: selectedWorkspaceId,
-  })
+  const { data: user } = trpc.user.getMyUser.useQuery();
 
-  console.log(workspacePictures)
+  const PlayingProject = projectStore((state: ProjectStore) => state.PlayingProject);
+  const toggleIsPlaying = projectStore((state: ProjectStore) => state.toggleIsPlaying);
+
+  useEffect(() => {
+    if(PlayingProject?.projectId === null){
+      sessions.map((session) => {
+        if(!session.endedAt && session.memberWorkspace?.user.id === user?.id){
+            toggleIsPlaying({
+              projectId: project.id,
+              workspaceId: selectedWorkspaceId
+            })
+        }
+      })
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   return (
     <div className={`ProjectSessions ${sessions.length > 2 && 'scroll'}`}>

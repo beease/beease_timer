@@ -13,8 +13,7 @@ export const ProjectList = ({ selectedWorkspaceId }: Props) => {
   const { data: worspace, error, isLoading } = trpc.workspace.getWorkspaceList.useQuery({
     workspaceId: selectedWorkspaceId
   });
-  console.log(worspace)
-
+  
   const isStatisticActive = workspaceStore(
     (state: WorkspaceState) => state.isStatisticActive
   );

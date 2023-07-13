@@ -3,7 +3,7 @@ import { randomValue, wait } from "../utils/function";
 
 // Type Definitions
 type Props = {
-  isStarted: null | string;
+  isStarted: boolean;
   color: null | string;
 };
 type Point = {

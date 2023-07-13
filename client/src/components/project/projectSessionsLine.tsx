@@ -6,6 +6,7 @@ import type { Session } from '../../libs/interfaces';
 import { trpc } from "../../trpc";
 import { workspaceStore, WorkspaceState } from "../../stores/workspaceStore";
 import { projectStore, ProjectStore } from '../../stores/projectStore';
+import { useEffect } from "react";
 
 interface Props {
     session: Session;
@@ -14,7 +15,7 @@ interface Props {
 
 export const ProjectSessionsLine = ({session, projectId}: Props) => {    
     const selectedWorkspaceId = workspaceStore((state: WorkspaceState) => state.selectedWorkspaceId);
-    const PlayingProjectId = projectStore((state: ProjectStore) => state.PlayingProjectId);
+    const PlayingProject = projectStore((state: ProjectStore) => state.PlayingProject);
     const toggleIsPlaying = projectStore((state: ProjectStore) => state.toggleIsPlaying);
 
     const utils = trpc.useContext();
@@ -46,8 +47,8 @@ export const ProjectSessionsLine = ({session, projectId}: Props) => {
                       projects: newProjects
                     }
                   })
-                  if(PlayingProjectId === projectId && !deletedSession.endedAt){
-                    toggleIsPlaying(PlayingProjectId)
+                  if(PlayingProject?.projectId === projectId && !deletedSession.endedAt){
+                    toggleIsPlaying(PlayingProject)
                   }
               }
             }
