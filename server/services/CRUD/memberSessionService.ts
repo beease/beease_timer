@@ -1,5 +1,6 @@
 import { PrismaClient, Prisma, Role } from "@prisma/client";
 import { asyncFunctionErrorCatcher } from "../utils/errorHandler";
+import { TRPCError } from "@trpc/server";
 const prisma = new PrismaClient();
 
 type updateMemberSessionData = {
@@ -10,7 +11,7 @@ type updateMemberSessionData = {
 export const createMemberSession = async (
   userId: string,
   projectId: string,
-  startedAt: string,
+  startedAt: string
 ) => {
   const getMemberWorkspace = await prisma.memberWorkspace.findFirst({
     where: {
@@ -29,7 +30,41 @@ export const createMemberSession = async (
     "Failed to create session"
   );
 };
-export const deleteMemberSession = async (sessionId: string) => {
+export const deleteMemberSession = async (
+  emitterId: string,
+  sessionId: string
+) => {
+  const memberSession = await prisma.memberSession.findFirst({
+    where: {
+      id: sessionId,
+    },
+  });
+  if (memberSession && memberSession.projectId) {
+    const project = await prisma.project.findFirst({
+      where: {
+        id: memberSession?.projectId,
+      },
+    });
+    const memberWorkspace = await prisma.memberWorkspace.findFirst({
+      where: {
+        userId: emitterId,
+        workspaceId: project?.workspaceId,
+      },
+    });
+
+    if (
+      memberSession.memberWorkspaceId !== memberWorkspace?.id &&
+      memberWorkspace?.role !== Role.ADMIN &&
+      memberWorkspace?.role !== Role.OWNER
+    ) {
+      throw new TRPCError({
+        code: "UNAUTHORIZED",
+        message:
+          "Unauthorized : member from workspace is not allowed to delete session",
+      });
+    }
+  }
+
   return asyncFunctionErrorCatcher(
     () =>
       prisma.memberSession.delete({
@@ -70,26 +105,49 @@ export const getMemberSessionById = async (sessionId: string) => {
 
 export const stopSession = async (
   emitterId: string,
-  projectId: string,
-  endedAt: string,
+  sessionId: string,
+  endedAt: string
 ) => {
-  const memberWorkspace = await prisma.memberWorkspace.findFirst({
+  const memberSession = await prisma.memberSession.findFirst({
     where: {
-      userId: emitterId,
+      id: sessionId,
     },
   });
+  if (memberSession && memberSession.projectId) {
+    const project = await prisma.project.findFirst({
+      where: {
+        id: memberSession?.projectId,
+      },
+    });
+    if (project && project.workspaceId) {
+      const memberWorkspace = await prisma.memberWorkspace.findUnique({
+        where: {
+          workspaceId_userId: {
+            userId: emitterId,
+            workspaceId: project.workspaceId,
+          },
+        },
+      });
+      if (memberSession.memberWorkspaceId !== memberWorkspace?.id) {
+        throw new TRPCError({
+          code: "UNAUTHORIZED",
+          message:
+            "Unauthorized : member from workspace is not allowed to stop session",
+        });
+      }
+    }
+  }
+
   return asyncFunctionErrorCatcher(
     () =>
-      prisma.memberSession.updateMany({
+      prisma.memberSession.update({
         where: {
-          projectId: projectId,
-          memberWorkspaceId: memberWorkspace?.id,
-          endedAt: null
+          id: sessionId,
         },
         data: {
           endedAt: endedAt,
         },
       }),
-    "Failed to update session"
+    "Failed to stop session"
   );
 };

@@ -13,7 +13,7 @@ type updateProjectData = {
 export const createProject = async (
   name: string,
   color: string,
-  workspaceId: string,
+  workspaceId: string
 ) => {
   try {
     const Project = await prisma.project.create({
@@ -23,7 +23,7 @@ export const createProject = async (
         workspaceId: workspaceId,
       },
       include: {
-        memberSessions:{
+        memberSessions: {
           include: {
             memberWorkspace: {
               select: {
@@ -31,21 +31,20 @@ export const createProject = async (
                   select: {
                     id: true,
                     given_name: true,
-                    picture: true
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
+                    picture: true,
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
     });
     return Project;
   } catch (err) {
     throw new Error(`Failed creating project : ${err}`);
   }
 };
-
 
 export const getProject = async (id: string) => {
   return asyncFunctionErrorCatcher(() =>
@@ -87,14 +86,14 @@ export const updateProject = async (
                     select: {
                       id: true,
                       given_name: true,
-                      picture: true
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
+                      picture: true,
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
       }),
     "Failed to update project."
   );
@@ -106,17 +105,6 @@ export const deleteProject = async (projectId: string) => {
       await prisma.project.delete({
         where: {
           id: projectId,
-        },
-      })
-  );
-};
-
-export const deleteProjectsByWorkspaceId = async (workspaceId: string) => {
-  return asyncFunctionErrorCatcher(
-    async () =>
-      await prisma.project.deleteMany({
-        where: {
-          workspaceId: workspaceId,
         },
       })
   );

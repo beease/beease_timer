@@ -1,5 +1,6 @@
 import { Prisma, PrismaClient } from "@prisma/client";
 import { asyncFunctionErrorCatcher } from "../utils/errorHandler";
+import { TRPCError } from "@trpc/server";
 
 const prisma = new PrismaClient();
 
@@ -8,7 +9,21 @@ export const sendInvitationService = async (
   invitedId: string,
   workspaceId: string
 ) => {
-  asyncFunctionErrorCatcher(
+  const memberWorkspace = await prisma.memberWorkspace.findUnique({
+    where: {
+      workspaceId_userId: {
+        userId: inviterId,
+        workspaceId: workspaceId,
+      },
+    },
+  });
+  if (memberWorkspace?.role !== "OWNER" && memberWorkspace?.role !== "ADMIN") {
+    throw new TRPCError({
+      code: "UNAUTHORIZED",
+      message: "Member is not allowed to send invitation",
+    });
+  }
+  return asyncFunctionErrorCatcher(
     () =>
       prisma.invitation.create({
         data: {

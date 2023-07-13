@@ -9,14 +9,20 @@ export const invitationRouter = router({
   sendInvitation: authorizedProcedure
     .input(
       z.object({
-        inviterId: z.string(),
         invitedId: z.string(),
         workspaceId: z.string(),
       })
     )
     .query(async (opts) => {
-      const { inviterId, invitedId, workspaceId } = opts.input;
-      return await sendInvitationService(inviterId, invitedId, workspaceId);
+      const { ctx } = opts;
+      const { invitedId, workspaceId } = opts.input;
+      if (ctx.tokenPayload && ctx.tokenPayload.userId) {
+        return await sendInvitationService(
+          ctx.tokenPayload.userId,
+          invitedId,
+          workspaceId
+        );
+      }
     }),
   sendInvitationEmail: authorizedProcedure
     .input(

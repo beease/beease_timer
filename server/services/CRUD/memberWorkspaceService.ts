@@ -34,9 +34,9 @@ export const deleteMemberWorkspace = async (
     },
   });
   if (
-    memberWorkspaceEmitter &&
-    (memberWorkspaceEmitter.role === "OWNER" ||
-      memberWorkspaceEmitter.role === "ADMIN")
+    memberWorkspaceEmitter
+    // (memberWorkspaceEmitter.role === "OWNER" ||
+    //   memberWorkspaceEmitter.role === "ADMIN")
   ) {
     return asyncFunctionErrorCatcher(
       () =>

@@ -8,8 +8,7 @@ import {
   getMemberSessionsByProjectId,
   stopSession,
 } from "../services/CRUD/memberSessionService";
-
-const prisma = new PrismaClient();
+import { TRPCError } from "@trpc/server";
 
 export const memberSessionRouter = router({
   createSession: authorizedProcedure
@@ -34,23 +33,31 @@ export const memberSessionRouter = router({
       })
     )
     .mutation(async (opts) => {
+      const { ctx } = opts;
       const { sessionId } = opts.input;
-      return await deleteMemberSession(sessionId);
+      if (ctx.tokenPayload) {
+        return await deleteMemberSession(ctx.tokenPayload.userId, sessionId);
+      } else {
+        throw new TRPCError({
+          code: "UNAUTHORIZED",
+          message: "Unauthorized to delete session.",
+        });
+      }
     }),
   stopSession: authorizedProcedure
     .input(
       z.object({
-        projectId: z.string(),
+        sessionId: z.string(),
         endedAt: z.string(),
       })
     )
     .mutation(async (opts) => {
       const { ctx } = opts;
-      const { projectId, endedAt } = opts.input;
+      const { sessionId, endedAt } = opts.input;
 
       if (ctx.tokenPayload) {
         const emitterId = ctx.tokenPayload.userId;
-        return await stopSession(emitterId, projectId, endedAt);
+        return await stopSession(emitterId, sessionId, endedAt);
       }
     }),
   getSessionsByProjectId: authorizedProcedure

@@ -1,9 +1,7 @@
 import { PrismaClient, Prisma, Role } from "@prisma/client";
 import { asyncFunctionErrorCatcher } from "../utils/errorHandler";
-import {
-  deleteProjectsByWorkspaceId,
-  getProjectsByWorkspaceId,
-} from "./projectService";
+import { getProjectsByWorkspaceId } from "./projectService";
+import { TRPCError } from "@trpc/server";
 const prisma = new PrismaClient();
 
 type WorkspaceUpdateData = {
@@ -69,12 +67,12 @@ export const getWorkspaceList = async (workspaceId: string) => {
                     user: {
                       select: {
                         given_name: true,
-                        picture: true
-                      }
-                    }
-                  }
-                }
-              }
+                        picture: true,
+                      },
+                    },
+                  },
+                },
+              },
             },
           },
         },
@@ -98,14 +96,16 @@ export const getUsersWithSessions = async (workspaceId: string) => {
       include: {
         memberWorkspace: {
           include: {
-            user: true
-          }
-        }
-      }
+            user: true,
+          },
+        },
+      },
     });
 
-    const users = sessions.map(session => session.memberWorkspace?.user);
-    const uniqueUsers = Array.from(new Set(users.map(u => u?.id))).map(id => users.find(u => u?.id === id) || {});
+    const users = sessions.map((session) => session.memberWorkspace?.user);
+    const uniqueUsers = Array.from(new Set(users.map((u) => u?.id))).map(
+      (id) => users.find((u) => u?.id === id) || {}
+    );
 
     return uniqueUsers;
   } catch (err) {
@@ -124,16 +124,27 @@ export const updateWorkspace = async (
       workspaceId: id,
     },
   });
-  return asyncFunctionErrorCatcher(
-    () =>
-      prisma.workspace.update({
-        where: {
-          id: id,
-        },
-        data,
-      }),
-    "Failed to update workspace"
-  );
+  if (
+    memberWorkspaceEmitter &&
+    (memberWorkspaceEmitter.role === "ADMIN" ||
+      memberWorkspaceEmitter.role === "OWNER")
+  ) {
+    return asyncFunctionErrorCatcher(
+      () =>
+        prisma.workspace.update({
+          where: {
+            id: id,
+          },
+          data,
+        }),
+      "Failed to update workspace"
+    );
+  } else {
+    throw new TRPCError({
+      code: "UNAUTHORIZED",
+      message: "Member from workspace is not allowed to update workspace",
+    });
+  }
 };
 
 export const deleteWorkspace = async (emitterId: string, id: string) => {
@@ -151,8 +162,13 @@ export const deleteWorkspace = async (emitterId: string, id: string) => {
             id,
           },
         }),
-      "Failed to delete user by id"
+      "Failed to delete workspace"
     );
+  } else {
+    throw new TRPCError({
+      code: "UNAUTHORIZED",
+      message: "Member is not allowed to delete workspace",
+    });
   }
 };
 

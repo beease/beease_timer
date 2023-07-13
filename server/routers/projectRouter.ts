@@ -4,27 +4,27 @@ import { Prisma, PrismaClient } from "@prisma/client";
 import {
   createProject,
   deleteProject,
-  deleteProjectsByWorkspaceId,
   getProject,
   getProjectsByWorkspaceId,
   updateProject,
 } from "../services/CRUD/projectService";
-const prisma = new PrismaClient();
 
 export const projectRouter = router({
   createWorkspace: authorizedProcedure
-  .input(z.object({ 
-    name: z.string(), 
-    color: z.string(), 
-    workspaceId: z.string()
-   }))
-  .mutation(async (opts) => {
-    return await createProject(
-      opts.input.name,
-      opts.input.color,
-      opts.input.workspaceId,
-    );
-  }),
+    .input(
+      z.object({
+        name: z.string(),
+        color: z.string(),
+        workspaceId: z.string(),
+      })
+    )
+    .mutation(async (opts) => {
+      return await createProject(
+        opts.input.name,
+        opts.input.color,
+        opts.input.workspaceId
+      );
+    }),
   getProjectsByWorkspaceId: authorizedProcedure
     .input(z.object({ workspaceId: z.string() }))
     .query(async (opts) => {
@@ -63,12 +63,6 @@ export const projectRouter = router({
     .mutation(async (opts) => {
       const { id } = opts.input;
       return await deleteProject(id);
-    }),
-  deleteProjectsByWorkspaceId: authorizedProcedure
-    .input(z.object({ workspaceId: z.string() }))
-    .mutation(async (opts) => {
-      const { workspaceId } = opts.input;
-      return await deleteProjectsByWorkspaceId(workspaceId);
     }),
 });
 
