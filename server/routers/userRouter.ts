@@ -7,14 +7,24 @@ import {
 } from "../trpc";
 import * as userService from "../services/CRUD/userService";
 import { Prisma } from "@prisma/client";
-
+import { getTokenByCredential } from "../services/CRUD/credentialService";
 export const userRouter = router({
   loginByGoogleToken: publicProcedure
     .input(z.object({ google_token: z.string() }))
     .mutation(async (opts) => {
       return await userService.loginByGoogleToken(opts.input.google_token);
     }),
-
+  loginByEmail: publicProcedure
+    .input(
+      z.object({
+        email: z.string().email(),
+        password: z.string(),
+      })
+    )
+    .mutation(async (opts) => {
+      const { email, password } = opts.input;
+      return await getTokenByCredential(email, password);
+    }),
   getMyUser: authorizedProcedure.query(async (opts) => {
     if (opts.ctx.tokenPayload) {
       return await userService.getUserById(opts.ctx.tokenPayload.userId);

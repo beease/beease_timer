@@ -7,6 +7,7 @@ import { memberWorkspaceRouter } from "./memberWorkspaceRouter";
 import { credentialRouter } from "./credentialRouter";
 import { memberSessionRouter } from "./memberSessionRouter";
 import { emailRouter } from "./emailRouter";
+import { invitationRouter } from "./InvitationRouter";
 
 const appRouter = router({
   user: userRouter,
@@ -16,6 +17,7 @@ const appRouter = router({
   memberWorkspace: memberWorkspaceRouter,
   credential: credentialRouter,
   memberSession: memberSessionRouter,
+  invitation: invitationRouter,
 });
 
 export type AppRouter = typeof appRouter;

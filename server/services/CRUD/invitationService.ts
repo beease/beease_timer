@@ -59,6 +59,9 @@ export const acceptInvitation = async (
     });
     return await prisma.$transaction([acceptInvitationFn, addToWorkspace]);
   } catch (err) {
-    throw new Error(`Accept invitation failed : ${err}`);
+    throw new TRPCError({
+      code: "INTERNAL_SERVER_ERROR",
+      message: `Accept invitation failed : ${err}`,
+    });
   }
 };

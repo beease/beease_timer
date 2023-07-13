@@ -1,5 +1,6 @@
 import { PrismaClient, Prisma, Role } from "@prisma/client";
 import { asyncFunctionErrorCatcher } from "../utils/errorHandler";
+import { TRPCError } from "@trpc/server";
 const prisma = new PrismaClient();
 
 type updateProjectData = {
@@ -11,10 +12,27 @@ type updateProjectData = {
 };
 
 export const createProject = async (
+  emitterId: string,
   name: string,
   color: string,
   workspaceId: string
 ) => {
+  const memberWorkspace = await prisma.memberWorkspace.findUnique({
+    where: {
+      workspaceId_userId: {
+        userId: emitterId,
+        workspaceId: workspaceId,
+      },
+    },
+  });
+
+  if (memberWorkspace?.role !== "OWNER" && memberWorkspace?.role !== "ADMIN") {
+    throw new TRPCError({
+      code: "UNAUTHORIZED",
+      message: "Member is not alowed to update project",
+    });
+  }
+
   try {
     const Project = await prisma.project.create({
       data: {
@@ -67,9 +85,37 @@ export const getProjectsByWorkspaceId = async (workspaceId: string) => {
 };
 
 export const updateProject = async (
+  emitterId: string,
   projectId: string,
   data: updateProjectData
 ) => {
+  const project = await prisma.project.findUnique({
+    where: {
+      id: projectId,
+    },
+  });
+
+  if (project && project.workspaceId) {
+    const memberWorkspace = await prisma.memberWorkspace.findUnique({
+      where: {
+        workspaceId_userId: {
+          userId: emitterId,
+          workspaceId: project.workspaceId,
+        },
+      },
+    });
+
+    if (
+      memberWorkspace?.role !== "OWNER" &&
+      memberWorkspace?.role !== "ADMIN"
+    ) {
+      throw new TRPCError({
+        code: "UNAUTHORIZED",
+        message: "Member is not alowed to update project",
+      });
+    }
+  }
+
   return asyncFunctionErrorCatcher(
     () =>
       prisma.project.update({
@@ -99,7 +145,34 @@ export const updateProject = async (
   );
 };
 
-export const deleteProject = async (projectId: string) => {
+export const deleteProject = async (emitterId: string, projectId: string) => {
+  const project = await prisma.project.findUnique({
+    where: {
+      id: projectId,
+    },
+  });
+
+  if (project && project.workspaceId) {
+    const memberWorkspace = await prisma.memberWorkspace.findUnique({
+      where: {
+        workspaceId_userId: {
+          userId: emitterId,
+          workspaceId: project.workspaceId,
+        },
+      },
+    });
+
+    if (
+      memberWorkspace?.role !== "OWNER" &&
+      memberWorkspace?.role !== "ADMIN"
+    ) {
+      throw new TRPCError({
+        code: "UNAUTHORIZED",
+        message: "Member is not alowed to delete project",
+      });
+    }
+  }
+
   return asyncFunctionErrorCatcher(
     async () =>
       await prisma.project.delete({

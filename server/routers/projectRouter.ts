@@ -19,11 +19,15 @@ export const projectRouter = router({
       })
     )
     .mutation(async (opts) => {
-      return await createProject(
-        opts.input.name,
-        opts.input.color,
-        opts.input.workspaceId
-      );
+      const { ctx } = opts;
+      if (ctx.tokenPayload && ctx.tokenPayload.userId) {
+        return await createProject(
+          ctx.tokenPayload.userId,
+          opts.input.name,
+          opts.input.color,
+          opts.input.workspaceId
+        );
+      }
     }),
   getProjectsByWorkspaceId: authorizedProcedure
     .input(z.object({ workspaceId: z.string() }))
@@ -55,14 +59,20 @@ export const projectRouter = router({
       })
     )
     .mutation(async (opts) => {
+      const { ctx } = opts;
       const { id, data } = opts.input;
-      return await updateProject(id, data);
+      if (ctx.tokenPayload && ctx.tokenPayload.userId) {
+        return await updateProject(ctx.tokenPayload.userId, id, data);
+      }
     }),
   deleteProject: authorizedProcedure
     .input(z.object({ id: z.string() }))
     .mutation(async (opts) => {
+      const { ctx } = opts;
       const { id } = opts.input;
-      return await deleteProject(id);
+      if (ctx.tokenPayload && ctx.tokenPayload.userId) {
+        return await deleteProject(ctx.tokenPayload.userId, id);
+      }
     }),
 });
 
