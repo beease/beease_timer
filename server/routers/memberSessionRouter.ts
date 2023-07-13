@@ -16,14 +16,14 @@ export const memberSessionRouter = router({
       z.object({
         projectId: z.string(),
         startedAt: z.string(),
+        endedAt: z.string().optional(),
       })
     )
     .mutation(async (opts) => {
       const { ctx } = opts;
       if (ctx.tokenPayload) {
-        const { projectId, startedAt } = opts.input;
         const emitterId = ctx.tokenPayload.userId;
-        return await createMemberSession(emitterId, projectId, startedAt);
+        return await createMemberSession(emitterId, opts.input);
       }
     }),
   deleteSession: authorizedProcedure
@@ -47,17 +47,17 @@ export const memberSessionRouter = router({
   stopSession: authorizedProcedure
     .input(
       z.object({
-        sessionId: z.string(),
+        projectId: z.string(),
         endedAt: z.string(),
       })
     )
     .mutation(async (opts) => {
       const { ctx } = opts;
-      const { sessionId, endedAt } = opts.input;
+      const { projectId, endedAt } = opts.input;
 
       if (ctx.tokenPayload) {
         const emitterId = ctx.tokenPayload.userId;
-        return await stopSession(emitterId, sessionId, endedAt);
+        return await stopSession(emitterId, projectId, endedAt);
       }
     }),
   getSessionsByProjectId: authorizedProcedure

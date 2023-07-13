@@ -1,7 +1,7 @@
 import { projectStore, ProjectStore } from "../../stores/projectStore";
 import { workspaceStore, WorkspaceState } from "../../stores/workspaceStore";
 import { trpc } from "../../trpc";
-import Dayjs from "dayjs";
+import dayjs from "dayjs";
 
 import { DotsButton } from "../ui/dotsButton";
 import { TitleTimer } from "../ui/titleTimer";
@@ -25,7 +25,7 @@ export const ProjectCardTop = ({
     (state: ProjectStore) => state.toggleIsPlaying
   );
   const PlayingProjectId = projectStore(
-    (state: ProjectStore) => state?.PlayingProjectId
+    (state: ProjectStore) => state.PlayingProjectId
   );
   const selectedWorkspaceId = workspaceStore(
     (state: WorkspaceState) => state.selectedWorkspaceId
@@ -37,29 +37,61 @@ export const ProjectCardTop = ({
   const CreateSession = async (projectId: string) => {
     mutationCreateSession.mutateAsync({
       projectId: projectId,
-      startedAt: Dayjs().format(),
-    });
+      startedAt: dayjs().format(),
+    },
+    {
+      onSuccess: (newSession) => {
+        if(!newSession || !selectedWorkspaceId) return;
+        utils.workspace.getWorkspaceList.setData(
+          { workspaceId: selectedWorkspaceId },
+          (oldQueryData) => {
+            if(!oldQueryData) return;
+            const newProjects = oldQueryData.projects.map((project) => {
+              if(project.id === projectId){
+                return {
+                  ...project,
+                  memberSessions: [...project.memberSessions, newSession]
+                }
+              }else{
+                return project
+              }
+            });
+            return{
+              ...oldQueryData,
+              projects: newProjects
+            }
+          })
+      }
+    }); 
   };
 
   const StopSession = async (projectId: string) => {
     mutationStopSession.mutateAsync({
       projectId: projectId,
-      endedAt: Dayjs().format(),
+      endedAt: dayjs().format(),
     },
     {
       onSuccess: (newSession) => {
         if(!newSession || !selectedWorkspaceId) return;
-        // utils.workspace.getWorkspaceList.setData(
-        //   { workspaceId: selectedWorkspaceId },
-        //   (oldQueryData) => {
-        //     if(!oldQueryData) return;
-        //     const newProject = oldQueryData.projects.find((project) => project.id === PlayingProjectId);
-
-        //     return{
-        //       ...oldQueryData,
-        //       projects: [...oldQueryData.projects, newProject]
-        //     }
-        //   })
+        utils.workspace.getWorkspaceList.setData(
+          { workspaceId: selectedWorkspaceId },
+          (oldQueryData) => {
+            if(!oldQueryData) return;
+            const newProjects = oldQueryData.projects.map((project) => {
+              if(project.id === projectId){
+                return {
+                  ...project,
+                  memberSessions: project.memberSessions.map((session) => (session.id === newSession.id ? newSession : session))
+                }
+              }else{
+                return project
+              }
+            });
+            return{
+              ...oldQueryData,
+              projects: newProjects
+            }
+          })
       }
     });
   };
