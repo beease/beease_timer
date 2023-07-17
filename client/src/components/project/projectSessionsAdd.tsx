@@ -38,9 +38,9 @@ export const ProjectSessionsAdd = ({ projectId }: Props) => {
       },
       {
         onSuccess: (newSession) => {
-          if (!newSession || !selectedWorkspaceId) return;
+          if (!newSession || !selectedWorkspaceId.id) return;
           utils.workspace.getWorkspaceList.setData(
-            { workspaceId: selectedWorkspaceId },
+            { workspaceId: selectedWorkspaceId.id },
             (oldQueryData) => {
               if (!oldQueryData) return;
               const newProjects = oldQueryData.projects.map((project) => {

@@ -1,12 +1,10 @@
 import { BasicButton } from "../ui/basicButton";
-import plus from "../../assets/Plus.svg";
 import { useState } from "react";
 import { trpc } from "../../trpc";
 import { workspaceStore, WorkspaceState } from "../../stores/workspaceStore";
-import { User, Workspace } from "../../libs/interfaces";
+import { Workspace } from "../../libs/interfaces";
 import send from "../../assets/send_w.svg";
-import { DisplayUserPicture } from "../ui/displayUserPicture";
-import bin from "../../assets/bin.svg";
+import { WorkspaceInvitationLine } from "./workspaceInvitationLine";
 
 interface Props {
   workspace: Workspace;
@@ -14,10 +12,10 @@ interface Props {
 
 export const UserList = ({ workspaceId }: { workspaceId: string }) => {
   const {
-    data: userList,
+    data: workspace,
     error,
     isLoading,
-  } = trpc.memberWorkspace.getMembersWorkspaceByWorkspaceId.useQuery({
+  } = trpc.workspace.getWorkspaceList.useQuery({
     workspaceId: workspaceId,
   });
 
@@ -25,21 +23,14 @@ export const UserList = ({ workspaceId }: { workspaceId: string }) => {
 
   if (isLoading) return <div className="Invitation_line skeleton"></div>;
 
-  if (userList) {
-    return userList.map(({ user }) => (
-      <div className="Invitation_line">
-        <DisplayUserPicture user={user} className="Invitation_user_picture" />
-        <div className="Invitation_user_name">{user.given_name}</div>
-        <BasicButton
-          icon={bin}
-          variant="grey"
-          size="small"
-          style={{
-            height: "36px",
-            width: "36px",
-          }}
-        />
-      </div>
+  if (workspace) {
+    console.log(workspace)
+    return workspace.membersWorkspace.map((member) => (
+      <WorkspaceInvitationLine 
+      member={member} 
+      myUser={workspace.myUser}
+      workspaceId={workspace.id}
+      />
     ));
   }
 };
@@ -106,7 +97,7 @@ export const InvitationPopup = ({ workspace }: Props) => {
           >
             {invationMessage.message}
           </div> */}
-        <div id="invite_user_list">
+        <div className="invite_user_list">
           <UserList workspaceId={workspace.id} />
         </div>
       </div>

@@ -46,6 +46,12 @@
   &.alert{
     background-color: $red-bg-color;
   }
+  &.disable{
+    background-color: white;
+    img {
+      opacity: 0.2;
+    }
+  }
 }
 
 

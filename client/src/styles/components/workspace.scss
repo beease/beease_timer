@@ -95,6 +95,33 @@
                 }
             }
         }
+
+        .WorkspaceInvitationButton {
+            width: auto;
+
+            button {
+                width: auto;
+                padding: 4px 12px 4px 4px;
+
+                .WorkspaceInvitationButton_imgs {
+                    display: flex;
+                    margin-right: 36px;
+                }
+
+                .WorkspaceInvitationButton_img_cont {
+                    width: 10px;
+                    height: 40px;
+
+                    img {
+                        border: 4px solid white;
+                        border-radius: 8px;
+                        opacity: 1;
+                        height: 32px;
+                        width: 32px;
+                    }
+                }
+            }
+        }
     }
 }
 
@@ -103,10 +130,3 @@
     background: linear-gradient(193deg, rgba(2, 0, 36, 1) 0%, rgba(7, 30, 148, 1) 49%, rgba(0, 112, 255, 1) 100%);
     border-radius: 4px;
 }
-
-
-
-
-
-
-

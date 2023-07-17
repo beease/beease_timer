@@ -7,12 +7,16 @@ import stats_w from "../../assets/stats_w.svg";
 import edit from "../../assets/edit.svg";
 import { Workspace } from "../../libs/interfaces";
 import plus from "../../assets/Plus.svg";
+import { WorkspaceInvitationButton } from "./workspaceInviationButton";
 
 interface Props{
   workspace: Workspace;
 }
 
 export const WorkspaceMoreInfos = ({workspace}: Props) => {
+
+console.log(workspace)
+
   const setFilters = filtersStore((state: FiltersState) => state.setFilters);
   const filters = filtersStore((state: FiltersState) => state.filters);
   const setSettingWorkspace = workspaceStore((state: WorkspaceState) => state.setSettingWorkspace);
@@ -47,14 +51,15 @@ export const WorkspaceMoreInfos = ({workspace}: Props) => {
           En cours
         </div>
       </div>
-      <BasicButton
-        onClick={() => {
-          toggleInvitationActive();
-        }}
-        icon={plus}
-        variant="clear"
+      <WorkspaceInvitationButton
+      workspaceId={workspace.id}
+      onClick={() => {
+        toggleInvitationActive();
+      }}
       />
-      <BasicButton
+      {
+        workspace.role === 'ADMIN' || workspace.role === 'OWNER'
+        && <BasicButton
         onClick={() => {
             setSettingWorkspace('edit')
         }}
@@ -62,6 +67,8 @@ export const WorkspaceMoreInfos = ({workspace}: Props) => {
         variant="clear"
         icon={edit}
       />
+      }
+      
     </div>
   );
 };

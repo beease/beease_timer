@@ -28,7 +28,7 @@ export const createWorkspace = async (
         userId: userId,
       },
     });
-    return workspace;
+    return {...workspace, role: Role.OWNER };
   } catch (err) {
     throw new Error(`Failed creating workspace : ${err}`);
   }
@@ -51,13 +51,29 @@ export const getWorkspaceById = async (id: string) => {
   );
 };
 
-export const getWorkspaceList = async (workspaceId: string) => {
+export const getWorkspaceList = async (workspaceId: string, userId: string) => {
   try {
     const fullWorkspace = await prisma.workspace.findUnique({
       where: {
         id: workspaceId,
       },
-      include: {
+      select: {
+        id: true,
+        membersWorkspace: {
+          select: {
+            role: true,
+            id: true,
+            user: {
+              select: {
+                id: true,
+                family_name: true,
+                name: true,
+                given_name: true,
+                picture: true,
+              },
+            },
+          },
+        },
         projects: {
           include: {
             memberSessions: {
@@ -82,7 +98,18 @@ export const getWorkspaceList = async (workspaceId: string) => {
       },
     });
 
-    return fullWorkspace;
+    if (!fullWorkspace) return;
+    const FullWorkspaceWithMyRole = {
+      ...fullWorkspace,
+      myUser: {
+        role: fullWorkspace.membersWorkspace.find(
+          (member) => member.user.id === userId
+        )?.role,
+        id: userId,
+      },
+    };
+
+    return FullWorkspaceWithMyRole;
   } catch (err) {
     throw new Error(`Failed to get workspace list : ${err}`);
   }
@@ -132,16 +159,20 @@ export const updateWorkspace = async (
     (memberWorkspaceEmitter.role === "ADMIN" ||
       memberWorkspaceEmitter.role === "OWNER")
   ) {
-    return asyncFunctionErrorCatcher(
-      () =>
-        prisma.workspace.update({
-          where: {
-            id: id,
-          },
-          data,
-        }),
-      "Failed to update workspace"
-    );
+try{
+  const workspace = await prisma.workspace.update({
+    where: {
+      id: id,
+    },
+    data,
+  })
+  return {...workspace, role: Role.OWNER };
+}
+catch(err){
+  throw new Error(`Failed to update workspace : ${err}`);
+}
+      
+  
   } else {
     throw new TRPCError({
       code: "UNAUTHORIZED",
@@ -189,7 +220,12 @@ export const getMyWorkspaces = async (id: string) => {
         },
       },
     });
-    const workspaces = user?.memberWorkspaces.map((mw) => mw.workspace) ?? [];
+    const workspaces = user?.memberWorkspaces.map((mw) => { 
+      return {...mw.workspace, role: mw.role}
+    });
+   
+
+
     return workspaces;
   } catch (err) {
     throw new Error(`Failed to get workspaces user by id : ${err}`);
