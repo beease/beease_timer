@@ -39,14 +39,14 @@ export const ProjectSessions = ({ project, selectedWorkspaceId }: Props) => {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
+  const sortedSessionsByDate = sessions.sort((a, b) => dayjs(b.startedAt).unix() - dayjs(a.startedAt).unix())
+  
   return (
     <div className={`ProjectSessions ${sessions.length > 2 && 'scroll'}`}>
       <ProjectSessionsAdd projectId={project.id}/>
-      {sessions.sort((a, b) => dayjs(b.startedAt).unix() - dayjs(a.startedAt).unix())
-          .map((session) => (
-            <ProjectSessionsLine session={session} projectId={project.id} />
-          ))
-      }
+      {sortedSessionsByDate.map((session) => (
+        <ProjectSessionsLine session={session} projectId={project.id} />
+      ))}
     </div>
   );
 };
