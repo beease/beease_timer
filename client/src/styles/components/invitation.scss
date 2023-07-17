@@ -15,7 +15,7 @@
   transition: all ease-in-out 0.2s;
 
   .Invitation_cont{
-    width: 210px;
+    width: 260px;
     background-color: $grey-1;
     box-shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;
     border-radius: 5px;
@@ -38,6 +38,11 @@
     }
   }
 
+  .invite_user_list{
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
   .Invitation_line{
     display: flex;
     gap: 8px;

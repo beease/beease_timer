@@ -2,8 +2,14 @@ import { create } from "zustand";
 import { projectStore } from "./projectStore";
 
 export interface WorkspaceState {
-  selectedWorkspaceId: string | null;
-  setSelectedWorkspaceId: (workspaceId: string | null) => void;
+  selectedWorkspaceId: {
+    id: string | null;
+    role: string | null;
+  };
+  setSelectedWorkspaceId: (workspaceId: {
+    id: string | null;
+    role: string | null;
+  }) => void;
   isSettingWorkspace: "edit" | "add" | null;
   setSettingWorkspace: (status: "edit" | "add" | null) => void;
   isStatisticActive: boolean;
@@ -15,20 +21,21 @@ export interface WorkspaceState {
 
 export const workspaceStore = create<WorkspaceState>((set) => ({
   isSettingWorkspace: null,
-  selectedWorkspaceId: null,
-  selectedWorkspaceIdCache: null,
+  selectedWorkspaceId: {
+    id: null,
+    role: null,
+  },
   isStatisticActive: false,
   isInvitationActive: false,
   setSelectedWorkspaceId: (workspaceId) =>
     set((state) => {
-      if (workspaceId !== state.selectedWorkspaceId) {
+      if (workspaceId.id !== state.selectedWorkspaceId.id) {
         projectStore.getState().toggleMoreInfo(null);
       }
-      if(workspaceId === null) localStorage.removeItem("selectedWorkspaceId");
-      else localStorage.setItem("selectedWorkspaceId", workspaceId);
+      if(workspaceId.id === null) localStorage.removeItem("selectedWorkspaceId");
+      else localStorage.setItem("selectedWorkspaceId", workspaceId.id);
       return {
         selectedWorkspaceId: workspaceId,
-        selectedWorkspaceIdCache: workspaceId,
         isSettingWorkspace: null,
         isStatisticActive: false,
       };
@@ -36,7 +43,10 @@ export const workspaceStore = create<WorkspaceState>((set) => ({
   setSettingWorkspace: (status) =>
     set((state) => ({
       isSettingWorkspace: status,
-      selectedWorkspaceId: status === "edit" ? state.selectedWorkspaceId : null,
+      selectedWorkspaceId: status === "edit" ? state.selectedWorkspaceId : {
+        id: null,
+        role: null,
+      },
     })),
   toggleStatisticActive: () =>
     set((state) => ({
@@ -48,7 +58,11 @@ export const workspaceStore = create<WorkspaceState>((set) => ({
     })),
   loadWorkspaceIdFromStorage: () => {
     const workspaceId = localStorage.getItem("selectedWorkspaceId");
-    if (workspaceId) set(() => ({ selectedWorkspaceId: workspaceId }));
+    const workspaceRole = localStorage.getItem("selectedWorkspaceRole");
+    if (workspaceId) set(() => ({ selectedWorkspaceId: {
+      id: workspaceId,
+      role: workspaceRole
+    } }));
   },
 }));
 

@@ -40,9 +40,9 @@ export const ProjectSettings = ({ project }: Props) => {
       { id: project.id },
       {
         onSuccess: (deletedProject) => {
-          if (!deletedProject || !selectedWorkspaceId) return;
+          if (!deletedProject || !selectedWorkspaceId.id) return;
           utils.workspace.getWorkspaceList.setData(
-            { workspaceId: selectedWorkspaceId },
+            { workspaceId: selectedWorkspaceId.id },
             (oldQueryData) => oldQueryData && {
               ...oldQueryData,
               projects: oldQueryData.projects.filter((project) => project.id !== deletedProject.id)
@@ -55,7 +55,7 @@ export const ProjectSettings = ({ project }: Props) => {
   };
 
   const handleUpdateProject = () => {
-    if (!name ?? !selectedWorkspaceId) return;
+    if (!name ?? !selectedWorkspaceId.id) return;
     mutationUpdate.mutate(
       {
         id: project.id,
@@ -69,9 +69,9 @@ export const ProjectSettings = ({ project }: Props) => {
       },
       {
         onSuccess: (newProject) => {
-          if (!newProject) return;
+          if (!newProject || !selectedWorkspaceId.id) return;
           utils.workspace.getWorkspaceList.setData(
-            { workspaceId: selectedWorkspaceId },
+            { workspaceId: selectedWorkspaceId.id },
             (oldQueryData) => oldQueryData && {
               ...oldQueryData,
               projects: oldQueryData.projects.map((project) => (project.id === newProject.id ? newProject : project))

@@ -49,7 +49,7 @@ export const ProjectMoreInfos = ({ project }: Props) => {
         <Button title={"setting"} icon={setting} />
       </div>
       <div className="ProjectCard_moreInfos_content">
-        {selectedButton === "history" && selectedWorkspaceId && <ProjectSessions project={project} selectedWorkspaceId={selectedWorkspaceId}/>}
+        {selectedButton === "history" && selectedWorkspaceId.id && <ProjectSessions project={project} selectedWorkspaceId={selectedWorkspaceId.id}/>}
         {selectedButton === "setting" && <ProjectSettings project={project} />}
       </div>
     </>

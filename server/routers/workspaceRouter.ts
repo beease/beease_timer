@@ -35,7 +35,10 @@ export const workspaceRouter = router({
   getWorkspaceList: authorizedProcedure
     .input(z.object({ workspaceId: z.string() }))
     .query(async (opts) => {
-      return await workspaceService.getWorkspaceList(opts.input.workspaceId);
+      const { ctx } = opts;
+      if (ctx.tokenPayload) {
+        return await workspaceService.getWorkspaceList(opts.input.workspaceId, ctx.tokenPayload.userId);
+      }
     }),
   updateWorkspace: authorizedProcedure
     .input(

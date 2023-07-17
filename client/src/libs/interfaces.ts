@@ -11,6 +11,11 @@ export type WorkspaceList = NonNullable<
   inferRouterOutputs<WorkspaceRouter>["getWorkspaceList"]
 >;
 
+export type MyUser = WorkspaceList['myUser']
+
+export type Member = WorkspaceList['membersWorkspace'][number]
+
+
 export type Workspaces = NonNullable<
   inferRouterOutputs<WorkspaceRouter>["getMyWorkspaces"]
 >;

@@ -53,7 +53,10 @@ export const WorkspaceEdit = ({ selectedWorkspaceId }: Props) => {
             }
           );
           setSettingWorkspace(null);
-          setSelectedWorkspaceId(null);
+          setSelectedWorkspaceId({
+            id: null,
+            role: null,
+          });
         },
       }
     );
@@ -64,7 +67,7 @@ export const WorkspaceEdit = ({ selectedWorkspaceId }: Props) => {
     if (!workspaceName) return;
     if (workspaceName === workspace?.name && colorWorkSpace === workspace?.color) {
       setSettingWorkspace(null);
-      setSelectedWorkspaceId(workspace.id);
+      setSelectedWorkspaceId({id: workspace.id, role: workspace.role})
       return;
     }
     mutationUpdate.mutate(
@@ -83,7 +86,7 @@ export const WorkspaceEdit = ({ selectedWorkspaceId }: Props) => {
             (oldQueryData = []) => oldQueryData.map(workspace => workspace.id === newWorkspace.id ? newWorkspace : workspace)
           );
           setSettingWorkspace(null);
-          setSelectedWorkspaceId(newWorkspace.id);
+          setSelectedWorkspaceId({id: newWorkspace.id, role: newWorkspace.role})
         },
       }
     );

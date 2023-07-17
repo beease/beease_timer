@@ -33,9 +33,9 @@ export const ProjectSessionsLine = ({ session, projectId }: Props) => {
       },
       {
         onSuccess: (deletedSession) => {
-          if (!deletedSession || !selectedWorkspaceId) return;
+          if (!deletedSession || !selectedWorkspaceId.id) return;
           utils.workspace.getWorkspaceList.setData(
-            { workspaceId: selectedWorkspaceId },
+            { workspaceId: selectedWorkspaceId.id },
             (oldQueryData) => {
               if (!oldQueryData) return;
               const newProjects = oldQueryData.projects.map((project) => {
@@ -65,17 +65,6 @@ export const ProjectSessionsLine = ({ session, projectId }: Props) => {
         },
       }
     );
-  };
-
-  const DisplayDate = ({ session }: { session: Session }) => {
-    const { startedAt, endedAt } = session;
-    if (startedAt && endedAt) {
-      const date = formatTwoDates(startedAt, endedAt);
-      return <>{date}</>;
-    } else if (startedAt) {
-      const date = formatDate(startedAt);
-      return <>{date}</>;
-    }
   };
 
   return (

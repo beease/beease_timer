@@ -64,7 +64,8 @@ export const getMembersWorkspaceByWorkspaceId = async (workspaceId: string) => {
         where: {
           workspaceId: workspaceId,
         },
-        include: {
+        select:{
+          role: true,
           user: {
             select: {
               id: true,
@@ -72,9 +73,14 @@ export const getMembersWorkspaceByWorkspaceId = async (workspaceId: string) => {
               name: true,
               family_name: true,
               picture: true,
+              // memberWorkspaces: {
+              //   select: {
+              //     role: true
+              //   }
+              // }
             }
           }
-        },
+        }
       }),
     "Failed to get members workspace by workspaceId"
   );

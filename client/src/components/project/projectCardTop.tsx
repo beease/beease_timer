@@ -41,9 +41,9 @@ export const ProjectCardTop = ({
     },
     {
       onSuccess: (newSession) => {
-        if(!newSession || !selectedWorkspaceId) return;
+        if(!newSession || !selectedWorkspaceId.id) return;
         utils.workspace.getWorkspaceList.setData(
-          { workspaceId: selectedWorkspaceId },
+          { workspaceId: selectedWorkspaceId.id },
           (oldQueryData) => {
             if(!oldQueryData) return;
             const newProjects = oldQueryData.projects.map((project) => {
@@ -98,8 +98,8 @@ export const ProjectCardTop = ({
 
   const handlePlayStop = async () => {
     const now = dayjs().format()
-    if (PlayingProject?.projectId === project.id && selectedWorkspaceId) {
-       StopSession(project.id, now, selectedWorkspaceId);
+    if (PlayingProject?.projectId === project.id && selectedWorkspaceId.id) {
+       StopSession(project.id, now, selectedWorkspaceId.id);
     } else if (PlayingProject?.projectId === null) {
        CreateSession(project.id, now);
     } else if (PlayingProject?.projectId !== project.id && PlayingProject?.projectId && PlayingProject.workspaceId) {
@@ -108,7 +108,7 @@ export const ProjectCardTop = ({
     }
     toggleIsPlaying({
       projectId: project.id,
-      workspaceId: selectedWorkspaceId,
+      workspaceId: selectedWorkspaceId.id,
       startedAt: now
     })
   };

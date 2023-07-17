@@ -36,7 +36,7 @@ export const WorkspaceAdd = () => {
             ]
           })
           setSettingWorkspace(null);
-          setSelectedWorkspaceId(newWorkspace.id)
+          setSelectedWorkspaceId({id: newWorkspace.id, role: newWorkspace.role})
         },
       }
     );

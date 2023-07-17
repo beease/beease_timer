@@ -1,8 +1,8 @@
 import React from 'react'
 
 interface Props extends React.HTMLAttributes<HTMLButtonElement>{
-    icon: string;
-    variant?: 'confirm' | 'cancel' | 'grey' | 'clear' | 'darkGrey' | 'alert';
+    icon?: string;
+    variant?: 'confirm' | 'cancel' | 'grey' | 'clear' | 'darkGrey' | 'alert' | 'disable';
     size?: 'small' | 'medium' | 'large';
 }
 
@@ -21,7 +21,7 @@ const sizes = {
     }
 }
 
-export const BasicButton = ({icon, variant, ...props}: Props) => {
+export const BasicButton = ({icon, variant, children, ...props}: Props) => {
   return (
     <button
         className={`ui_basicButton ${variant}`}
@@ -30,13 +30,16 @@ export const BasicButton = ({icon, variant, ...props}: Props) => {
         }}
         {...props}
       >
-        <img 
+        {children 
+        ? children 
+        : <img 
           src={icon} 
           style={{
             width: sizes[props.size || 'medium'].height,
             height: sizes[props.size || 'medium'].width,
           }}
-        />
+        />}
+        {}
     </button>
   )
 }
