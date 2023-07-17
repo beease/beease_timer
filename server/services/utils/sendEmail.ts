@@ -7,6 +7,7 @@ type sendMailSchema = {
   html: string;
 };
 export const sendEmail = async (emailTo: string, data: sendMailSchema) => {
+  console.log('trying send mail', emailTo)
   try {
     const { subject, html } = data;
     const transporter = nodemailer.createTransport({
@@ -25,6 +26,7 @@ export const sendEmail = async (emailTo: string, data: sendMailSchema) => {
       subject: subject,
       html: html,
     });
+    console.log('mail sent')
   } catch (error) {
     throw new Error(`Failed to send email : ${error}`);
   }

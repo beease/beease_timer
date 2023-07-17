@@ -4,8 +4,10 @@ import { TitleTimer } from "../ui/titleTimer";
 import { AnimationCard } from "../animationCard";
 
 import { projectStore, ProjectStore } from "../../stores/projectStore";
+import { workspaceStore, WorkspaceState } from "../../stores/workspaceStore";
 import { WorkspaceMoreInfos } from "./workspaceMoreInfos";
 import { trpc } from '../../trpc';
+import { InvitationPopup } from "./workspaceInvitationPopup";
 
 interface Props{
   selectedWorkspaceId: string;
@@ -19,6 +21,10 @@ export const WorkspaceHeader = ({selectedWorkspaceId}: Props) => {
 
   const isPlaying = projectStore(
     (state: ProjectStore) => state.PlayingProject
+  );
+
+  const isInvitationActive = workspaceStore(
+    (state: WorkspaceState) => state.isInvitationActive
   );
 
   const bottomDistance = isDotsButtonActive ? "0" : "56";
@@ -47,6 +53,7 @@ export const WorkspaceHeader = ({selectedWorkspaceId}: Props) => {
             <AnimationCard isStarted={isPlaying?.workspaceId === selectedWorkspaceId} color={workspace.color}/>
           </div>
         </div>
+        {isInvitationActive && <InvitationPopup workspace={workspace}/>}
       </div>
     );
   }

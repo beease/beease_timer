@@ -61,6 +61,28 @@ export const getUserList = async () => {
   );
 };
 
+export const getUserByMail = async (email: string) => {
+  return asyncFunctionErrorCatcher(
+    () =>
+      prisma.user.findUnique({
+        where: {
+          email: email,
+        },
+        select: {
+          id: true,
+          name: true,
+          email: true,
+          verified_email: true,
+          picture: true,
+          locale: true,
+          family_name: true,
+          given_name: true,
+        },
+      }),
+    "Failed to get user by id with Prisma."
+  );
+};
+
 export const getUserById = async (id: string) => {
   return asyncFunctionErrorCatcher(
     () =>

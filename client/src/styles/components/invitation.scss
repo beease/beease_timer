@@ -1,0 +1,60 @@
+@import '../Mixin.scss';
+@import '../Var.scss';
+
+#Invitation_popup{
+  display: none;
+  z-index: 100;
+  top: 0px;
+  z-index: 100;
+  left: 0px;
+  background-color: #ffffff66;
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  @include flex-center;
+  transition: all ease-in-out 0.2s;
+
+  .Invitation_cont{
+    width: 210px;
+    background-color: $grey-1;
+    box-shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;
+    border-radius: 5px;
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .invite_user{
+    display: flex;
+    gap: 8px;
+    input{
+        flex: 1;
+        height: 36px;
+        padding: 0 8px;
+        width: calc(100% - 44px);
+        @include input;
+        @include input-font;
+    }
+  }
+
+  .Invitation_line{
+    display: flex;
+    gap: 8px;
+    height: 36px;
+
+    .Invitation_user_name{
+        flex: 1;
+        background-color: $grey-2;
+        border-radius: 4px;
+        line-height: 36px;
+        padding: 0 8px;
+    }
+  }
+
+  .Invitation_user_picture{
+    width: 36px;
+    height: 36px;
+    border-radius: 4px;
+  }
+}

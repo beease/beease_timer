@@ -44,7 +44,7 @@ export const memberWorkspaceRouter = router({
       const { workspaceId } = opts.input;
       return await getMembersWorkspaceByWorkspaceId(workspaceId);
     }),
-  getUserseByWorkspaceId: authorizedProcedure
+  getUsersByWorkspaceId: authorizedProcedure
     .input(z.object({ workspaceId: z.string() }))
     .query(async (opts) => {
       const { workspaceId } = opts.input;
@@ -65,3 +65,5 @@ export const memberWorkspaceRouter = router({
         return await updateRoleMemberWorkspace(emitterId, id, data);
     }),
 });
+
+export type MemberWorkspaceRouter = typeof memberWorkspaceRouter;

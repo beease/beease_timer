@@ -7,6 +7,8 @@ export interface WorkspaceState {
   isSettingWorkspace: "edit" | "add" | null;
   setSettingWorkspace: (status: "edit" | "add" | null) => void;
   isStatisticActive: boolean;
+  toggleInvitationActive: () => void;
+  isInvitationActive: boolean;
   toggleStatisticActive: () => void;
   loadWorkspaceIdFromStorage: () => void;
 }
@@ -16,6 +18,7 @@ export const workspaceStore = create<WorkspaceState>((set) => ({
   selectedWorkspaceId: null,
   selectedWorkspaceIdCache: null,
   isStatisticActive: false,
+  isInvitationActive: false,
   setSelectedWorkspaceId: (workspaceId) =>
     set((state) => {
       if (workspaceId !== state.selectedWorkspaceId) {
@@ -38,6 +41,10 @@ export const workspaceStore = create<WorkspaceState>((set) => ({
   toggleStatisticActive: () =>
     set((state) => ({
       isStatisticActive: !state.isStatisticActive,
+    })),
+  toggleInvitationActive: () =>
+    set((state) => ({
+      isInvitationActive: !state.isInvitationActive,
     })),
   loadWorkspaceIdFromStorage: () => {
     const workspaceId = localStorage.getItem("selectedWorkspaceId");

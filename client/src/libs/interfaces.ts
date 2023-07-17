@@ -1,5 +1,6 @@
 import type { inferRouterOutputs } from "@trpc/server";
 import type { WorkspaceRouter } from "../../../server/routers/workspaceRouter";
+import type { MemberWorkspaceRouter } from "../../../server/routers/memberWorkspaceRouter";
 
 export interface Filters {
   archives: boolean;
@@ -9,6 +10,16 @@ export interface Filters {
 export type WorkspaceList = NonNullable<
   inferRouterOutputs<WorkspaceRouter>["getWorkspaceList"]
 >;
+
+export type Workspaces = NonNullable<
+  inferRouterOutputs<WorkspaceRouter>["getMyWorkspaces"]
+>;
+
+export type Workspace = Workspaces[number];
+
+export type UserList = inferRouterOutputs<MemberWorkspaceRouter>['getUsersByWorkspaceId']
+
+// export type User = UserList[number]
 
 export type Project = Extract<
   inferRouterOutputs<WorkspaceRouter>["getWorkspaceList"],

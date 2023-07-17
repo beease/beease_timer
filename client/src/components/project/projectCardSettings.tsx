@@ -40,7 +40,7 @@ export const ProjectSettings = ({ project }: Props) => {
       { id: project.id },
       {
         onSuccess: (deletedProject) => {
-          if (!deletedProject ?? !selectedWorkspaceId) return;
+          if (!deletedProject || !selectedWorkspaceId) return;
           utils.workspace.getWorkspaceList.setData(
             { workspaceId: selectedWorkspaceId },
             (oldQueryData) => oldQueryData && {

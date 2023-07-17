@@ -5,8 +5,8 @@ import { BasicButton } from "../ui/basicButton";
 import stats from "../../assets/stats.svg";
 import stats_w from "../../assets/stats_w.svg";
 import edit from "../../assets/edit.svg";
-import { WorkspaceInvitation } from "./workspaceInvitation";
 import { Workspace } from "../../libs/interfaces";
+import plus from "../../assets/Plus.svg";
 
 interface Props{
   workspace: Workspace;
@@ -18,7 +18,7 @@ export const WorkspaceMoreInfos = ({workspace}: Props) => {
   const setSettingWorkspace = workspaceStore((state: WorkspaceState) => state.setSettingWorkspace);
   const isStatisticActive = workspaceStore((state: WorkspaceState) => state.isStatisticActive);
   const toggleStatisticActive = workspaceStore((state: WorkspaceState) => state.toggleStatisticActive);
-  
+  const toggleInvitationActive = workspaceStore((state: WorkspaceState) => state.toggleInvitationActive);
   return (
     <div className="WorkspaceHeader_moreInfos">
       <BasicButton
@@ -47,7 +47,13 @@ export const WorkspaceMoreInfos = ({workspace}: Props) => {
           En cours
         </div>
       </div>
-      <WorkspaceInvitation />
+      <BasicButton
+        onClick={() => {
+          toggleInvitationActive();
+        }}
+        icon={plus}
+        variant="clear"
+      />
       <BasicButton
         onClick={() => {
             setSettingWorkspace('edit')

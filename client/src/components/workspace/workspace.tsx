@@ -5,6 +5,7 @@ import { workspaceStore, WorkspaceState } from "../../stores/workspaceStore";
 import { projectStore, ProjectStore } from "../../stores/projectStore";
 import { WorkspaceAdd } from "./workspaceAdd";
 import { WorkspaceEdit } from "./workspaceEdit";
+import { InvitationPopup } from "./workspaceInvitationPopup";
 
 export const Workspace = () => {
   const isSettingWorkspace = workspaceStore(
