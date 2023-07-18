@@ -1,5 +1,5 @@
 import { PrismaClient, Prisma } from "@prisma/client";
-import { fetchGoogleUserInfo } from "../google/googleApis";
+import { fetchGoogleUserInfo, verifyGoogleToken } from "../google/googleApis";
 import { asyncFunctionErrorCatcher } from "../utils/errorHandler";
 import { signJwt } from "../auth/jwt";
 const prisma = new PrismaClient();
@@ -43,6 +43,35 @@ export const loginByGoogleToken = async (google_token: string) => {
     token: signJwt(upsertUser.id, upsertUser.given_name),
   };
 };
+
+export const loginByGoogleCredential =async (token:string) => {
+
+const userInfo = await verifyGoogleToken(token).catch(console.error);
+if(!userInfo) throw new Error("Failed to verify google token.");
+
+const upsertUser = await asyncFunctionErrorCatcher(
+  () =>
+    prisma.user.create({
+      data: {
+        google_id: userInfo.sub,
+        email: userInfo.email,
+        verified_email: userInfo.email_verified,
+        picture: userInfo.picture,
+        family_name: userInfo.family_name,
+        given_name: userInfo.given_name,
+        name: userInfo.name,
+      },
+    }),
+  "Failed to update user info with Prisma."
+);
+
+return {
+  user: upsertUser,
+  token: signJwt(upsertUser.id, upsertUser.given_name),
+};
+
+
+}
 
 export const getUserList = async () => {
   return asyncFunctionErrorCatcher(() =>

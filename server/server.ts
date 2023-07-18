@@ -9,6 +9,9 @@ import {
   verifyEmail,
 } from "./services/CRUD/credentialService";
 import { z } from "zod";
+import path from "path";
+
+
 import { sendEmail } from "./services/utils/sendEmail";
 import {
   acceptInvitation,
@@ -83,6 +86,48 @@ app.use(
     createContext,
   })
 );
+
+
+app.get('/login', function(req, res) {
+  res.header('Content-Type', 'text/html');
+  res.sendFile(path.join(__dirname, 'views', 'sign.html'));
+});
+
+app.get('/sign', (req, res) => {
+  res.header('Content-Type', 'text/html');
+  const loginUri = process.env.SERVER_URL + '/api/user.loginByGoogleCredential';
+  res.send(`
+  <!DOCTYPE html>
+  <html>
+  <head>
+    <title>Connexion avec Google</title>
+  </head>
+  <body>
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+    <div id="g_id_onload"
+      data-client_id="377990403127-s7ul9jtmi4stmvvd97qlvjv21sdqlk12.apps.googleusercontent.com"
+      data-auto_prompt="false">
+    </div>
+    <div class="g_id_signin"
+      data-type="standard"
+      data-size="large"
+      data-theme="outline"
+      data-text="sign_in_with"
+      data-shape="rectangular"
+      data-logo_alignment="left"
+      data-width=400>
+    </div>
+    <script>
+    window.onload = function() {
+      var loginUri = "${loginUri}?origin=" + window.location.origin;
+      document.getElementById('g_id_onload').setAttribute('data-login_uri', loginUri);
+    }
+  </script>
+  </body>
+  </html>
+  `);
+});
+
 app.set("views", __dirname + "/views");
 app.set("view engine", "ejs");
 
@@ -111,27 +156,34 @@ app.get("/renderVerifiedEmail", async (req, res) => {
   }
 });
 
-app.get("/invitationHandler", async (req, res) => {
-  const { fromUser, toUser, at } = await invitationSchema.parse(req.query);
-  if (!fromUser || !toUser || !at)
-    return res
-      .status(404)
-      .json({ message: "Failed to render verified email : email not found" });
+app.get("/acceptInvitation", async (req, res) => {
 
-  try {
-    const response = await acceptInvitation(fromUser, toUser, at);
-    app.render(
-      "invitationAccepted",
-      { fromUser: fromUser, toUser: toUser },
-      (err: any, html: any) => {
-        if (err) return res.status(500).json({ message: err.message });
-        res.status(200).type("html").send(html);
-      }
-    );
-  } catch (err) {
-    return res.status(500).json({ message: err });
-  }
+
+
 });
+
+
+// app.get("/invitationHandler", async (req, res) => {
+//   const { fromUser, toUser, at } = await invitationSchema.parse(req.query);
+//   if (!fromUser || !toUser || !at)
+//     return res
+//       .status(404)
+//       .json({ message: "Failed to render verified email : email not found" });
+
+//   try {
+//     const response = await acceptInvitation(fromUser, toUser, at);
+//     app.render(
+//       "invitationAccepted",
+//       { fromUser: fromUser, toUser: toUser },
+//       (err: any, html: any) => {
+//         if (err) return res.status(500).json({ message: err.message });
+//         res.status(200).type("html").send(html);
+//       }
+//     );
+//   } catch (err) {
+//     return res.status(500).json({ message: err });
+//   }
+// });
 
 const server = http.createServer(app);
 

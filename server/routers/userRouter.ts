@@ -14,6 +14,11 @@ export const userRouter = router({
     .mutation(async (opts) => {
       return await userService.loginByGoogleToken(opts.input.google_token);
     }),
+  loginByGoogleCredential: publicProcedure
+    .input(z.object({ credential: z.string(),g_csrf_token: z.string() }))
+    .mutation(async (opts) => {
+      return await userService.loginByGoogleCredential(opts.input.credential);
+    }),
   loginByEmail: publicProcedure
     .input(
       z.object({
