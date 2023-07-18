@@ -35,6 +35,7 @@ export const ProjectList = ({ selectedWorkspaceId }: Props) => {
     );
 
   if (worspace) {
+    console.log(worspace)
     const filteredProjects = worspace.projects.filter(
       (project) =>
         (project.isArchived && filters.archives) ||
@@ -47,7 +48,7 @@ export const ProjectList = ({ selectedWorkspaceId }: Props) => {
     return (
       <div className='ProjectList'>
         {filteredProjects.map((project) => (
-          <ProjectCard key={project.id} project={project} />
+          <ProjectCard key={project.id} project={project} myUser={worspace.myUser}/>
         ))}
         <ProjectAdd selectedWorkspaceId={selectedWorkspaceId} />
       </div>

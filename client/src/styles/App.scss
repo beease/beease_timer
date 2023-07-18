@@ -78,3 +78,14 @@ input {
     background-color: $grey-1;
   }
 }
+
+.input_cont{
+  display: flex;
+  flex-direction: column;
+  input{
+    flex: 1;
+  }
+  .input_error{
+    color: $red-bg-color
+  }
+}

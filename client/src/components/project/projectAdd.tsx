@@ -1,125 +1,132 @@
-import React, { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef } from "react";
 import { BasicButton } from "../ui/basicButton";
 import plus from "../../assets/Plus.svg";
 import less from "../../assets/Less.svg";
 import check from "../../assets/check_w.svg";
 import { ColorPickerPopup } from "../ui/colorPicker";
 import { wait } from "../../utils/function";
-import { trpc } from '../../trpc';
+import { trpc } from "../../trpc";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
 
-interface Props{
+interface Props {
   selectedWorkspaceId: string;
 }
 
-export const ProjectAdd = ({selectedWorkspaceId}: Props) => {
-  const [isAddWorkspaceDisplay, setIsAddWorkspaceDisplay] = useState(false);
-  const [colorProject, setColorProject] = useState("#4969fb");
-  const [colorProjectPopup, setColorProjectPopup] = useState(false);
-  const [name, setName] = useState<string>("");
+const validationSchema = z.object({
+  name: z.string().nonempty("Please enter a project name"),
+  color: z.string().nonempty(),
+});
 
-  const addProjectFormRef = useRef<HTMLDivElement>(null);
-  const addProjectInputRef = useRef<HTMLInputElement>(null);
+export const ProjectAdd = ({ selectedWorkspaceId }: Props) => {
+  const [isAddProjectDisplay, setIsAddProjectDisplay] = useState(false);
+  const [colorProjectPopup, setColorProjectPopup] = useState(false);
+
+  const addProjectFormRef = useRef<HTMLFormElement>(null);
   const addProjectContRef = useRef<HTMLDivElement>(null);
 
   const utils = trpc.useContext();
-  const mutation = trpc.project.createWorkspace.useMutation()
 
-  const handleAddProject = () => {
-    if (!name) return;
-    mutation.mutate(
-      {
-        name: name,
-        color: colorProject,
-        workspaceId: selectedWorkspaceId,
-      },
-      {
-        onSuccess: (newProject) => {
-          if(!newProject) return;
-          utils.workspace.getWorkspaceList.setData(
-            {workspaceId: selectedWorkspaceId}, 
-            (oldQueryData) => oldQueryData && {
-              ...oldQueryData,
-              projects: [...oldQueryData.projects, newProject]
-            })
-          setName("")
-          setColorProject("#4969fb")
-          setIsAddWorkspaceDisplay(false)
-        },
-      }
-    );
-  };
+  const {
+    register,
+    handleSubmit,
+    watch,
+    formState: { errors, isValid },
+    reset,
+    setFocus,
+    setValue,
+  } = useForm({
+    resolver: zodResolver(validationSchema),
+    defaultValues: {
+      name: "",
+      color: "#4969fb",
+    },
+  });
+
+  const mutationCreate = trpc.project.createWorkspace.useMutation({
+    onSuccess: (newProject) => {
+      if (!newProject) return;
+      utils.workspace.getWorkspaceList.setData(
+        { workspaceId: selectedWorkspaceId },
+        (oldQueryData) =>
+          oldQueryData && {
+            ...oldQueryData,
+            projects: [...oldQueryData.projects, newProject],
+          }
+      );
+    },
+  });
 
   useEffect(() => {
     const animation = async () => {
-      const refsExist =
-        addProjectFormRef.current &&
-        addProjectInputRef.current &&
-        addProjectContRef.current;
+      const refsExist = addProjectFormRef.current && addProjectContRef.current;
       if (!refsExist) return;
 
-      if (isAddWorkspaceDisplay) {
+      if (isAddProjectDisplay) {
         addProjectContRef.current.style.width = "100%";
         addProjectFormRef.current.style.opacity = "0";
         await wait(100);
         addProjectFormRef.current.style.display = "flex";
         addProjectFormRef.current.style.opacity = "1";
-        addProjectInputRef.current.focus();
+        setFocus("name");
       } else {
         addProjectFormRef.current.style.opacity = "0";
         await wait(100);
         addProjectContRef.current.style.width = "64px";
         addProjectFormRef.current.style.display = "none";
-        addProjectInputRef.current.value = "";
+        reset();
       }
     };
 
     animation();
-  }, [isAddWorkspaceDisplay]);
+  }, [isAddProjectDisplay, reset, setFocus]);
 
   return (
     <div ref={addProjectContRef} className="ProjectAdd">
       <BasicButton
-        icon={isAddWorkspaceDisplay ? less : plus}
+        icon={isAddProjectDisplay ? less : plus}
         variant="grey"
         size="small"
         style={{
           width: "48px !important",
-            height: "48px !important",
+          height: "48px !important",
         }}
         onClick={() => {
-          setIsAddWorkspaceDisplay(!isAddWorkspaceDisplay);
+          setIsAddProjectDisplay(!isAddProjectDisplay);
         }}
       />
-      <div ref={addProjectFormRef} className="ProjectAdd_form">
-        <input
-          onChange={(e) => {
-            setName(e.target.value);
-          }}
-          value={name}
-          ref={addProjectInputRef}
-          className="ProjectAdd_input"
-          placeholder="Mon top projet :3"
-        />
+      <form
+        ref={addProjectFormRef}
+        className="ProjectAdd_form"
+        onSubmit={handleSubmit(async (values) => {
+          await mutationCreate.mutateAsync({ ...values, workspaceId: selectedWorkspaceId });
+          reset();
+          setIsAddProjectDisplay(false);
+        })}
+      >
+        <div className="input_cont ProjectAdd_input">
+          <input {...register("name")} placeholder="My project name" />
+          {errors.name?.message && (
+            <div className="input_error">{errors.name?.message}</div>
+          )}
+        </div>
         <ColorPickerPopup
-          setColor={setColorProject}
+           setColor={(color: string) => setValue('color', color)}
+           color={watch('color')}
           colorPopup={colorProjectPopup}
           setColorPopup={setColorProjectPopup}
-          color={colorProject}
           style={{
             width: "48px",
             height: "48px",
           }}
         />
-        <BasicButton 
-        icon={check} 
-        variant={
-          name ? "confirm" : "grey"
-        }
-        onClick={() => {
-          name && handleAddProject()
-        }}
-         />
-      </div>
+        <BasicButton
+          icon={check}
+          variant={isValid ? "confirm" : "grey"}
+          type={"submit"}
+        />
+      </form>
     </div>
   );
 };

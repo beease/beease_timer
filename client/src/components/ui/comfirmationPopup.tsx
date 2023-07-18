@@ -56,6 +56,7 @@ export const ConfirmationPopup = ({
             style={{
               width: "calc(50% - 5px)",
             }}
+            type="button"
           />
           <BasicButton
             icon={bin}
@@ -66,6 +67,7 @@ export const ConfirmationPopup = ({
             style={{
               width: "calc(50% - 5px)",
             }}
+            type="button"
           />
         </div>
       </div>

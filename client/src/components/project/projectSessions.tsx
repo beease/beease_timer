@@ -5,7 +5,7 @@ import { DisplayMyPicture } from "../ui/displayMyPicture";
 import { DisplayUserPicture } from "../ui/displayUserPicture";
 import { ProjectSessionsLine } from "./projectSessionsLine";
 import { projectStore, ProjectStore } from '../../stores/projectStore';
-import type { Project } from "../../libs/interfaces";
+import type { Project, MyUser } from "../../libs/interfaces";
 import { trpc } from "../../trpc";
 import { ProjectSessionsAdd } from "./projectSessionsAdd";
 import dayjs from 'dayjs';
@@ -14,9 +14,10 @@ import { useEffect } from "react";
 interface Props {
   project: Project;
   selectedWorkspaceId: string;
+  myUser: MyUser
 }
 
-export const ProjectSessions = ({ project, selectedWorkspaceId }: Props) => {
+export const ProjectSessions = ({ project, selectedWorkspaceId, myUser }: Props) => {
   const sessions = project.memberSessions;
 
   const { data: user } = trpc.user.getMyUser.useQuery();
@@ -45,7 +46,7 @@ export const ProjectSessions = ({ project, selectedWorkspaceId }: Props) => {
     <div className={`ProjectSessions ${sessions.length > 2 && 'scroll'}`}>
       <ProjectSessionsAdd projectId={project.id}/>
       {sortedSessionsByDate.map((session) => (
-        <ProjectSessionsLine session={session} projectId={project.id} />
+        <ProjectSessionsLine myUser={myUser} session={session} projectId={project.id} />
       ))}
     </div>
   );

@@ -1,11 +1,8 @@
-import { useEffect } from "react"
 import { WorkspaceHeader } from "./workspaceHeader";
 import { ProjectList } from "../project/projectList";
 import { workspaceStore, WorkspaceState } from "../../stores/workspaceStore";
-import { projectStore, ProjectStore } from "../../stores/projectStore";
 import { WorkspaceAdd } from "./workspaceAdd";
 import { WorkspaceEdit } from "./workspaceEdit";
-import { InvitationPopup } from "./workspaceInvitationPopup";
 
 export const Workspace = () => {
   const isSettingWorkspace = workspaceStore(
@@ -19,11 +16,11 @@ export const Workspace = () => {
     if (isSettingWorkspace === 'add') {
       return <WorkspaceAdd/>;
     }
-    else if (isSettingWorkspace === 'edit' && selectedWorkspaceId.id) {
-      return <WorkspaceEdit selectedWorkspaceId={selectedWorkspaceId.id} />;
+    else if (isSettingWorkspace === 'edit' && selectedWorkspaceId) {
+      return <WorkspaceEdit selectedWorkspaceId={selectedWorkspaceId} />;
     }
-    else if (selectedWorkspaceId.id){
-      return <WorkspaceHeader selectedWorkspaceId={selectedWorkspaceId.id} />;
+    else if (selectedWorkspaceId){
+      return <WorkspaceHeader selectedWorkspaceId={selectedWorkspaceId} />;
     }
     return null
   }
@@ -31,7 +28,7 @@ export const Workspace = () => {
   return (
     <div className="workspace">
       <RenderWorkspaceHeader />
-      {selectedWorkspaceId.id && <ProjectList selectedWorkspaceId={selectedWorkspaceId.id}/>}
+      {selectedWorkspaceId && <ProjectList selectedWorkspaceId={selectedWorkspaceId}/>}
     </div>
   );
 };

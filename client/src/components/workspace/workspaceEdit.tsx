@@ -6,18 +6,23 @@ import { BasicButton } from "../ui/basicButton";
 import { workspaceStore, WorkspaceState } from "../../stores/workspaceStore";
 import { trpc } from "../../trpc";
 import { ConfirmationPopup } from "../ui/comfirmationPopup";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
 
 interface Props {
   selectedWorkspaceId: string;
 }
 
+const validationSchema = z.object({
+  name: z.string().nonempty("Please enter a project name"),
+  color: z.string().nonempty(),
+});
+
 export const WorkspaceEdit = ({ selectedWorkspaceId }: Props) => {
-  const [colorWorkSpace, setColorWorkSpace] = useState("");
   const [colorWorkSpacePopup, setColorWorkSpacePopup] = useState(false);
   const [isConfirmationPopupActive, setIsConfirmationPopupActive] =
     useState(false);
-
-  const inputRef = useRef<HTMLInputElement>(null);
 
   const setSettingWorkspace = workspaceStore(
     (state: WorkspaceState) => state.setSettingWorkspace
@@ -27,70 +32,65 @@ export const WorkspaceEdit = ({ selectedWorkspaceId }: Props) => {
   );
 
   const utils = trpc.useContext();
-  const mutationDelete = trpc.workspace.deleteWorkspace.useMutation();
-  const mutationUpdate = trpc.workspace.updateWorkspace.useMutation();
 
-  const {data: workspaces, error, isLoading} = trpc.workspace.getMyWorkspaces.useQuery()
+  const {
+    register,
+    handleSubmit,
+    watch,
+    formState: { errors, isValid },
+    reset,
+    setValue,
+  } = useForm({
+    resolver: zodResolver(validationSchema),
+    defaultValues: {
+      name: "",
+      color: "#4969fb",
+    },
+  });
 
-  const workspace = workspaces ? workspaces.find(ws => ws.id === selectedWorkspaceId) : null;
+  const mutationDelete = trpc.workspace.deleteWorkspace.useMutation({
+    onSuccess: (newWorkspace) => {
+      if (!newWorkspace) return;
+      utils.workspace.getMyWorkspaces.setData(
+        undefined,
+        (oldQueryData = []) => {
+          return oldQueryData.filter(
+            (workspace) => workspace.id !== newWorkspace.id
+          );
+        }
+      );
+      setSettingWorkspace(null);
+      setSelectedWorkspaceId(null);
+    },
+  });
+
+  const mutationUpdate = trpc.workspace.updateWorkspace.useMutation({
+    onSuccess: (newWorkspace) => {
+      if (!newWorkspace) return;
+      utils.workspace.getMyWorkspaces.setData(undefined, (oldQueryData = []) =>
+        oldQueryData.map((workspace) =>
+          workspace.id === newWorkspace.id ? newWorkspace : workspace
+        )
+      );
+      setSettingWorkspace(null);
+      setSelectedWorkspaceId(newWorkspace.id);
+    },
+  });
+
+  const {
+    data: workspaces,
+    error,
+    isLoading,
+  } = trpc.workspace.getMyWorkspaces.useQuery();
+
+  const workspace = workspaces
+    ? workspaces.find((ws) => ws.id === selectedWorkspaceId)
+    : null;
 
   useEffect(() => {
-    setColorWorkSpace(workspace?.color || "#4969fb");
-  }, [workspace?.color]);
-
-  const handleDeleteWorkspace = () => {
-    mutationDelete.mutate(
-      { id: selectedWorkspaceId },
-      {
-        onSuccess: (newWorkspace) => {
-          if (!newWorkspace) return;
-          utils.workspace.getMyWorkspaces.setData(
-            undefined,
-            (oldQueryData = []) => {
-              return oldQueryData.filter(
-                (workspace) => workspace.id !== newWorkspace.id
-              );
-            }
-          );
-          setSettingWorkspace(null);
-          setSelectedWorkspaceId({
-            id: null,
-            role: null,
-          });
-        },
-      }
-    );
-  };
-
-  const handleUpdateWorkspace = () => {
-    const workspaceName = inputRef.current?.value;
-    if (!workspaceName) return;
-    if (workspaceName === workspace?.name && colorWorkSpace === workspace?.color) {
-      setSettingWorkspace(null);
-      setSelectedWorkspaceId({id: workspace.id, role: workspace.role})
-      return;
-    }
-    mutationUpdate.mutate(
-      {
-        id: selectedWorkspaceId,
-        data: {
-          name: workspaceName,
-          color: colorWorkSpace,
-        },
-      },
-      {
-        onSuccess: (newWorkspace) => {
-          if (!newWorkspace) return;
-          utils.workspace.getMyWorkspaces.setData(
-            undefined,
-            (oldQueryData = []) => oldQueryData.map(workspace => workspace.id === newWorkspace.id ? newWorkspace : workspace)
-          );
-          setSettingWorkspace(null);
-          setSelectedWorkspaceId({id: newWorkspace.id, role: newWorkspace.role})
-        },
-      }
-    );
-  };
+    setValue("color", workspace?.color || "#4969fb");
+    setValue("name", workspace?.name || "");
+  }, [setValue, workspace]);
 
   if (error) return;
 
@@ -98,20 +98,33 @@ export const WorkspaceEdit = ({ selectedWorkspaceId }: Props) => {
 
   if (workspace) {
     return (
-      <div className="addWorkspace">
-        <input
-          ref={inputRef}
-          className="addWorkspace_name_input"
-          type="text"
-          placeholder="Workspace name"
-          defaultValue={workspace?.name}
-        />
+      <form
+        className="addWorkspace"
+        onSubmit={handleSubmit(async (values) => {
+          await mutationUpdate.mutateAsync({
+            data: values,
+            id: selectedWorkspaceId,
+          });
+          reset();
+          setSettingWorkspace(null);
+        })}
+      >
+        <div className="input_cont addWorkspace_name_input">
+          <input
+            autoFocus
+            {...register("name")}
+            placeholder="My workspace name"
+          />
+          {errors.name?.message && (
+            <div className="input_error">{errors.name?.message}</div>
+          )}
+        </div>
 
         <ColorPickerPopup
-          setColor={setColorWorkSpace}
+          setColor={(color: string) => setValue("color", color)}
+          color={watch("color")}
           colorPopup={colorWorkSpacePopup}
           setColorPopup={setColorWorkSpacePopup}
-          color={colorWorkSpace || "#4969fb"}
           style={{
             width: "48px",
             height: "48px",
@@ -120,27 +133,29 @@ export const WorkspaceEdit = ({ selectedWorkspaceId }: Props) => {
         <BasicButton
           onClick={() => {
             setIsConfirmationPopupActive(true);
-            // handleDeleteWorkspace();
           }}
           variant="grey"
           icon={bin}
+          type="button"
         />
         <BasicButton
-          onClick={() => {
-            handleUpdateWorkspace();
-          }}
-          variant="confirm"
           icon={check}
+          variant={isValid ? "confirm" : "grey"}
+          type={"submit"}
         />
         {isConfirmationPopupActive && (
           <ConfirmationPopup
             open={isConfirmationPopupActive}
             setOpen={setIsConfirmationPopupActive}
             text={`Delete ${workspace.name}?`}
-            onConfirm={handleDeleteWorkspace}
+            onConfirm={async () => {
+              await mutationDelete.mutateAsync({ id: selectedWorkspaceId });
+              setSettingWorkspace(null);
+              setSelectedWorkspaceId(null);
+            }}
           />
         )}
-      </div>
+      </form>
     );
   }
 };

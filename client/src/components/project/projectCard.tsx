@@ -5,13 +5,14 @@ import { wait } from "../../utils/function";
 import { projectStore, ProjectStore } from "../../stores/projectStore";
 import { ProjectMoreInfos } from "./projectCardMoreInfos";
 import { ProjectCardTop } from "./projectCardTop";
-import type { Project } from "../../libs/interfaces";
+import type { Project, MyUser } from "../../libs/interfaces";
 
 interface Props {
   project: Project;
+  myUser: MyUser;
 }
 
-export const ProjectCard = ({ project }: Props) => {
+export const ProjectCard = ({ project, myUser }: Props) => {
   const [isDotsButtonActive, setIsDotsButtonActive] = useState(false);
   const MoreInfoProjectId = projectStore(
     (state: ProjectStore) => state?.MoreInfoProjectId
@@ -72,6 +73,7 @@ export const ProjectCard = ({ project }: Props) => {
       >
         <ProjectMoreInfos 
           project={project}
+          myUser={myUser}
         /> 
       </div>
     </div>

@@ -1,7 +1,6 @@
 import { colors } from "../libs/colors";
 import dayjs from "dayjs";
 import { useEffect, useState } from 'react';
-import type { Session } from '../libs/interfaces';
 
 export const wait = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 

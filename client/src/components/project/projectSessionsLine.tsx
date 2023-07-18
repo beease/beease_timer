@@ -2,17 +2,18 @@ import { DisplayUserPicture } from "../ui/displayUserPicture";
 import { BasicButton } from "../ui/basicButton";
 import bin from "../../assets/bin.svg";
 import { formatDate, formatTwoDates, useTimer } from "../../utils/function";
-import type { Session } from "../../libs/interfaces";
+import type { Session, MyUser } from "../../libs/interfaces";
 import { trpc } from "../../trpc";
 import { workspaceStore, WorkspaceState } from "../../stores/workspaceStore";
 import { projectStore, ProjectStore } from "../../stores/projectStore";
 
 interface Props {
   session: Session;
+  myUser: MyUser;
   projectId: string;
 }
 
-export const ProjectSessionsLine = ({ session, projectId }: Props) => {
+export const ProjectSessionsLine = ({ session, projectId, myUser }: Props) => {
   const selectedWorkspaceId = workspaceStore(
     (state: WorkspaceState) => state.selectedWorkspaceId
   );
@@ -33,9 +34,9 @@ export const ProjectSessionsLine = ({ session, projectId }: Props) => {
       },
       {
         onSuccess: (deletedSession) => {
-          if (!deletedSession || !selectedWorkspaceId.id) return;
+          if (!deletedSession || !selectedWorkspaceId) return;
           utils.workspace.getWorkspaceList.setData(
-            { workspaceId: selectedWorkspaceId.id },
+            { workspaceId: selectedWorkspaceId },
             (oldQueryData) => {
               if (!oldQueryData) return;
               const newProjects = oldQueryData.projects.map((project) => {
@@ -67,6 +68,10 @@ export const ProjectSessionsLine = ({ session, projectId }: Props) => {
     );
   };
 
+  const isAdminOrOwner = myUser.role === 'ADMIN' || myUser.role === 'OWNER';
+  const isMySession = session.memberWorkspace?.user.id === myUser.id;
+  const isDeletable = isAdminOrOwner || isMySession;
+
   return (
     <div className="ProjectSessions_line">
       {session.memberWorkspace?.user && (
@@ -85,10 +90,10 @@ export const ProjectSessionsLine = ({ session, projectId }: Props) => {
       </div>
       <BasicButton
         icon={bin}
-        variant="grey"
+        variant={isDeletable ? "grey" : "disable"}
         size="small"
         onClick={() => {
-          handleDeleteSession();
+          isDeletable && handleDeleteSession();
         }}
         style={{
           height: "36px",

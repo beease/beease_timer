@@ -7,132 +7,143 @@ import { Switch } from "../ui/switch";
 import { trpc } from "../../trpc";
 import { workspaceStore, WorkspaceState } from "../../stores/workspaceStore";
 import { projectStore, ProjectStore } from "../../stores/projectStore";
-import type { Project } from '../../libs/interfaces';
+import type { Project } from "../../libs/interfaces";
 import { ConfirmationPopup } from "../ui/comfirmationPopup";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm, useWatch } from "react-hook-form";
 
 interface Props {
   project: Project;
 }
 
+const validationSchema = z.object({
+  name: z.string().nonempty("Please enter a workspace name"),
+  dailyPrice: z.number().optional(),
+  hourByDay: z.number().optional(),
+  color: z.string().nonempty(),
+  isArchived: z.boolean(),
+});
+
 export const ProjectSettings = ({ project }: Props) => {
-  const [name, setName] = useState<string>(project.name);
-  const [dailyPrice, setDailyPrice] = useState<number | null>(project.dailyPrice);
-  const [hourByDay, setHourByDay] = useState<number | null>(project.hourByDay);
-  const [colorProject, setColorProject] = useState<string>(project.color);
-  const [isArchived, setIsArchived] = useState<boolean>(project.isArchived);
-  
-  const [isValuesChanged, setIsValueChanged] = useState<boolean>(false);
-
   const [colorProjectPopup, setColorProjectPopup] = useState<boolean>(false);
-  const [isConfirmationPopupActive, setIsConfirmationPopupActive] = useState<boolean>(false);
-  
-  const selectedWorkspaceId = workspaceStore((state: WorkspaceState) => state.selectedWorkspaceId);
+  const [isConfirmationPopupActive, setIsConfirmationPopupActive] =
+    useState<boolean>(false);
 
-  const utils = trpc.useContext();
-  const mutationDelete = trpc.project.deleteProject.useMutation();
-  const mutationUpdate = trpc.project.updateProject.useMutation();
+  const selectedWorkspaceId = workspaceStore(
+    (state: WorkspaceState) => state.selectedWorkspaceId
+  );
   const toggleMoreInfo = projectStore(
     (state: ProjectStore) => state.toggleMoreInfo
   );
 
-  const handleDeleteProject = () => {
-    mutationDelete.mutate(
-      { id: project.id },
-      {
-        onSuccess: (deletedProject) => {
-          if (!deletedProject || !selectedWorkspaceId.id) return;
-          utils.workspace.getWorkspaceList.setData(
-            { workspaceId: selectedWorkspaceId.id },
-            (oldQueryData) => oldQueryData && {
-              ...oldQueryData,
-              projects: oldQueryData.projects.filter((project) => project.id !== deletedProject.id)
-            }
-          );
-          toggleMoreInfo(null);
-        },
-      }
-    );
+  const utils = trpc.useContext();
+
+  const defaultValues = {
+    name: project.name,
+    dailyPrice: project.dailyPrice ? +project.dailyPrice : undefined,
+    hourByDay: project.hourByDay ? +project.hourByDay : undefined,
+    color: project.color,
+    isArchived: project.isArchived,
   };
 
-  const handleUpdateProject = () => {
-    if (!name ?? !selectedWorkspaceId.id) return;
-    mutationUpdate.mutate(
-      {
-        id: project.id,
-        data: {
-          name: name,
-          color: colorProject,
-          dailyPrice: dailyPrice ? +dailyPrice : undefined,
-          hourByDay: hourByDay ? +hourByDay : undefined,
-          isArchived: isArchived
-        },
-      },
-      {
-        onSuccess: (newProject) => {
-          if (!newProject || !selectedWorkspaceId.id) return;
-          utils.workspace.getWorkspaceList.setData(
-            { workspaceId: selectedWorkspaceId.id },
-            (oldQueryData) => oldQueryData && {
-              ...oldQueryData,
-              projects: oldQueryData.projects.map((project) => (project.id === newProject.id ? newProject : project))
-            },
-          );
-        },
-      }
-    );
-  };
+  const {
+    register,
+    handleSubmit,
+    watch,
+    formState: { errors, isValid },
+    reset,
+    control,
+    setValue,
+  } = useForm({
+    resolver: zodResolver(validationSchema),
+    defaultValues: defaultValues,
+  });
 
-  useEffect(() => {
-    const hasValueChanged = (
-      name !== project.name ||
-      dailyPrice !== project.dailyPrice ||
-      hourByDay !== project.hourByDay ||
-      colorProject !== project.color ||
-      isArchived !== project.isArchived
-    );
-    setIsValueChanged(hasValueChanged);
-  }, [name, dailyPrice, hourByDay, colorProject, isArchived, project.name, project.dailyPrice, project.hourByDay, project.color, project.isArchived]);
-  
+  const watchAllFields = useWatch({ control });
+
+  const hasChanged =
+    JSON.stringify(watchAllFields) !== JSON.stringify(defaultValues);
+
+  const mutationDelete = trpc.project.deleteProject.useMutation({
+    onSuccess: (deletedProject) => {
+      if (!deletedProject || !selectedWorkspaceId) return;
+      utils.workspace.getWorkspaceList.setData(
+        { workspaceId: selectedWorkspaceId },
+        (oldQueryData) =>
+          oldQueryData && {
+            ...oldQueryData,
+            projects: oldQueryData.projects.filter(
+              (project) => project.id !== deletedProject.id
+            ),
+          }
+      );
+      toggleMoreInfo(null);
+    },
+  });
+
+  const mutationUpdate = trpc.project.updateProject.useMutation({
+    onSuccess: (newProject) => {
+      if (!newProject || !selectedWorkspaceId) return;
+      utils.workspace.getWorkspaceList.setData(
+        { workspaceId: selectedWorkspaceId },
+        (oldQueryData) =>
+          oldQueryData && {
+            ...oldQueryData,
+            projects: oldQueryData.projects.map((project) =>
+              project.id === newProject.id ? newProject : project
+            ),
+          }
+      );
+    },
+  });
+
   return (
-    <div className="ProjectSettings">
+    <form
+      className="ProjectSettings"
+      onSubmit={handleSubmit(async (values) => {
+        await mutationUpdate.mutateAsync({
+          id: project.id,
+          data: values,
+        });
+        reset(values);
+      })}
+    >
       <div className="ProjectSettings_line">
-        <input
-          onChange={(e) => {
-            setName(e.target.value);
-          }}
-          value={name}
-          className="ProjectSettings_name"
-          placeholder="Project name"
-          defaultValue={project.name}
-        />
+        <div className="input_cont ProjectSettings_name">
+          <input autoFocus {...register("name")} placeholder="Project name" />
+          {errors.name?.message && (
+            <div className="input_error">{errors.name?.message}</div>
+          )}
+        </div>
       </div>
 
       <div className="ProjectSettings_line">
-        <input 
-        onChange={(e) => {
-          setDailyPrice(+e.target.value || null)
-        }}
-          value={dailyPrice ?? ""}
-          className="ProjectSettings_number" 
-          placeholder="TJM" 
-          type="number" 
-          defaultValue={project.dailyPrice || ""}
+        <div className="input_cont ProjectSettings_number">
+          <input
+            type="number"
+            {...register("dailyPrice", { valueAsNumber: true })}
+            placeholder="TJM"
           />
-        <input 
-          onChange={(e) => {
-            setHourByDay(+e.target.value || null)
-          }}
-          value={hourByDay ?? ""}
-          className="ProjectSettings_number" 
-          placeholder="Hours per day" 
-          type="number" 
-          defaultValue={project.hourByDay || ""}
-        />
+          {errors.dailyPrice?.message && (
+            <div className="input_error">{errors.dailyPrice?.message}</div>
+          )}
+        </div>
+        <div className="input_cont ProjectSettings_number">
+          <input
+            type="number"
+            {...register("hourByDay", { valueAsNumber: true })}
+            placeholder="H/day"
+          />
+          {errors.hourByDay?.message && (
+            <div className="input_error">{errors.hourByDay?.message}</div>
+          )}
+        </div>
         <ColorPickerPopup
-          setColor={setColorProject}
+          setColor={(color: string) => setValue("color", color)}
+          color={watch("color")}
           colorPopup={colorProjectPopup}
           setColorPopup={setColorProjectPopup}
-          color={colorProject}
           style={{
             width: "42px",
             height: "42px",
@@ -141,8 +152,9 @@ export const ProjectSettings = ({ project }: Props) => {
         <BasicButton
           icon={bin}
           variant="grey"
-          onClick={() =>{
-            setIsConfirmationPopupActive(true)
+          type="button"
+          onClick={() => {
+            setIsConfirmationPopupActive(true);
           }}
           style={{
             height: "42px",
@@ -154,7 +166,11 @@ export const ProjectSettings = ({ project }: Props) => {
             open={isConfirmationPopupActive}
             setOpen={setIsConfirmationPopupActive}
             text={`Delete ${project.name}?`}
-            onConfirm={handleDeleteProject}
+            onConfirm={() =>
+              mutationDelete.mutate({
+                id: project.id,
+              })
+            }
           />
         )}
       </div>
@@ -165,21 +181,22 @@ export const ProjectSettings = ({ project }: Props) => {
           height={42}
           options={["En cours", "Archives"]}
           color={project.color}
-          currentOption={isArchived}
-          setCurrentOption={setIsArchived}
+          currentOption={watch("isArchived")}
+          setCurrentOption={(option) => {
+            setValue("isArchived", option);
+          }}
         />
         <BasicButton
           icon={check}
-          variant={isValuesChanged ? "confirm" : "grey"}
-          onClick={() => {
-            isValuesChanged && handleUpdateProject();
-          }}
+          disabled={!isValid || !hasChanged}
+          variant={isValid && hasChanged ? "confirm" : "grey"}
+          type={"submit"}
           style={{
             height: "42px",
             width: "92px",
           }}
         />
       </div>
-    </div>
+    </form>
   );
 };

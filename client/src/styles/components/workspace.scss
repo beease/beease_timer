@@ -17,13 +17,16 @@
     @include action_card;
 
     .addWorkspace_name_input {
-        height: 48px;
+        input{
+            border: none;
+            border-radius: 4px;
+            padding: 8px;
+            box-sizing: border-box;
+            @include input-font;
+
+            height: 48px;
+        }
         flex: 1;
-        border: none;
-        border-radius: 4px;
-        padding: 8px;
-        box-sizing: border-box;
-        @include input-font;
     }
 }
 
