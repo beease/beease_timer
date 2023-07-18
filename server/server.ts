@@ -12,7 +12,7 @@ import { z } from "zod";
 import path from "path";
 
 
-import { sendEmail } from "./services/utils/sendEmail";
+import { sendEmail } from "./services/email/sendEmail";
 import {
   acceptInvitation,
   sendInvitationService,
@@ -27,11 +27,6 @@ const app = express();
 const PORT = process.env.PORT || 3001;
 
 const emailSchema = z.string().email();
-const invitationSchema = z.object({
-  fromUser: z.string(),
-  toUser: z.string(),
-  at: z.string(),
-});
 
 app.options("*", (_req, res) => {
   res.setHeader(
@@ -87,47 +82,6 @@ app.use(
   })
 );
 
-
-app.get('/login', function(req, res) {
-  res.header('Content-Type', 'text/html');
-  res.sendFile(path.join(__dirname, 'views', 'sign.html'));
-});
-
-app.get('/sign', (req, res) => {
-  res.header('Content-Type', 'text/html');
-  const loginUri = process.env.SERVER_URL + '/api/user.loginByGoogleCredential';
-  res.send(`
-  <!DOCTYPE html>
-  <html>
-  <head>
-    <title>Connexion avec Google</title>
-  </head>
-  <body>
-    <script src="https://accounts.google.com/gsi/client" async defer></script>
-    <div id="g_id_onload"
-      data-client_id="377990403127-s7ul9jtmi4stmvvd97qlvjv21sdqlk12.apps.googleusercontent.com"
-      data-auto_prompt="false">
-    </div>
-    <div class="g_id_signin"
-      data-type="standard"
-      data-size="large"
-      data-theme="outline"
-      data-text="sign_in_with"
-      data-shape="rectangular"
-      data-logo_alignment="left"
-      data-width=400>
-    </div>
-    <script>
-    window.onload = function() {
-      var loginUri = "${loginUri}?origin=" + window.location.origin;
-      document.getElementById('g_id_onload').setAttribute('data-login_uri', loginUri);
-    }
-  </script>
-  </body>
-  </html>
-  `);
-});
-
 app.set("views", __dirname + "/views");
 app.set("view engine", "ejs");
 
@@ -155,13 +109,6 @@ app.get("/renderVerifiedEmail", async (req, res) => {
     );
   }
 });
-
-app.get("/acceptInvitation", async (req, res) => {
-
-
-
-});
-
 
 // app.get("/invitationHandler", async (req, res) => {
 //   const { fromUser, toUser, at } = await invitationSchema.parse(req.query);

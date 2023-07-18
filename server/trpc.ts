@@ -14,7 +14,7 @@ export async function createContext({
       const tokenPayload = await verifyJwt(
         req.headers.authorization.split(" ")[1]
       );
-      return tokenPayload as PayloadOnAuthJWT;
+      return tokenPayload;
     }
     return null;
   }

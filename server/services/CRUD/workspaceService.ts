@@ -223,11 +223,11 @@ export const getMyWorkspaces = async (id: string) => {
     const workspaces = user?.memberWorkspaces.map((mw) => { 
       return {...mw.workspace, role: mw.role}
     });
-   
-
-
     return workspaces;
   } catch (err) {
     throw new Error(`Failed to get workspaces user by id : ${err}`);
   }
 };
+
+
+

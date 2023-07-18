@@ -1,4 +1,8 @@
-<!DOCTYPE html>
+import { Workspace } from "@prisma/client"
+
+export const invitationAcceptedTemplate = (workspace:Workspace) =>
+{
+return (`<!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
@@ -38,7 +42,7 @@
       <h1>Invitation acceptée</h1>
       <p>Félicitations!</p>
       <p>
-        Vous avez accepté l'invitation à rejoindre le workspace Beease Timer.
+        Vous avez accepté l'invitation à rejoindre le workspace ${workspace.name}.
       </p>
       <p>
         Vous pouvez maintenant profiter de toutes les fonctionnalités offertes
@@ -48,4 +52,5 @@
       <p>L'équipe Beease Timer</p>
     </div>
   </body>
-</html>
+</html>`)
+}

@@ -2,7 +2,7 @@ import { z } from "zod";
 import { router, publicProcedure, isAuthed } from "../trpc";
 import { Prisma, PrismaClient } from "@prisma/client";
 import * as credentialService from "../services/CRUD/credentialService";
-import { sendEmail } from "../services/utils/sendEmail";
+import { sendEmail } from "../services/email/sendEmail";
 const prisma = new PrismaClient();
 
 export const credentialRouter = router({

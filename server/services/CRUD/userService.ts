@@ -1,7 +1,8 @@
 import { PrismaClient, Prisma } from "@prisma/client";
 import { fetchGoogleUserInfo, verifyGoogleToken } from "../google/googleApis";
 import { asyncFunctionErrorCatcher } from "../utils/errorHandler";
-import { signJwt } from "../auth/jwt";
+import { createMemberWorkspace } from "./memberWorkspaceService";
+import { signJwt, verifyJwtInvitation  } from "../auth/jwt";
 const prisma = new PrismaClient();
 
 export const loginByGoogleToken = async (google_token: string) => {
@@ -37,19 +38,18 @@ export const loginByGoogleToken = async (google_token: string) => {
       }),
     "Failed to update user info with Prisma."
   );
-
   return {
     user: upsertUser,
     token: signJwt(upsertUser.id, upsertUser.given_name),
   };
 };
 
-export const loginByGoogleCredential =async (token:string) => {
+export const signByGoogleCredentialToJoinWorkspace =async (googleCredentialToken:string,joinWorkspaceToken:string) => {
 
-const userInfo = await verifyGoogleToken(token).catch(console.error);
+const userInfo = await verifyGoogleToken(googleCredentialToken);
 if(!userInfo) throw new Error("Failed to verify google token.");
 
-const upsertUser = await asyncFunctionErrorCatcher(
+const createUser = await asyncFunctionErrorCatcher(
   () =>
     prisma.user.create({
       data: {
@@ -64,13 +64,9 @@ const upsertUser = await asyncFunctionErrorCatcher(
     }),
   "Failed to update user info with Prisma."
 );
-
-return {
-  user: upsertUser,
-  token: signJwt(upsertUser.id, upsertUser.given_name),
-};
-
-
+const joinWorkspaceTokenPayload = await verifyJwtInvitation(joinWorkspaceToken)
+if(!joinWorkspaceTokenPayload) throw new Error("Failed to verify join workspace token.")
+return await createMemberWorkspace(createUser.id,joinWorkspaceTokenPayload.workspaceId)
 }
 
 export const getUserList = async () => {

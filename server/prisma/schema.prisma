@@ -83,7 +83,6 @@ model memberSession {
   memberWorkspaceId String?
 }
 
-
 model Invitation {
   id          String @id @default(cuid())
   date        DateTime @default(now())

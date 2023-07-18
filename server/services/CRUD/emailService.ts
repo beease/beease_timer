@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { asyncFunctionErrorCatcher } from "../utils/errorHandler";
-import { sendEmail } from "../utils/sendEmail";
+import { sendEmail } from "../email/sendEmail";
 type sendMailSchema = {
   subject: string;
   html: string;

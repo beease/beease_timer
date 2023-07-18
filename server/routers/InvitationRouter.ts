@@ -1,10 +1,12 @@
 import { z } from "zod";
-import { authorizedProcedure, router } from "../trpc";
-import { sendInvitationService } from "../services/CRUD/invitationService";
-import { sendEmailTo } from "../services/CRUD/emailService";
+import { authorizedProcedure, publicProcedure, router } from "../trpc";
+import { sendInvitationService, acceptInvitation } from "../services/CRUD/invitationService";
 import { getUserById, getUserByMail } from "../services/CRUD/userService";
-import { getWorkspaceById } from "../services/CRUD/workspaceService";
-import { signInvitationJwt } from "../services/auth/jwt";
+import { getWorkspaceById, getWorkspaceList } from "../services/CRUD/workspaceService";
+import { verifyJwtInvitation } from "../services/auth/jwt";
+import { sendInvitationToWorkspace } from "../services/email/invitationToWorkspace";
+import { signInvitationPage } from "../views/signInvitationPage";
+import { invitationAcceptedTemplate } from "../views/invitationAcceptedPage";
 export const invitationRouter = router({
   sendInvitation: authorizedProcedure
     .input(
@@ -35,37 +37,52 @@ export const invitationRouter = router({
       const { ctx } = opts;
       if (ctx.tokenPayload && ctx.tokenPayload.userId) {
         const { workspaceId, invitedMail } = opts.input;
+       
+        if(!await getWorkspaceList(workspaceId, ctx.tokenPayload.userId)) throw new Error("You are not in this workspace");
+
         const inviterUser = await getUserById(ctx.tokenPayload.userId);
         const invitedUser = await getUserByMail(invitedMail);
         const workspace = await getWorkspaceById(workspaceId);
-        console.log("invitedUser", invitedUser, "workspace", workspace, "inviterUser", inviterUser);
-        if (workspace && inviterUser) {
-          return await sendEmailTo(invitedMail, {
-            subject: `Invitation to join ${workspace.name} workspace`,
-            html: ` <div style="max-width: 600px; margin: 0 auto; padding: 40px; background-color: #f2f2f2; font-family: Arial, sans-serif;">
-            <h1 style="font-size: 28px; color: #333333; margin-bottom: 20px;">Invitation à rejoindre l'espace de travail</h1>
-            <p style="font-size: 16px; color: #666666;">Bonjour ${
-              invitedUser && (invitedUser.family_name + " " + invitedUser.name)
-            },</p>
-            <p style="font-size: 16px; color: #666666;">Vous avez été invité à rejoindre l'espace de travail <strong>${
-              workspace?.name
-            }</strong> par ${
-              inviterUser.family_name + " " + inviterUser.name
-            }.</p>
-            <p style="font-size: 16px; color: #666666;">Cliquez sur le bouton ci-dessous pour accepter l'invitation :</p>
-            <p><a href="${process.env.SERVER_URL}/sign?invitationToken=${signInvitationJwt(workspaceId)}" target="_blank" style="display: inline-block; background-color: #4CAF50; color: white; padding: 10px 20px; text-decoration: none; font-size: 16px; border-radius: 4px; transition: background-color 0.3s ease;">Accepter l'invitation</a></p>
-            <p style="font-size: 16px; color: #666666;">Si vous avez des questions ou besoin d'aide, n'hésitez pas à nous contacter.</p>
-            <p style="font-size: 16px; color: #666666;">Merci !</p>
-            <p style="font-size: 16px; color: #666666;">L'équipe de Beease Timer</p>
-        </div>`,
-          });
-        } else {
-          throw new Error(
-            "Invitation email failed  : incorrect informations provided."
-          );
-        }
-       
+        if(inviterUser && workspace) {
+        sendInvitationToWorkspace(opts.input.invitedMail, workspace, inviterUser, invitedUser );
+        if(invitedUser) sendInvitationService(inviterUser.id, invitedUser.id, workspaceId)
+       }     
       }
     }),
+    acceptInvitation: publicProcedure
+    .input(
+      z.object({
+        invitationToken: z.string(),
+      })
+    )
+    .query(async (opts) => {
+    const invitationTokenPayload = await verifyJwtInvitation(opts.input.invitationToken)
+    if(!invitationTokenPayload?.invitedUserId ) throw new Error("Invalid invitation token")
+    return await acceptInvitation( 
+      invitationTokenPayload.inviterUserId,
+      invitationTokenPayload.invitedUserId, 
+      invitationTokenPayload.workspaceId
+      )
+    }
+    ),
+    signInvitationPage: publicProcedure
+    .input(
+      z.object({
+        invitationToken: z.string(),
+      })
+    )
+    .query(async () => {
+      return signInvitationPage(process.env.SERVER_URL + '/api/user.signByGoogleCredentialToJoinWorkspace')
+     }),
+    invitationAcceptedPage: publicProcedure
+    .input(
+      z.object({
+        workspaceId: z.string(),
+      })
+    )
+    .query(async (opts) => {
+      const workspace = await getWorkspaceById(opts.input.workspaceId)
+      if(!workspace) throw new Error("Invalid workspace id")
+      return invitationAcceptedTemplate(workspace)
+     }),
 });
-//"http://localhost:3001/api/acceptInvitation?fromUser=${inviterUser}&toUser=${invitedUser}&at=${workspaceId}" 

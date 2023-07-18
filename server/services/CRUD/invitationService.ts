@@ -9,20 +9,6 @@ export const sendInvitationService = async (
   invitedId: string,
   workspaceId: string
 ) => {
-  const memberWorkspace = await prisma.memberWorkspace.findUnique({
-    where: {
-      workspaceId_userId: {
-        userId: inviterId,
-        workspaceId: workspaceId,
-      },
-    },
-  });
-  if (memberWorkspace?.role !== "OWNER" && memberWorkspace?.role !== "ADMIN") {
-    throw new TRPCError({
-      code: "UNAUTHORIZED",
-      message: "Member is not allowed to send invitation",
-    });
-  }
   return asyncFunctionErrorCatcher(
     () =>
       prisma.invitation.create({
