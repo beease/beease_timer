@@ -13,7 +13,7 @@ export const WorkspacesList = () => {
   
   useEffect(() => {
     if(!selectedWorkspaceId && !isSettingWorkspace && workspaces?.[0]) {
-      setSelectedWorkspaceId({id: workspaces[0].id, role: workspaces[0].role})
+      setSelectedWorkspaceId(workspaces[0].id)
     }
   }, [isSettingWorkspace, selectedWorkspaceId, setSelectedWorkspaceId, workspaces])
 
@@ -32,8 +32,8 @@ export const WorkspacesList = () => {
       const WorkspaceMiniature = ({workspace}: {workspace: typeof workspaces[number] })  => {
         return(
         <div 
-          className={`workspaceMiniature ${selectedWorkspaceId.id === workspace.id && 'selected'}`}
-          onClick={() => setSelectedWorkspaceId({id: workspace.id, role: workspace.role})}
+          className={`workspaceMiniature ${selectedWorkspaceId === workspace.id && 'selected'}`}
+          onClick={() =>{selectedWorkspaceId !== workspace.id && setSelectedWorkspaceId(workspace.id)}}
           style={{
             backgroundColor: workspace.color,
           }}

@@ -3,7 +3,7 @@ import { ProjectSettings } from "./projectCardSettings";
 import history from "../../assets/history.svg";
 import setting from "../../assets/setting.svg";
 import { ProjectSessions } from "./projectSessions";
-import type { Project } from "../../libs/interfaces";
+import type { Project, MyUser } from "../../libs/interfaces";
 import { workspaceStore, WorkspaceState } from "../../stores/workspaceStore";
 interface ButtonProps {
   title: "history" | "setting";
@@ -12,9 +12,10 @@ interface ButtonProps {
 
 interface Props {
   project: Project;
+  myUser: MyUser
 }
 
-export const ProjectMoreInfos = ({ project }: Props) => {
+export const ProjectMoreInfos = ({ project, myUser }: Props) => {
   const [selectedButton, setSelectedButton] = useState<"history" | "setting">(
     "history"
   );
@@ -42,15 +43,17 @@ export const ProjectMoreInfos = ({ project }: Props) => {
     );
   };
 
+  const isAdminOrOwner = myUser.role === "ADMIN" || myUser.role === "OWNER";
+
   return (
     <>
       <div className="ProjectCard_moreInfos_menu">
         <Button title={"history"} icon={history} />
-        <Button title={"setting"} icon={setting} />
+        {isAdminOrOwner && <Button title={"setting"} icon={setting} />}
       </div>
       <div className="ProjectCard_moreInfos_content">
-        {selectedButton === "history" && selectedWorkspaceId.id && <ProjectSessions project={project} selectedWorkspaceId={selectedWorkspaceId.id}/>}
-        {selectedButton === "setting" && <ProjectSettings project={project} />}
+        {selectedButton === "history" && selectedWorkspaceId && <ProjectSessions project={project} myUser={myUser} selectedWorkspaceId={selectedWorkspaceId}/>}
+        {selectedButton === "setting" && isAdminOrOwner && <ProjectSettings project={project} />}
       </div>
     </>
   );

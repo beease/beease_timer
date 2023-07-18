@@ -25,12 +25,13 @@
         gap: 8px;
         flex: 1;
         display: none;
-
+        .input_cont{
+            flex: 1;
+        }
         input {
             @include input-font;
             @include input;
             padding: 0 8px;
-            flex: 1;
         }
     }
 }

@@ -1,6 +1,6 @@
 import React from 'react'
 
-interface Props extends React.HTMLAttributes<HTMLButtonElement>{
+interface Props extends React.ButtonHTMLAttributes<HTMLButtonElement>{
     icon?: string;
     variant?: 'confirm' | 'cancel' | 'grey' | 'clear' | 'darkGrey' | 'alert' | 'disable';
     size?: 'small' | 'medium' | 'large';
@@ -25,9 +25,6 @@ export const BasicButton = ({icon, variant, children, ...props}: Props) => {
   return (
     <button
         className={`ui_basicButton ${variant}`}
-        style={{
-            ...props.style,
-        }}
         {...props}
       >
         {children 
