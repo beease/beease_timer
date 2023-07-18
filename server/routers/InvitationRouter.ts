@@ -49,40 +49,4 @@ export const invitationRouter = router({
        }     
       }
     }),
-    acceptInvitation: publicProcedure
-    .input(
-      z.object({
-        invitationToken: z.string(),
-      })
-    )
-    .query(async (opts) => {
-    const invitationTokenPayload = await verifyJwtInvitation(opts.input.invitationToken)
-    if(!invitationTokenPayload?.invitedUserId ) throw new Error("Invalid invitation token")
-    return await acceptInvitation( 
-      invitationTokenPayload.inviterUserId,
-      invitationTokenPayload.invitedUserId, 
-      invitationTokenPayload.workspaceId
-      )
-    }
-    ),
-    signInvitationPage: publicProcedure
-    .input(
-      z.object({
-        invitationToken: z.string(),
-      })
-    )
-    .query(async () => {
-      return signInvitationPage(process.env.SERVER_URL + '/api/user.signByGoogleCredentialToJoinWorkspace')
-     }),
-    invitationAcceptedPage: publicProcedure
-    .input(
-      z.object({
-        workspaceId: z.string(),
-      })
-    )
-    .query(async (opts) => {
-      const workspace = await getWorkspaceById(opts.input.workspaceId)
-      if(!workspace) throw new Error("Invalid workspace id")
-      return invitationAcceptedTemplate(workspace)
-     }),
 });

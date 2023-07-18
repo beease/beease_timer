@@ -1,7 +1,7 @@
-import { PrismaClient, Prisma } from "@prisma/client";
+import { PrismaClient, Prisma, User } from "@prisma/client";
 import { fetchGoogleUserInfo, verifyGoogleToken } from "../google/googleApis";
 import { asyncFunctionErrorCatcher } from "../utils/errorHandler";
-import { createMemberWorkspace } from "./memberWorkspaceService";
+import { createMemberWorkspace, getMemberWorkspaceByWorkspaceIdAndUserId } from "./memberWorkspaceService";
 import { signJwt, verifyJwtInvitation  } from "../auth/jwt";
 const prisma = new PrismaClient();
 
@@ -44,12 +44,14 @@ export const loginByGoogleToken = async (google_token: string) => {
   };
 };
 
-export const signByGoogleCredentialToJoinWorkspace =async (googleCredentialToken:string,joinWorkspaceToken:string) => {
+
+export const signByGoogleCredentialToJoinWorkspace = async (googleCredentialToken:string,joinWorkspaceToken:string) => {
 
 const userInfo = await verifyGoogleToken(googleCredentialToken);
-if(!userInfo) throw new Error("Failed to verify google token.");
-
-const createUser = await asyncFunctionErrorCatcher(
+if(!userInfo?.email) throw new Error("Failed to verify google token.");
+let userExist = await getUserByMail(userInfo.email) as User;
+if(!userExist) {
+    userExist = await asyncFunctionErrorCatcher(
   () =>
     prisma.user.create({
       data: {
@@ -63,10 +65,16 @@ const createUser = await asyncFunctionErrorCatcher(
       },
     }),
   "Failed to update user info with Prisma."
-);
+)}
 const joinWorkspaceTokenPayload = await verifyJwtInvitation(joinWorkspaceToken)
 if(!joinWorkspaceTokenPayload) throw new Error("Failed to verify join workspace token.")
-return await createMemberWorkspace(createUser.id,joinWorkspaceTokenPayload.workspaceId)
+
+const isValidMember = await getMemberWorkspaceByWorkspaceIdAndUserId(joinWorkspaceTokenPayload.workspaceId,userExist.id)
+if(!isValidMember){
+return (await createMemberWorkspace(userExist.id,joinWorkspaceTokenPayload.workspaceId)).workspaceId
+}else{
+return isValidMember.workspaceId
+}
 }
 
 export const getUserList = async () => {

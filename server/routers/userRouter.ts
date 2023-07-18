@@ -13,11 +13,6 @@ export const userRouter = router({
     .mutation(async (opts) => {
       return await userService.loginByGoogleToken(opts.input.google_token);
     }),
-  signByGoogleCredentialToJoinWorkspace: publicProcedure
-    .input(z.object({ credential: z.string(),invitationToken:z.string() }))
-    .mutation(async (opts) => {
-      return await userService.signByGoogleCredentialToJoinWorkspace(opts.input.credential,opts.input.invitationToken);
-    }),
   loginByEmail: publicProcedure
     .input(
       z.object({

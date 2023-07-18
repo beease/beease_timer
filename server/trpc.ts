@@ -20,6 +20,8 @@ export async function createContext({
   }
   const tokenPayload = await getUserFromHeader();
   return {
+    req,
+    res,
     tokenPayload,
   };
 }
