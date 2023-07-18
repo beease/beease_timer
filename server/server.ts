@@ -4,7 +4,7 @@ import appRouter from "./routers/router";
 import router from "./router";
 import http from "http";
 import { createContext } from "./trpc";
-import { z } from "zod";
+
 // import {
 //   getTokenByCredential,
 //   registerByEmail,
@@ -28,7 +28,7 @@ import { z } from "zod";
 const app = express();
 const PORT = process.env.PORT || 3001;
 
-const emailSchema = z.string().email();
+//const emailSchema = z.string().email();
 
 app.options("*", (_req, res) => {
   res.setHeader(
