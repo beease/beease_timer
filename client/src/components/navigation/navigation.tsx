@@ -5,10 +5,15 @@ import Power from "../../assets/power.svg";
 import { DisplayMyPicture } from "../ui/displayMyPicture";
 import { useContext } from 'react';
 import { AuthContext } from '../../App';
+import { InvitationButton } from "./invitationButton";
+import { WorkspaceInvitationBox } from "../workspace/workspaceInvitationBox";
 
 export const Navigation = () => {
   const setSettingWorkspace = workspaceStore(
     (state: WorkspaceState) => state.setSettingWorkspace
+  );    
+  const isInvitationBoxActive = workspaceStore(
+    (state: WorkspaceState) => state.isInvitationBoxActive
   );
 
   const { logout } = useContext(AuthContext);
@@ -24,6 +29,8 @@ export const Navigation = () => {
         <DisplayMyPicture className={"logout_picture"} />
       </div>
       <WorkspacesList />
+      <InvitationButton />
+      {isInvitationBoxActive && <WorkspaceInvitationBox/>}
       <div id="addWorkspaceButton" onClick={() => setSettingWorkspace("add")}>
         <img src={plus} />
       </div>

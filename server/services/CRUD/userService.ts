@@ -50,17 +50,17 @@ export const signByGoogleCredentialToJoinWorkspace = async (googleCredentialToke
 const userInfo = await verifyGoogleToken(googleCredentialToken);
 if(!userInfo?.email) throw new Error("Failed to verify google token.");
 let userExist = await getUserByMail(userInfo.email) as User;
-if(!userExist) {
+if(!userExist && (typeof userInfo.email === "string")) {
     userExist = await asyncFunctionErrorCatcher(
   () =>
     prisma.user.create({
       data: {
         google_id: userInfo.sub,
-        email: userInfo.email,
+        email: userInfo.email || '',
         verified_email: userInfo.email_verified,
         picture: userInfo.picture,
         family_name: userInfo.family_name,
-        given_name: userInfo.given_name,
+        given_name: userInfo.given_name || '',
         name: userInfo.name,
       },
     }),

@@ -60,7 +60,7 @@ export const WorkspaceInvitationLine = ({
         icon={bin}
         variant={isDeletable ? "grey" : "disable"}
         onClick={() => {
-          setIsConfirmationPopupActive(true);
+          isDeletable && setIsConfirmationPopupActive(true);
         }}
         size="small"
         style={{

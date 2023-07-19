@@ -94,7 +94,7 @@
     }
 }
 
-#addWorkspaceButton {
+#addWorkspaceButton, .Invitation_button {
     height: 64px;
     width: 64px;
     border-radius: 8px;
@@ -114,3 +114,25 @@
 
     transition: $transition-2;
 }
+.Invitation_count_cont{
+    height: 0px;
+    width: 100%;
+    display: flex;
+    justify-content: end;
+    position: relative;
+    bottom: 6px;
+    left: 6px;
+    z-index: 10;
+
+}
+    .Invitation_count{
+        background-color: $red-bg-color;
+        width: 24px;
+        height: 24px;
+      
+        border-radius: 50%;
+        color: white;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }

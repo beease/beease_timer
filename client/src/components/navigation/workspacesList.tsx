@@ -12,7 +12,7 @@ export const WorkspacesList = () => {
   const isSettingWorkspace = workspaceStore((state: WorkspaceState) => state.isSettingWorkspace);
   
   useEffect(() => {
-    if(!selectedWorkspaceId && !isSettingWorkspace && workspaces?.[0]) {
+    if(selectedWorkspaceId === null && !isSettingWorkspace && workspaces?.[0]) {
       setSelectedWorkspaceId(workspaces[0].id)
     }
   }, [isSettingWorkspace, selectedWorkspaceId, setSelectedWorkspaceId, workspaces])

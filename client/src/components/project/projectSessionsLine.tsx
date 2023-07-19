@@ -81,7 +81,7 @@ export const ProjectSessionsLine = ({ session, projectId, myUser }: Props) => {
         />
       )}
       <div className={`ProjectSessions_time ${!session.endedAt && "skeleton"}`}>
-        {useTimer(session.startedAt, session.endedAt)}
+        {useTimer(0, session.startedAt, session.endedAt)}
       </div>
       <div className={`ProjectSessions_date ${!session.endedAt && "skeleton"}`}>
         {session.startedAt && session.endedAt

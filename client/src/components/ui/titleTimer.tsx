@@ -1,12 +1,15 @@
 import { projectStore, ProjectStore } from "../../stores/projectStore";
+import { formatTimestamp } from "../../utils/function";
 import { Timer } from "./timer";
 
 interface Props {
   title: string;
   isPlaying: boolean;
+  total?: number; 
+  hoursByDay?: number | null;
 }
 
-export const TitleTimer = ({ title, isPlaying }: Props) => {
+export const TitleTimer = ({ title, isPlaying, hoursByDay, total }: Props) => {
   const playingProject = projectStore(
     (state: ProjectStore) => state.PlayingProject
   );
@@ -18,9 +21,11 @@ export const TitleTimer = ({ title, isPlaying }: Props) => {
         className={isPlaying ? "titleTimer_timer skeleton" : "titleTimer_timer"}
       >
         {isPlaying && playingProject.startedAt ? (
-          <Timer startedAt={playingProject.startedAt} />
+          <Timer startedAt={playingProject.startedAt} add={total}/>
         ) : (
-          "00:00:00"
+          total 
+          ? formatTimestamp(total, hoursByDay ?? 24)
+          : "00:00:00"
         )}
       </div>
     </div>

@@ -10,10 +10,12 @@ import { BasicButton } from "../ui/basicButton";
 import play from "../../assets/play_w.svg";
 import stop from "../../assets/stop_w.svg";
 
+import type { Project } from "../../libs/interfaces"
+
 interface Props {
   setIsDotsButtonActive: (status: boolean) => void;
   isDotsButtonActive: boolean;
-  project: any;
+  project: Project;
 }
 
 export const ProjectCardTop = ({
@@ -113,6 +115,16 @@ export const ProjectCardTop = ({
     })
   };
 
+  const totalSessionTime = project.memberSessions.reduce(
+    (acc: number, session) => {
+      if (session.endedAt) {
+        return acc + dayjs(session.endedAt).diff(dayjs(session.startedAt), "ms");
+      }
+      return acc;
+    },
+    0
+  );
+
   return (
     <div className="ProjectCard_top">
       <DotsButton
@@ -124,7 +136,7 @@ export const ProjectCardTop = ({
       />
       {
         
-      }<TitleTimer title={project.name} isPlaying={PlayingProject.projectId === project.id} />
+      }<TitleTimer title={project.name} isPlaying={PlayingProject.projectId === project.id} total={totalSessionTime} hoursByDay={project.hourByDay}/>
       <BasicButton
         icon={PlayingProject?.projectId === project.id ? stop : play}
         size="small"
