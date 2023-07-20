@@ -4,7 +4,6 @@ services:
     restart: always
     build: ./server
     container_name: beease_timer
-    command: bash -c "prisma migrate dev && npm run start"
     ports: 
       - '8020:8020'
     depends_on:

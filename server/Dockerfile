@@ -1,14 +1,14 @@
-FROM node:17-alpine
+FROM node:latest
 
 WORKDIR /server
 
-COPY package.json .
+COPY package*.json ./
 
 RUN npm install
-
+RUN npm install -g prisma
 COPY . .
+RUN prisma generate
 
-EXPOSE 8030
-
+EXPOSE 8020
 
 CMD ["npm", "start"]
