@@ -1,5 +1,5 @@
 import { signJwt, verifyJwt } from "../auth/jwt";
-import { PayloadOnAuthJWT } from "../../../shared/interfaces/queryInterfaces";
+import { PayloadOnAuthJWT } from '../utils/interfaces';
 import { PrismaClient } from "@prisma/client";
 import {
   asyncFunctionErrorCatcher,

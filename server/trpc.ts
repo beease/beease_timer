@@ -1,7 +1,6 @@
 import { initTRPC, inferAsyncReturnType, TRPCError } from "@trpc/server";
 import * as trpcExpress from "@trpc/server/adapters/express";
 import { verifyJwt } from "./services/auth/jwt";
-import { PayloadOnAuthJWT } from "../shared/interfaces/queryInterfaces";
 // You can use any variable name you like.
 // We use t to keep things simple.
 

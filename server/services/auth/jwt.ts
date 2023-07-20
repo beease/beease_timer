@@ -1,5 +1,5 @@
 import jwt from 'jsonwebtoken';
-import { PayloadOnAuthJWT } from '../../../shared/interfaces/queryInterfaces';
+import { PayloadOnAuthJWT } from '../utils/interfaces';
 
 type PayloadOnJwtInvitation = {
   workspaceId: string;
