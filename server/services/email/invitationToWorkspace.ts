@@ -1,7 +1,17 @@
 import { sendEmailTo } from "../CRUD/emailService";
 import { signInvitationJwt } from "../auth/jwt";
 import { Workspace } from "@prisma/client";
-import { clientUser } from "../../../shared/interfaces/queryInterfaces";
+
+type clientUser = {
+  id: string;
+  name: string | null;
+  email: string;
+  verified_email: boolean;
+  picture: string | null;
+  locale: string | null;
+  family_name: string | null;
+  given_name: string;
+}
 
 export const sendInvitationToWorkspace = async (invitedMail:string,workspace:Workspace,inviterUser:clientUser,invitedUser?:clientUser | null)=>{
     let invitationURL 
