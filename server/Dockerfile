@@ -8,7 +8,7 @@ RUN npm install
 
 COPY . .
 
-RUN npm run migrate
+RUN npx run migrate
 
 EXPOSE 8020
 
