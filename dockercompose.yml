@@ -1,0 +1,21 @@
+version: "3"
+services:
+  beease_timer:
+    restart: always
+    build: ./server
+    container_name: beease_timer
+    ports: 
+      - '8020:8020'
+    depends_on:
+      - database
+  database:
+    image: postgres:latest
+    restart: always
+    container_name: postgres_db
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: yourpassword
+      POSTGRES_DB: beease
+      PGDATA: '/var/lib/postgresql/data/pgdata'
+    volumes:
+        - ./data/database:/var/lib/postgresql/data
