@@ -21,7 +21,7 @@ export const TitleTimer = ({ title, isPlaying, hoursByDay, total }: Props) => {
         className={isPlaying ? "titleTimer_timer skeleton" : "titleTimer_timer"}
       >
         {isPlaying && playingProject.startedAt ? (
-          <Timer startedAt={playingProject.startedAt} add={total}/>
+          <Timer startedAt={playingProject.startedAt} add={total} hoursByDay={hoursByDay ?? 24} />
         ) : (
           total 
           ? formatTimestamp(total, hoursByDay ?? 24)

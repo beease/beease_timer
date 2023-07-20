@@ -52,7 +52,7 @@ export const ProjectCardTop = ({
               if(project.id === projectId){
                 return {
                   ...project,
-                  memberSessions: [...project.memberSessions, newSession]
+                  memberSessions: [...project.memberSessions, newSession.newSession]
                 }
               }else{
                 return project
@@ -62,7 +62,14 @@ export const ProjectCardTop = ({
               ...oldQueryData,
               projects: newProjects
             }
-          })        
+          })   
+        utils.user.getMyUser.setData(
+          undefined,
+          (oldQueryData) => {
+            if(!oldQueryData) return;
+            return {...oldQueryData, currentSession: newSession.updateUser.currentSession}
+          }
+        ) 
         }
     }); 
   };
@@ -83,7 +90,7 @@ export const ProjectCardTop = ({
               if(project.id === projectId){
                 return {
                   ...project,
-                  memberSessions: project.memberSessions.map((session) => (session.id === newSession.id ? newSession : session))
+                  memberSessions: project.memberSessions.map((session) => (session.id === newSession.newSession.id ? newSession.newSession : session))
                 }
               }else{
                 return project
@@ -93,26 +100,34 @@ export const ProjectCardTop = ({
               ...oldQueryData,
               projects: newProjects
             }
-          })
+          }),
+          utils.user.getMyUser.setData(
+            undefined,
+            (oldQueryData) => {
+              if(!oldQueryData) return;
+              return {...oldQueryData, currentSession: null}
+            }
+          )    
       }
     });
   };
 
   const handlePlayStop = async () => {
     const now = dayjs().format()
+    toggleIsPlaying({
+      projectId: project.id,
+      workspaceId: selectedWorkspaceId,
+      startedAt: now
+    })    
     if (PlayingProject?.projectId === project.id && selectedWorkspaceId) {
        StopSession(project.id, now, selectedWorkspaceId);
     } else if (PlayingProject?.projectId === null) {
        CreateSession(project.id, now);
     } else if (PlayingProject?.projectId !== project.id && PlayingProject?.projectId && PlayingProject.workspaceId) {
+      console.log(PlayingProject.projectId, now, PlayingProject.workspaceId)
       await StopSession(PlayingProject.projectId, now, PlayingProject.workspaceId);
       CreateSession(project.id, now);
     }
-    toggleIsPlaying({
-      projectId: project.id,
-      workspaceId: selectedWorkspaceId,
-      startedAt: now
-    })
   };
 
   const totalSessionTime = project.memberSessions.reduce(

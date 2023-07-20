@@ -4,13 +4,14 @@ import { useTimer } from '../../utils/function'
 interface Props {
     startedAt: string;
     add?: number;
+    hoursByDay: number;
 }
 
-export const Timer = ({startedAt, add}: Props) => {
+export const Timer = ({startedAt, add, hoursByDay}: Props) => {
   return (
     <>
     {
-        useTimer(add || 0, startedAt)
+        useTimer(add || 0, hoursByDay, startedAt )
         }
     </>
   )

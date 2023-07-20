@@ -31,6 +31,8 @@ model User {
   Invited          Invitation[]      @relation("InvitedUser")
   credential       Credential?       
   memberWorkspaces memberWorkspace[]
+  currentSession   memberSession?    @relation("CurrentUserSession", fields: [currentSessionId], references: [id])
+  currentSessionId String?           @unique
 }
 
 model Credential {
@@ -69,7 +71,6 @@ model memberWorkspace {
   user           User            @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId         String
   memberSessions memberSession[]
-
   @@unique([workspaceId, userId])
 }
 
@@ -81,6 +82,7 @@ model memberSession {
   projectId         String?
   memberWorkspace   memberWorkspace? @relation(fields: [memberWorkspaceId], references: [id], onDelete: Cascade)
   memberWorkspaceId String?
+  currentUser       User?             @relation("CurrentUserSession")
 }
 
 model Invitation {

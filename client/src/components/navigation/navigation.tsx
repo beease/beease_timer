@@ -7,8 +7,25 @@ import { useContext } from 'react';
 import { AuthContext } from '../../App';
 import { InvitationButton } from "./invitationButton";
 import { WorkspaceInvitationBox } from "../workspace/workspaceInvitationBox";
-
+import { projectStore, ProjectStore } from "../../stores/projectStore";
+import { trpc } from "../../trpc";
+import { useEffect } from "react";
 export const Navigation = () => {
+  const {data: user } = trpc.user.getMyUser.useQuery()
+
+  const PlayingProject = projectStore((state: ProjectStore) => state.PlayingProject)
+  const toggleIsPlaying = projectStore((state: ProjectStore) => state.toggleIsPlaying)
+
+  useEffect(()=> {
+    if(user && PlayingProject && PlayingProject.projectId === null && user.currentSession !== null && user.currentSession?.memberWorkspace){
+      toggleIsPlaying({
+        projectId: user.currentSession.projectId,
+        workspaceId: user.currentSession.memberWorkspace.workspaceId,
+        startedAt: user.currentSession.startedAt
+      })
+    }
+  },[user])
+
   const setSettingWorkspace = workspaceStore(
     (state: WorkspaceState) => state.setSettingWorkspace
   );    

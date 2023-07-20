@@ -132,6 +132,17 @@ export const getUserById = async (id: string) => {
           locale: true,
           family_name: true,
           given_name: true,
+          currentSession: {
+            select: {
+              projectId: true,
+              startedAt: true,
+              memberWorkspace: {
+                select: {
+                  workspaceId: true,
+                }
+              }
+            }
+          },
         },
       }),
     "Failed to get user by id with Prisma."

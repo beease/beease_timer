@@ -36,12 +36,12 @@ export const randomValue = (min: number, max: number) => {
   return Math.floor(Math.random() * (max - min + 1) + min);
 }
 
-export const timer = (startDate: string, add: number) => {
+export const timer = (startDate: string, add: number, hoursByDay: number) => {
   const now = dayjs();
   const start = dayjs(startDate);
   const elapsedMilliseconds = now.diff(start);
   
-  return formatTimestamp(elapsedMilliseconds + add, 24);
+  return formatTimestamp(elapsedMilliseconds + add, hoursByDay);
 }
 
 export const getTimestampWithTwoDates = (date1: string, date2?: string) => {
@@ -72,15 +72,15 @@ export const formatDate = (date: string): string => {
 };
 
 
-export const useTimer = (add: number, startedAt?: string | null, endedAt?: string | null) => {
+export const useTimer = (add: number, hoursByDay:number, startedAt?: string | null, endedAt?: string | null) => {
   const [time, setTime] = useState("");
 
   useEffect(() => {
       if (startedAt && !endedAt) {
-          setTime(timer(startedAt, add));
+          setTime(timer(startedAt, add, hoursByDay));
 
           const intervalId = setInterval(() => {
-              setTime(timer(startedAt, add));
+              setTime(timer(startedAt, add, hoursByDay));
           }, 1000);
 
           return () => clearInterval(intervalId);

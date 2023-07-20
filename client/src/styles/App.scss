@@ -13,8 +13,6 @@
 body {
   margin: 0;
   background-color: $grey-1;
-  width: 500px;
-  min-height: 300px;
   height: auto;
 }
 
@@ -63,6 +61,8 @@ input {
   display: flex;
   width: 100%;
   align-items: flex-start;
+  width: 500px;
+  min-height: 300px;
 }
 
 .skeleton {
@@ -79,6 +79,20 @@ input {
   }
 }
 
+.playing {
+  animation: playing 1s linear infinite alternate;
+}
+
+@keyframes playing {
+  0% {
+    opacity: 1;
+  }
+  
+  100% {
+    opacity: 0.7;
+  }
+}
+
 .input_cont{
   display: flex;
   flex-direction: column;
@@ -87,5 +101,24 @@ input {
   }
   .input_error{
     color: $red-bg-color
+  }
+}
+
+#google_connect {
+  width: 250px;
+  height: 60px;
+  background-color: white;
+  border-radius: 5px;
+  margin: 10px;
+  padding: 0 10px;
+  border: 1px solid $grey-2;
+  cursor: pointer;
+  transition: all 0.2s;
+  &:hover {
+    background-color: $grey-2;
+  }
+  img {
+    height: 30px;
+    margin: 0 10px;
   }
 }
