@@ -31,3 +31,21 @@ if(workspace && inviterUser){
     });
   }
 }
+
+export const sendInvitationNotification = async (invitedMail:string,workspace:Workspace,inviterUser:clientUser,invitedUser?:clientUser | null)=>{
+  return await sendEmailTo(invitedMail, {
+    subject: `Invitation to join ${workspace.name} workspace`,
+    html: ` <div style="max-width: 600px; margin: 0 auto; padding: 40px; background-color: #f2f2f2; font-family: Arial, sans-serif;">
+    <h1 style="font-size: 28px; color: #333333; margin-bottom: 20px;">Invitation à rejoindre l'espace de travail</h1>
+    <p style="font-size: 16px; color: #666666;">Bonjour ${
+      invitedUser ? (invitedUser.name) : ""
+    },</p>
+    <p style="font-size: 16px; color: #666666;">Vous avez été invité à rejoindre l'espace de travail <strong>${
+      workspace?.name
+    }</strong> par ${inviterUser.name}.</p>
+    <p style="font-size: 16px; color: #666666;">Si vous avez des questions ou besoin d'aide, n'hésitez pas à nous contacter.</p>
+    <p style="font-size: 16px; color: #666666;">Merci !</p>
+    <p style="font-size: 16px; color: #666666;">L'équipe de Beease Timer</p>
+</div>`,
+  });
+}

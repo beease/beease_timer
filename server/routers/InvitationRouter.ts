@@ -3,10 +3,9 @@ import { authorizedProcedure, publicProcedure, router } from "../trpc";
 import { sendInvitationService, acceptInvitation, getInvitationByUserId, denyInvitation } from "../services/CRUD/invitationService";
 import { getUserById, getUserByMail } from "../services/CRUD/userService";
 import { getWorkspaceById, getWorkspaceList } from "../services/CRUD/workspaceService";
-import { verifyJwtInvitation } from "../services/auth/jwt";
-import { sendInvitationToWorkspace } from "../services/email/invitationToWorkspace";
-import { signInvitationPage } from "../views/signInvitationPage";
-import { invitationAcceptedTemplate } from "../views/invitationAcceptedPage";
+
+import { sendInvitationToWorkspace, sendInvitationNotification } from "../services/email/invitationToWorkspace";
+
 export const invitationRouter = router({
   getInvitationByUserId: authorizedProcedure
     .query(async (opts) => {
@@ -79,7 +78,8 @@ export const invitationRouter = router({
         const invitedUser = await getUserByMail(invitedMail);
         const workspace = await getWorkspaceById(workspaceId);
         if(inviterUser && workspace) {
-        sendInvitationToWorkspace(invitedMail, workspace, inviterUser, invitedUser );
+          sendInvitationNotification(opts.input.invitedMail, workspace, inviterUser, invitedUser );
+          // sendInvitationToWorkspace(opts.input.invitedMail, workspace, inviterUser, invitedUser );
         if(invitedUser) sendInvitationService(inviterUser.id, invitedMail, workspaceId)
        }     
       }
