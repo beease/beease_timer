@@ -8,7 +8,8 @@ RUN npm install
 
 COPY . .
 
-RUN npx run migrate
+RUN prisma migrate
+RUN prisma generate
 
 EXPOSE 8020
 
