@@ -1,7 +1,4 @@
-import { z } from "zod";
-
 const nodemailer = require("nodemailer");
-const emailToSchema = z.string().email();
 type sendMailSchema = {
   subject: string;
   html: string;

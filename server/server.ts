@@ -83,7 +83,7 @@ app.use(
   })
 );
 
-app.use("/",router);
+//app.use("/",router);
 app.set("views", __dirname + "/views");
 app.set("view engine", "ejs");
 
