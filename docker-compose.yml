@@ -5,7 +5,7 @@ services:
     build: ./server
     container_name: beease_timer
     ports: 
-      - '8020:8020'
+      - '8020:3001'
     depends_on:
       - database
   database:
