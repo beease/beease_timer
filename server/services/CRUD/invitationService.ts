@@ -7,11 +7,20 @@ const prisma = new PrismaClient();
 export const getInvitationByUserId = async (
   userId: string,
 ) => {
+  const user = await prisma.user.findUnique({
+    where: {
+      id: userId,
+    },
+    select: {
+      email: true,
+    }
+  })
+  if (user?.email) {
   return asyncFunctionErrorCatcher(
     () =>
       prisma.invitation.findMany({
         where: {
-          invitedId: userId,
+          invitedMail: user.email,
         },
         include: {
           inviter: {
@@ -29,11 +38,12 @@ export const getInvitationByUserId = async (
       }),
     "Failed to create invitation."
   );
+}
 };
 
 export const sendInvitationService = async (
   inviterId: string,
-  invitedId: string,
+  invitedMail: string,
   workspaceId: string
 ) => {
   return asyncFunctionErrorCatcher(
@@ -41,7 +51,7 @@ export const sendInvitationService = async (
       prisma.invitation.create({
         data: {
           inviterId: inviterId,
-          invitedId: invitedId,
+          invitedMail: invitedMail,
           workspaceId: workspaceId,
         },
       }),
@@ -54,11 +64,20 @@ export const acceptInvitation = async (
   inviterId: string,
   workspaceId: string
 ) => {
+  const user = await prisma.user.findUnique({
+    where: {
+      id: invitedId,
+    },
+    select: {
+      email: true,
+    }
+  })
+  if (!user?.email) return;
   try {
     const acceptInvitationFn = prisma.invitation.delete({
       where: {
-        invitedId_inviterId_workspaceId: {
-          invitedId: invitedId,
+        invitedMail_inviterId_workspaceId: {
+          invitedMail: user.email,
           inviterId: inviterId,
           workspaceId: workspaceId,
         },
@@ -93,11 +112,20 @@ export const denyInvitation = async (
   inviterId: string,
   workspaceId: string
 ) => {
+  const user = await prisma.user.findUnique({
+    where: {
+      id: invitedId,
+    },
+    select: {
+      email: true,
+    }
+  })
+  if (!user?.email) return;
   try {
     const denyInvitation = prisma.invitation.delete({
       where: {
-        invitedId_inviterId_workspaceId: {
-          invitedId: invitedId,
+        invitedMail_inviterId_workspaceId: {
+          invitedMail: user.email,
           inviterId: inviterId,
           workspaceId: workspaceId,
         },

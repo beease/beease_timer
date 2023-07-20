@@ -28,7 +28,6 @@ model User {
   locale           String?
   google_id        String?           @unique
   Inviter          Invitation[]      @relation("InviterUser")
-  Invited          Invitation[]      @relation("InvitedUser")
   credential       Credential?       
   memberWorkspaces memberWorkspace[]
   currentSession   memberSession?    @relation("CurrentUserSession", fields: [currentSessionId], references: [id])
@@ -88,12 +87,11 @@ model memberSession {
 model Invitation {
   id          String @id @default(cuid())
   date        DateTime @default(now())
-  invited     User  @relation("InvitedUser", fields: [invitedId], references: [id], onDelete: Cascade)
-  invitedId   String
+  invitedMail String
   inviter     User  @relation("InviterUser", fields: [inviterId], references: [id], onDelete: Cascade)
   inviterId   String
   workspace   Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   workspaceId String
 
-  @@unique([invitedId, inviterId, workspaceId])
+  @@unique([invitedMail, inviterId, workspaceId])
 }

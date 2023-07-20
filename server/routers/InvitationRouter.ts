@@ -46,17 +46,17 @@ export const invitationRouter = router({
   sendInvitation: authorizedProcedure
     .input(
       z.object({
-        invitedId: z.string(),
+        invitedMail: z.string().email(),
         workspaceId: z.string(),
       })
     )
     .query(async (opts) => {
       const { ctx } = opts;
-      const { invitedId, workspaceId } = opts.input;
+      const { invitedMail, workspaceId } = opts.input;
       if (ctx.tokenPayload && ctx.tokenPayload.userId) {
         return await sendInvitationService(
           ctx.tokenPayload.userId,
-          invitedId,
+          invitedMail,
           workspaceId
         );
       }
@@ -79,8 +79,8 @@ export const invitationRouter = router({
         const invitedUser = await getUserByMail(invitedMail);
         const workspace = await getWorkspaceById(workspaceId);
         if(inviterUser && workspace) {
-        sendInvitationToWorkspace(opts.input.invitedMail, workspace, inviterUser, invitedUser );
-        if(invitedUser) sendInvitationService(inviterUser.id, invitedUser.id, workspaceId)
+        sendInvitationToWorkspace(invitedMail, workspace, inviterUser, invitedUser );
+        if(invitedUser) sendInvitationService(inviterUser.id, invitedMail, workspaceId)
        }     
       }
     }),
