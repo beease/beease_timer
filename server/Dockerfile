@@ -12,4 +12,4 @@ RUN prisma generate
 
 EXPOSE 8020
 
-CMD ["npm", "start"]
+CMD ["./start.sh"]
