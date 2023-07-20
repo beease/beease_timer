@@ -19,6 +19,10 @@ RUN npm install
 
 RUN npx prisma generate
 
+COPY start.sh ./
+
+RUN chmod +x ./start.sh
+
 EXPOSE 8020
 
-CMD npm start
+CMD ["./start.sh"]
