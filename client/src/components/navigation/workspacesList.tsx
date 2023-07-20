@@ -2,6 +2,8 @@ import { trpc } from "../../trpc"
 import { useEffect } from "react";
 import beeaseLogo from '../../assets/logo_beease.svg';
 import { workspaceStore, WorkspaceState } from "../../stores/workspaceStore";
+import { projectStore, ProjectStore } from "../../stores/projectStore";
+import { PlayingAnimation } from "../ui/playingAnimation";
 
 
 export const WorkspacesList = () => {
@@ -10,9 +12,10 @@ export const WorkspacesList = () => {
   const setSelectedWorkspaceId = workspaceStore((state: WorkspaceState) => state.setSelectedWorkspaceId);
   const selectedWorkspaceId = workspaceStore((state: WorkspaceState) => state.selectedWorkspaceId);
   const isSettingWorkspace = workspaceStore((state: WorkspaceState) => state.isSettingWorkspace);
-  
+  const PlayingProject = projectStore((state: ProjectStore) => state.PlayingProject);
+
   useEffect(() => {
-    if(!selectedWorkspaceId && !isSettingWorkspace && workspaces?.[0]) {
+    if(selectedWorkspaceId === null && !isSettingWorkspace && workspaces?.[0]) {
       setSelectedWorkspaceId(workspaces[0].id)
     }
   }, [isSettingWorkspace, selectedWorkspaceId, setSelectedWorkspaceId, workspaces])
@@ -38,7 +41,7 @@ export const WorkspacesList = () => {
             backgroundColor: workspace.color,
           }}
         >
-          <img src={beeaseLogo} />
+         <img src={beeaseLogo} className={`${PlayingProject.workspaceId === workspace.id && 'playing'}`} />
         </div>
         )
       }

@@ -17,28 +17,8 @@ interface Props {
   myUser: MyUser
 }
 
-export const ProjectSessions = ({ project, selectedWorkspaceId, myUser }: Props) => {
+export const ProjectSessions = ({ project, myUser }: Props) => {
   const sessions = project.memberSessions;
-
-  const { data: user } = trpc.user.getMyUser.useQuery();
-
-  const PlayingProject = projectStore((state: ProjectStore) => state.PlayingProject);
-  const toggleIsPlaying = projectStore((state: ProjectStore) => state.toggleIsPlaying);
-
-  useEffect(() => {
-    if(PlayingProject?.projectId === null){
-      sessions.map((session) => {
-        if(!session.endedAt && session.memberWorkspace?.user.id === user?.id){
-            toggleIsPlaying({
-              projectId: project.id,
-              workspaceId: selectedWorkspaceId,
-              startedAt: session.startedAt
-            })
-        }
-      })
-    }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
 
   const sortedSessionsByDate = sessions.sort((a, b) => dayjs(b.startedAt).unix() - dayjs(a.startedAt).unix())
   

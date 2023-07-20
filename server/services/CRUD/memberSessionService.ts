@@ -17,37 +17,89 @@ export const createMemberSession = async (
     endedAt?: string;
   }
 ) => {
-  const getMemberWorkspace = await prisma.memberWorkspace.findFirst({
+  try {
+  const workspace = await prisma.project.findUnique({
+    where:{
+      id: projectId
+    },
+    select: {
+      workspaceId: true,
+    }
+  })
+  if (! workspace?.workspaceId) {
+    throw new Error("No workspace found");
+  }
+  const getMemberWorkspace = await prisma.memberWorkspace.findUnique({
     where: {
-      userId: userId,
+      workspaceId_userId: {
+        userId: userId,
+        workspaceId: workspace.workspaceId
+      }
     },
   });
-  return asyncFunctionErrorCatcher(
-    () =>
-      prisma.memberSession.create({
-        data: {
-          memberWorkspaceId: getMemberWorkspace?.id,
-          projectId: projectId,
-          startedAt: startedAt,
-          endedAt: endedAt,
-        },
-        include: {
-          memberWorkspace: {
+
+  const newSession = await prisma.memberSession.create({
+    data: {
+      memberWorkspaceId: getMemberWorkspace?.id,
+      projectId: projectId,
+      startedAt: startedAt,
+      endedAt: endedAt,
+    },
+    include: {
+      memberWorkspace: {
+        select: {
+          user: {
             select: {
-              user: {
-                select: {
-                  id: true,
-                  given_name: true,
-                  picture: true,
-                },
-              },
+              id: true,
+              given_name: true,
+              picture: true,
             },
           },
         },
-      }),
-    "Failed to create session"
-  );
+      },
+    },
+  })
+
+  const updateUser = await prisma.user.update({
+    where:{
+      id: userId
+    },
+    data: {
+      currentSession: {
+        connect: {
+          id: newSession.id
+        }
+      }
+    },
+    select: {
+      currentSession: {
+        select: {
+          projectId: true,
+          startedAt: true,
+          memberWorkspace: {
+            select: {
+              workspaceId: true,
+            }
+          }
+        }
+      },
+    }
+  })
+
+    return { 
+      newSession: newSession,
+      updateUser: updateUser,
+    } 
+  } catch (err) {
+    throw new TRPCError({
+      code: "INTERNAL_SERVER_ERROR",
+      message: `Accept invitation failed : ${err}`,
+    });
+  }
 };
+
+
+
 export const deleteMemberSession = async (
   emitterId: string,
   sessionId: string
@@ -126,21 +178,36 @@ export const stopSession = async (
   projectId: string,
   endedAt: string
 ) => {
-  const memberWorkspace = await prisma.memberWorkspace.findFirst({
+  const workspace = await prisma.project.findUnique({
+    where:{
+      id: projectId
+    },
+    select: {
+      workspaceId: true,
+    }
+  })
+  if (! workspace?.workspaceId) {
+    throw new Error("No workspace found");
+  }
+  const getMemberWorkspace = await prisma.memberWorkspace.findUnique({
     where: {
-      userId: emitterId,
+      workspaceId_userId: {
+        userId: emitterId,
+        workspaceId: workspace.workspaceId
+      }
     },
   });
-  if (!memberWorkspace?.id) {
+  if (!getMemberWorkspace?.id) {
     throw new Error("No member workspace found");
   }
   const sessionsToStop = await prisma.memberSession.findMany({
     where: {
       projectId: projectId,
-      memberWorkspaceId: memberWorkspace?.id,
+      memberWorkspaceId: getMemberWorkspace.id,
       endedAt: null,
     },
   });
+
   if (sessionsToStop.length === 0) {
     throw new Error("No sessions to stop");
   }
@@ -154,9 +221,8 @@ export const stopSession = async (
       data: { endedAt: endedAt },
     });
   }
-  return asyncFunctionErrorCatcher(
-    () =>
-      prisma.memberSession.update({
+
+   const updateSession = await prisma.memberSession.update({
         where: {
           id: lastSession.id,
         },
@@ -176,7 +242,22 @@ export const stopSession = async (
             },
           },
         },
-      }),
-    "Failed to update session"
-  );
+      })
+
+      const updateUser = await prisma.user.update({
+        where:{
+          id: emitterId
+        },
+        data: {
+          currentSession: {
+            disconnect: true
+          }
+        }
+      })
+    
+        return { 
+          newSession: updateSession,
+          updateUser: updateUser,
+        } 
+
 };

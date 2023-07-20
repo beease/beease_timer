@@ -35,7 +35,6 @@ export const ProjectList = ({ selectedWorkspaceId }: Props) => {
     );
 
   if (worspace) {
-    console.log(worspace)
     const filteredProjects = worspace.projects.filter(
       (project) =>
         (project.isArchived && filters.archives) ||

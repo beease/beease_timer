@@ -12,38 +12,43 @@ export const colorByLetter = (letter: string) => {
     return colors[index];
   }
 
-export const formatTimestamp = (timestamp: number) => {
-  const totalSeconds = Math.floor(timestamp / 1000);
-  const totalMinutes = Math.floor(totalSeconds / 60);
-  const hours = Math.floor(totalMinutes / 60);
+  export const formatTimestamp = (timestamp: number, hoursByDay: number) => {
+    const totalSeconds = Math.floor(timestamp / 1000);
+    const totalMinutes = Math.floor(totalSeconds / 60);
+    const totalHours = Math.floor(totalMinutes / 60);
+    
+    const days = Math.floor(totalHours / hoursByDay);
+    
+    const hours = totalHours % hoursByDay;
+    const minutes = totalMinutes % 60;
+    const seconds = totalSeconds % 60;
   
-  const seconds = totalSeconds % 60;
-  const minutes = totalMinutes % 60;
+    const formattedDays = days.toString();
+    const formattedHours = hours.toString().padStart(2, '0');
+    const formattedMinutes = minutes.toString().padStart(2, '0');
+    const formattedSeconds = seconds.toString().padStart(2, '0');
   
-  const formattedHours = hours.toString().padStart(2, '0');
-  const formattedMinutes = minutes.toString().padStart(2, '0');
-  const formattedSeconds = seconds.toString().padStart(2, '0');
-
-  return `${formattedHours}:${formattedMinutes}:${formattedSeconds}`;
-}
+    return `${+formattedDays > 0 ? formattedDays + 'd ' : ''}${formattedHours}:${formattedMinutes}:${formattedSeconds}`;
+  }
+  
 
 export const randomValue = (min: number, max: number) => {
   return Math.floor(Math.random() * (max - min + 1) + min);
 }
 
-export const timer = (startDate: string) => {
+export const timer = (startDate: string, add: number, hoursByDay: number) => {
   const now = dayjs();
   const start = dayjs(startDate);
   const elapsedMilliseconds = now.diff(start);
   
-  return formatTimestamp(elapsedMilliseconds);
+  return formatTimestamp(elapsedMilliseconds + add, hoursByDay);
 }
 
 export const getTimestampWithTwoDates = (date1: string, date2?: string) => {
   const day1 = dayjs(date1);
   const day2 = dayjs(date2);
   const diff = day2.diff(day1);
-  return formatTimestamp(diff);
+  return formatTimestamp(diff, 24);
 }
 
 export const formatTwoDates = (date1: string, date2: string): string => {
@@ -67,15 +72,15 @@ export const formatDate = (date: string): string => {
 };
 
 
-export const useTimer = (startedAt?: string | null, endedAt?: string | null) => {
+export const useTimer = (add: number, hoursByDay:number, startedAt?: string | null, endedAt?: string | null) => {
   const [time, setTime] = useState("");
 
   useEffect(() => {
       if (startedAt && !endedAt) {
-          setTime(timer(startedAt));
+          setTime(timer(startedAt, add, hoursByDay));
 
           const intervalId = setInterval(() => {
-              setTime(timer(startedAt));
+              setTime(timer(startedAt, add, hoursByDay));
           }, 1000);
 
           return () => clearInterval(intervalId);

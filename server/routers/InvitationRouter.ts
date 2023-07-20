@@ -1,12 +1,47 @@
 import { z } from "zod";
 import { authorizedProcedure, publicProcedure, router } from "../trpc";
-import { sendInvitationService  } from "../services/CRUD/invitationService";
+import { sendInvitationService, acceptInvitation, getInvitationByUserId, denyInvitation } from "../services/CRUD/invitationService";
 import { getUserById, getUserByMail } from "../services/CRUD/userService";
 import { getWorkspaceById, getWorkspaceList } from "../services/CRUD/workspaceService";
 
 import { sendInvitationToWorkspace, sendInvitationNotification } from "../services/email/invitationToWorkspace";
 
 export const invitationRouter = router({
+  getInvitationByUserId: authorizedProcedure
+    .query(async (opts) => {
+      const { ctx } = opts;
+      if (ctx.tokenPayload && ctx.tokenPayload.userId) {
+        return await getInvitationByUserId(ctx.tokenPayload.userId);
+      }
+    }),
+  acceptInvitation: authorizedProcedure
+    .input(
+      z.object({
+        inviterId: z.string(),
+        workspaceId: z.string(),
+      })
+    )
+    .mutation(async (opts) => {
+      const { ctx } = opts;
+      if (ctx.tokenPayload && ctx.tokenPayload.userId) {
+        const { inviterId, workspaceId } = opts.input;
+        return await acceptInvitation(ctx.tokenPayload.userId, inviterId, workspaceId);
+      }
+    }),
+  denyInvitation: authorizedProcedure
+    .input(
+      z.object({
+        inviterId: z.string(),
+        workspaceId: z.string(),
+      })
+    )
+    .mutation(async (opts) => {
+      const { ctx } = opts;
+      if (ctx.tokenPayload && ctx.tokenPayload.userId) {
+        const { inviterId, workspaceId } = opts.input;
+        return await denyInvitation(ctx.tokenPayload.userId, inviterId, workspaceId);
+      }
+    }),
   sendInvitation: authorizedProcedure
     .input(
       z.object({

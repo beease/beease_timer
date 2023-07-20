@@ -11,7 +11,7 @@ import type { Project } from "../../libs/interfaces";
 import { ConfirmationPopup } from "../ui/comfirmationPopup";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm, useWatch } from "react-hook-form";
+import { useForm } from "react-hook-form";
 
 interface Props {
   project: Project;
@@ -19,9 +19,9 @@ interface Props {
 
 const validationSchema = z.object({
   name: z.string().nonempty("Please enter a workspace name"),
-  dailyPrice: z.number().optional(),
-  hourByDay: z.number().optional(),
-  color: z.string().nonempty(),
+  dailyPrice:  z.string().transform((val) => (val === "" ? undefined : +val)).optional(),
+  hourByDay:  z.string().transform((val) => (val === "" ? undefined : +val)).optional(),
+  color:  z.string(),
   isArchived: z.boolean(),
 });
 
@@ -41,8 +41,8 @@ export const ProjectSettings = ({ project }: Props) => {
 
   const defaultValues = {
     name: project.name,
-    dailyPrice: project.dailyPrice ? +project.dailyPrice : undefined,
-    hourByDay: project.hourByDay ? +project.hourByDay : undefined,
+    dailyPrice: project.dailyPrice?.toString(),
+    hourByDay: project.hourByDay?.toString(),
     color: project.color,
     isArchived: project.isArchived,
   };
@@ -60,10 +60,12 @@ export const ProjectSettings = ({ project }: Props) => {
     defaultValues: defaultValues,
   });
 
-  const watchAllFields = useWatch({ control });
-
-  const hasChanged =
-    JSON.stringify(watchAllFields) !== JSON.stringify(defaultValues);
+  const hasChanged = 
+  watch('color') !== project.color ||
+  watch('name') !== project.name ||
+  watch('dailyPrice') && watch('dailyPrice') !== project.dailyPrice?.toString() || 
+  watch('hourByDay') && watch('hourByDay') !== project.hourByDay?.toString() ||
+  watch('isArchived') !== project.isArchived
 
   const mutationDelete = trpc.project.deleteProject.useMutation({
     onSuccess: (deletedProject) => {
@@ -102,11 +104,18 @@ export const ProjectSettings = ({ project }: Props) => {
     <form
       className="ProjectSettings"
       onSubmit={handleSubmit(async (values) => {
+        console.log(values)
         await mutationUpdate.mutateAsync({
           id: project.id,
-          data: values,
+          data: {
+            ...values,
+            dailyPrice: values.dailyPrice ? +values.dailyPrice : undefined,
+            hourByDay: values.hourByDay ? +values.hourByDay : undefined,
+          },
         });
-        reset(values);
+        reset({...values,
+          dailyPrice: values.dailyPrice ? values.dailyPrice.toString() : undefined,
+          hourByDay: values.hourByDay ? values.hourByDay.toString() : undefined,});
       })}
     >
       <div className="ProjectSettings_line">
@@ -122,7 +131,7 @@ export const ProjectSettings = ({ project }: Props) => {
         <div className="input_cont ProjectSettings_number">
           <input
             type="number"
-            {...register("dailyPrice", { valueAsNumber: true })}
+            {...register("dailyPrice")}
             placeholder="TJM"
           />
           {errors.dailyPrice?.message && (
@@ -132,7 +141,7 @@ export const ProjectSettings = ({ project }: Props) => {
         <div className="input_cont ProjectSettings_number">
           <input
             type="number"
-            {...register("hourByDay", { valueAsNumber: true })}
+            {...register("hourByDay")}
             placeholder="H/day"
           />
           {errors.hourByDay?.message && (

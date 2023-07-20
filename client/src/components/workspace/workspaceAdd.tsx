@@ -47,6 +47,7 @@ export const WorkspaceAdd = () => {
           newWorkspace
         ]
       })
+      setSettingWorkspace(null);
       setSelectedWorkspaceId(newWorkspace.id)
     },
   });
@@ -57,7 +58,6 @@ export const WorkspaceAdd = () => {
     onSubmit={handleSubmit(async (values) => {
       await mutationCreate.mutateAsync(values);
       reset();
-      setSettingWorkspace(null);
     })}
     >
         <div className="input_cont addWorkspace_name_input">
