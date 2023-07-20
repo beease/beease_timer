@@ -1,6 +1,6 @@
 FROM node:17-alpine
 
-WORKDIR /time_api
+WORKDIR /server
 
 COPY package.json .
 
