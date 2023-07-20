@@ -5,8 +5,8 @@
   "main": "server.ts",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "tsc && node server.ts",
-    "dev": "tsc && nodemon server.ts"
+    "start": "tsc && node dist/server.js",
+    "dev": "tsc && nodemon server.ts" 
   },
   "author": "LTZ Technologies",
   "license": "ISC",
