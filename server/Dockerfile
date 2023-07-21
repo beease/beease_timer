@@ -1,13 +1,27 @@
-FROM node:latest
+FROM node:alpine
 
 WORKDIR /server
 
 COPY package*.json ./
 
-RUN npm install
-RUN npm install -g prisma
+COPY prisma ./prisma/
+
+# COPY ENV variable
+COPY .env ./
+
+# COPY tsconfig.json file
+COPY tsconfig.json ./
+
+# COPY
 COPY . .
-RUN prisma generate
+
+RUN npm install
+
+RUN npx prisma generate
+
+COPY start.sh ./
+
+RUN chmod +x ./start.sh
 
 EXPOSE 8020
 
