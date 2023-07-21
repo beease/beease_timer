@@ -41,6 +41,22 @@ export const getInvitationByUserId = async (
 }
 };
 
+export const getInvitationByEmailAndWorkspaceId = async (
+  invitedMail: string,
+  workspaceId: string
+) => {
+  return asyncFunctionErrorCatcher(
+    () =>
+      prisma.invitation.findFirst({
+        where: {
+            invitedMail: invitedMail,
+            workspaceId: workspaceId,
+        },
+      }),
+    "Failed to get invitation."
+  );
+};
+
 export const sendInvitationService = async (
   inviterId: string,
   invitedMail: string,

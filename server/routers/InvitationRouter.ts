@@ -1,10 +1,10 @@
 import { z } from "zod";
 import { authorizedProcedure, publicProcedure, router } from "../trpc";
-import { sendInvitationService, acceptInvitation, getInvitationByUserId, denyInvitation } from "../services/CRUD/invitationService";
+import { sendInvitationService, acceptInvitation, getInvitationByUserId, denyInvitation, getInvitationByEmailAndWorkspaceId } from "../services/CRUD/invitationService";
 import { getUserById, getUserByMail } from "../services/CRUD/userService";
-import { getWorkspaceById, getWorkspaceList } from "../services/CRUD/workspaceService";
+import { getWorkspaceById, getWorkspacesUsers } from "../services/CRUD/workspaceService";
 
-import { sendInvitationToWorkspace, sendInvitationNotification } from "../services/email/invitationToWorkspace";
+import { sendInvitationNotification } from "../services/email/invitationToWorkspace";
 
 export const invitationRouter = router({
   getInvitationByUserId: authorizedProcedure
@@ -72,7 +72,13 @@ export const invitationRouter = router({
       if (ctx.tokenPayload && ctx.tokenPayload.userId) {
         const { workspaceId, invitedMail } = opts.input;
        
-        if(!await getWorkspaceList(workspaceId, ctx.tokenPayload.userId)) throw new Error("You are not in this workspace");
+        const userLists = (await getWorkspacesUsers(workspaceId));
+        if(!userLists) throw new Error("Failed to get user list");
+        if(!userLists.find(member => member.user.id === ctx.tokenPayload?.userId)) throw new Error("You are not in this workspace");
+        if(userLists.find(member => member.user.email === invitedMail)) throw new Error("This user is already in this workspace");
+        const invitation = await getInvitationByEmailAndWorkspaceId( invitedMail, workspaceId );
+        console.log(invitation)
+        if(invitation) throw new Error("invitation already sent")     
 
         const inviterUser = await getUserById(ctx.tokenPayload.userId);
         const invitedUser = await getUserByMail(invitedMail);
@@ -80,7 +86,7 @@ export const invitationRouter = router({
         if(inviterUser && workspace) {
           sendInvitationNotification(opts.input.invitedMail, workspace, inviterUser, invitedUser );
           // sendInvitationToWorkspace(opts.input.invitedMail, workspace, inviterUser, invitedUser );
-        if(invitedUser) sendInvitationService(inviterUser.id, invitedMail, workspaceId)
+          sendInvitationService(inviterUser.id, invitedMail, workspaceId);
        }     
       }
     }),

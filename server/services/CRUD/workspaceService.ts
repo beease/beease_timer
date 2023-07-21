@@ -229,5 +229,21 @@ export const getMyWorkspaces = async (id: string) => {
   }
 };
 
+export const getWorkspacesUsers = async (workspaceId: string) => {
+  try {
+    const users = await prisma.memberWorkspace.findMany({
+      where: {
+        workspaceId: workspaceId,
+      },
+      include: {
+        user: true,
+      },
+    });
+    return users;
+  } catch (err) {
+    throw new Error(`Failed to get workspaces users : ${err}`);
+  }
+}
+
 
 
