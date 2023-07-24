@@ -99,9 +99,9 @@ input {
   input{
     flex: 1;
   }
-  .input_error{
-    color: $red-bg-color
-  }
+}
+.input_error{
+  color: $red-bg-color
 }
 
 #google_connect {
@@ -121,4 +121,73 @@ input {
     height: 30px;
     margin: 0 10px;
   }
+}
+.loading_cont{
+  @include action_card;
+  padding: 16px 32px;
+  margin: 8px;
+}
+.logo_animation_part1{
+  animation-name: logo_animation_part1;
+  animation-duration: 2s;
+  animation-iteration-count: infinite;
+}
+.logo_animation_part2{
+  animation-name: logo_animation_part2;
+  animation-duration: 2s;
+  animation-iteration-count: infinite;
+}
+.logo_animation_part3{
+  animation-name: logo_animation_part3;
+  animation-duration: 2s;
+  animation-iteration-count: infinite;
+}
+.logo_animation_part4{
+  animation-name: logo_animation_part4;
+  animation-duration: 2s;
+  animation-iteration-count: infinite;
+}
+@keyframes logo_animation_part1 {
+0% {opacity: 1;}
+12.5%   {opacity: 1;}
+25%  {opacity: 1;}
+37.5%  {opacity: 1;}
+50% {opacity: 0.1;}
+62.5%   {opacity: 1;}
+75%   {opacity: 1;}
+87.5%  {opacity: 1;}
+100%  {opacity: 1;}
+}
+@keyframes logo_animation_part2 {
+  0% {opacity: 1;}
+  12.5%   {opacity: 1;}
+  25%  {opacity: 1;}
+  37.5%  {opacity: 0;}
+  50% {opacity: 0;}
+  62.5%   {opacity: 0;}
+  75%   {opacity: 1;}
+  87.5%  {opacity: 1;}
+  100%  {opacity: 1;}
+}
+@keyframes logo_animation_part3 {
+  0% {opacity: 1;}
+  12.5%   {opacity: 1;}
+  25%  {opacity: 0;}
+  37.5%  {opacity: 0;}
+  50% {opacity: 0;}
+  62.5%   {opacity: 0;}
+  75%   {opacity: 0;}
+  87.5%  {opacity: 1;}
+  100%  {opacity: 1;}
+}
+@keyframes logo_animation_part4 { 
+  0% {opacity: 1;}
+  12.5%   {opacity: 0;}
+  25%  {opacity: 0;}
+  37.5%  {opacity: 0;}
+  50% {opacity: 0;}
+  62.5%   {opacity: 0;}
+  75%   {opacity: 0;}
+  87.5%  {opacity: 0;}
+  100%  {opacity: 1;}
 }

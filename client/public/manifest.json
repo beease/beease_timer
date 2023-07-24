@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
-  "name": "Chrome Extension Demo",
-  "description": "React Chrome Extension",
+  "name": "Beease Timer",
+  "description": "Suivez et organisez votre temps de travail en tant que freelance avec facilité.",
   "version": "1.0.0",
   "action": {
     "default_icon": {
@@ -12,14 +12,9 @@
     "default_popup": "index.html",
     "default_title": "Beease Timer"
   },
-  "host_permissions": [
-    "http://localhost:3000/"
-  ],
   "permissions": [
-    "scripting",
     "identity",
-    "storage",
-    "cookies"
+    "storage"
   ],
   "content_security_policy":{
     "extension_page": "script-src 'self' 'unsafe-eval' https://apis.google.com; object-src 'self'; script-src-elem 'self' 'unsafe-eval' https://apis.google.com"

@@ -1,14 +1,20 @@
 import { BasicButton } from "../ui/basicButton";
-import { useState } from "react";
 import { trpc } from "../../trpc";
 import { workspaceStore, WorkspaceState } from "../../stores/workspaceStore";
 import { Workspace } from "../../libs/interfaces";
 import send from "../../assets/send_w.svg";
 import { WorkspaceInvitationLine } from "./workspaceInvitationLine";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
 
 interface Props {
   workspace: Workspace;
 }
+
+const validationSchema = z.object({
+  invitedMail: z.string().email(),
+});
 
 export const UserList = ({ workspaceId }: { workspaceId: string }) => {
   const {
@@ -24,7 +30,6 @@ export const UserList = ({ workspaceId }: { workspaceId: string }) => {
   if (isLoading) return <div className="Invitation_line skeleton"></div>;
 
   if (workspace) {
-    console.log(workspace)
     return workspace.membersWorkspace.map((member) => (
       <WorkspaceInvitationLine 
       member={member} 
@@ -36,8 +41,6 @@ export const UserList = ({ workspaceId }: { workspaceId: string }) => {
 };
 
 export const InvitationPopup = ({ workspace }: Props) => {
-  const [email, setEmail] = useState<string>("");
-
   const toggleInvitationActive = workspaceStore(
     (state: WorkspaceState) => state.toggleInvitationActive
   );
@@ -49,54 +52,58 @@ export const InvitationPopup = ({ workspace }: Props) => {
     }
   };
 
-  const mutationInvitation = trpc.invitation.sendInvitationEmail.useMutation();
-
-  const handleInvite = () => {
-    if (!email) return;
-    mutationInvitation.mutate(
-      {
-        invitedMail: email,
-        workspaceId: workspace.id,
-      },
-      {
-        onSuccess: (newInvitation) => {
-          if (!newInvitation) return;
-          console.log(newInvitation);
-        },
-      }
-    );
-  };
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isValid },
+    reset,
+    setError,
+  } = useForm({
+    resolver: zodResolver(validationSchema),
+    defaultValues: {
+      invitedMail: "",
+    },
+  });
+  
+  const mutationInvitation = trpc.invitation.sendInvitationEmail.useMutation({
+    onError: (error) => {
+      setError("invitedMail", {
+        type: "server",
+        message: error.message,
+      });
+    },
+  });
 
   return (
     <div id="Invitation_popup" onClick={handleInvitationContClick}>
       <div className="Invitation_cont">
-        <div className="invite_user">
+        <form 
+        className="invite_user" 
+        onSubmit={handleSubmit(async (values) => {
+          await mutationInvitation.mutateAsync({
+            invitedMail: values.invitedMail,
+            workspaceId: workspace.id,
+          });
+          reset();
+        })}>
           <input
+            autoFocus 
+            {...register("invitedMail")}
             placeholder="Invite by mail"
-            onChange={(e) => setEmail(e.target.value)}
-            value={email}
-          ></input>
+          />
           <BasicButton
             icon={send}
             style={{
-              backgroundColor: workspace.color,
+              backgroundColor: isValid ? workspace.color : "#d7d7e0",
               height: "36px",
               width: "36px",
             }}
-            onClick={() => {
-              handleInvite();
-            }}
+            type={"submit"}
           />
-        </div>
-        {/* <div
-            id="invite_user_error"
-            style={{
-              display: invationMessage.display ? "block" : "none",
-              color: invationMessage.color,
-            }}
-          >
-            {invationMessage.message}
-          </div> */}
+        </form>
+        {errors.invitedMail?.message && (
+            <div className="input_error">{errors.invitedMail?.message}</div>
+          )}
         <div className="invite_user_list">
           <UserList workspaceId={workspace.id} />
         </div>

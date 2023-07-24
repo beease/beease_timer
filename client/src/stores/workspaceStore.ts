@@ -26,7 +26,7 @@ export const workspaceStore = create<WorkspaceState>((set) => ({
       if (workspaceId !== state.selectedWorkspaceId) {
         projectStore.getState().toggleMoreInfo(null);
       }
-      if(workspaceId === null) localStorage.removeItem("selectedWorkspaceId");
+      if (workspaceId === null) localStorage.removeItem("selectedWorkspaceId");
       else localStorage.setItem("selectedWorkspaceId", workspaceId);
       return {
         selectedWorkspaceId: workspaceId,
@@ -47,16 +47,16 @@ export const workspaceStore = create<WorkspaceState>((set) => ({
     set((state) => ({
       isInvitationActive: !state.isInvitationActive,
     })),
-    setInvitationBoxActive: (status) =>
+  setInvitationBoxActive: (status) =>
     set(() => ({
       isInvitationBoxActive: status,
     })),
-  loadWorkspaceIdFromStorage: () => {
-    const workspaceId = localStorage.getItem("selectedWorkspaceId");
-    const workspaceRole = localStorage.getItem("selectedWorkspaceRole");
-    if (workspaceId) set(() => ({ selectedWorkspaceId: workspaceId }));
-  },
+    loadWorkspaceIdFromStorage: () => {
+      const workspaceId = localStorage.getItem("selectedWorkspaceId");
+      if (workspaceId) {
+        set(() => ({ selectedWorkspaceId: workspaceId }));
+      }
+    },
 }));
 
 workspaceStore.getState().loadWorkspaceIdFromStorage();
-
