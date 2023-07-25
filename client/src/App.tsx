@@ -5,12 +5,13 @@ import { httpBatchLink } from "@trpc/client";
 import { AppRouter } from "./router";
 import { trpc } from "./trpc";
 import {
-  getAuthCookie,
-  setAuthCookie,
-  removeAuthCookie,
+  getAuthStorage,
+  setAuthStorage,
+  removeAuthStorage,
 } from "./utils/Auth/Auth";
 import { cachingTimes } from "./libs/cachingTimes";
 import "./styles/App.scss";
+import { Loading } from "./components/ui/loading";
 
 interface AuthContextProps {
   logout: () => void;
@@ -71,14 +72,14 @@ export function App() {
       const data = await response.json();
       setIsLogged(data.result.data);
       generateTrpcClient((data.result.data && accessToken) || "");
-      data.result.data ? setAuthCookie(accessToken) : removeAuthCookie();
+      data.result.data ? setAuthStorage(accessToken) : removeAuthStorage();
     } catch (error) {
       console.error("Error:", error);
     }
   };
 
   useEffect(() => {
-    getAuthCookie().then((token) => {
+    getAuthStorage().then((token) => {
       if (token) {
         isAccessTokenValidAndSetLogged(token);
       } else {
@@ -90,7 +91,7 @@ export function App() {
   const AuthProvider = ({ children }: { children: ReactNode }) => {
     const logout = () => {
       setIsLogged(false);
-      removeAuthCookie();
+      removeAuthStorage();
       generateTrpcClient();
     };
 
@@ -108,7 +109,11 @@ export function App() {
   return (
     <trpc.Provider client={trpcClient} queryClient={queryClient}>
       <QueryClientProvider client={queryClient}>
-        <AuthProvider>{(trpcClient && <AppRouter />) || "login"}</AuthProvider>
+        <AuthProvider>{(trpcClient && <AppRouter />) || 
+          <div className="loading_cont">
+            <Loading color={'#4969fb'}/>
+          </div>
+        }</AuthProvider>
       </QueryClientProvider>
     </trpc.Provider>
   );

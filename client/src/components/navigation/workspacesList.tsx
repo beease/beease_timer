@@ -3,7 +3,8 @@ import { useEffect } from "react";
 import beeaseLogo from '../../assets/logo_beease.svg';
 import { workspaceStore, WorkspaceState } from "../../stores/workspaceStore";
 import { projectStore, ProjectStore } from "../../stores/projectStore";
-import { PlayingAnimation } from "../ui/playingAnimation";
+import { Loading } from "../ui/loading";
+import { set } from "zod";
 
 
 export const WorkspacesList = () => {
@@ -12,13 +13,21 @@ export const WorkspacesList = () => {
   const setSelectedWorkspaceId = workspaceStore((state: WorkspaceState) => state.setSelectedWorkspaceId);
   const selectedWorkspaceId = workspaceStore((state: WorkspaceState) => state.selectedWorkspaceId);
   const isSettingWorkspace = workspaceStore((state: WorkspaceState) => state.isSettingWorkspace);
+  const setSettingWorkspace = workspaceStore((state: WorkspaceState) => state.setSettingWorkspace);
   const PlayingProject = projectStore((state: ProjectStore) => state.PlayingProject);
 
   useEffect(() => {
     if(selectedWorkspaceId === null && !isSettingWorkspace && workspaces?.[0]) {
       setSelectedWorkspaceId(workspaces[0].id)
     }
-  }, [isSettingWorkspace, selectedWorkspaceId, setSelectedWorkspaceId, workspaces])
+
+  }, [isSettingWorkspace, selectedWorkspaceId, setSelectedWorkspaceId, workspaces, setSettingWorkspace])
+
+  useEffect(() => {
+    if(workspaces && workspaces.length === 0) {
+      setSettingWorkspace('add')
+    }
+  }, [workspaces, setSettingWorkspace])
 
   if(error) return;
 

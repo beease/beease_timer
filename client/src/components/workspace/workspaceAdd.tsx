@@ -28,7 +28,7 @@ export const WorkspaceAdd = () => {
     watch,
     formState: { errors, isValid },
     reset,
-    setFocus,
+    setError,
     setValue,
   } = useForm({
     resolver: zodResolver(validationSchema),
@@ -40,6 +40,7 @@ export const WorkspaceAdd = () => {
 
   const mutationCreate = trpc.workspace.createWorkspace.useMutation({
     onSuccess: (newWorkspace) => {
+      console.log('newWorkspace', newWorkspace)
       if(!newWorkspace) return;
       utils.workspace.getMyWorkspaces.setData(undefined, (oldQueryData = []) => {
         return [
@@ -81,6 +82,7 @@ export const WorkspaceAdd = () => {
           setSettingWorkspace(null);
           workspaceStore.getState().loadWorkspaceIdFromStorage();
         }}
+        type='button'
         variant='grey'
         icon={cross}
       />
