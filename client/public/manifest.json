@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
-  "name": "Beease Timer",
-  "description": "Suivez et organisez votre temps de travail en tant que freelance avec facilité.",
-  "version": "1.0.0",
+  "name": "Freelance Timer - Beease",
+  "description": "Track and organize your work time as a freelancer with ease.",
+  "version": "1.0.3",
   "action": {
     "default_icon": {
       "16": "./time_machine_off.png",
@@ -20,7 +20,7 @@
     "extension_page": "script-src 'self' 'unsafe-eval' https://apis.google.com; object-src 'self'; script-src-elem 'self' 'unsafe-eval' https://apis.google.com"
     }, 
   "oauth2": {
-    "client_id": "377990403127-gaves747gkh0dp5r42o2gfdat5kpq90r.apps.googleusercontent.com",
+    "client_id": "",
     "scopes": [
       "https://www.googleapis.com/auth/userinfo.profile"
     ]
