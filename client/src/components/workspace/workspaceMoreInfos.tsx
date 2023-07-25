@@ -1,4 +1,3 @@
-import React from "react";
 import { FiltersState, filtersStore } from "../../stores/filterStore";
 import { workspaceStore, WorkspaceState } from "../../stores/workspaceStore";
 import { BasicButton } from "../ui/basicButton";
@@ -6,7 +5,6 @@ import stats from "../../assets/stats.svg";
 import stats_w from "../../assets/stats_w.svg";
 import edit from "../../assets/edit.svg";
 import { Workspace } from "../../libs/interfaces";
-import plus from "../../assets/Plus.svg";
 import { WorkspaceInvitationButton } from "./workspaceInviationButton";
 
 interface Props{
@@ -14,9 +12,6 @@ interface Props{
 }
 
 export const WorkspaceMoreInfos = ({workspace}: Props) => {
-
-console.log(workspace)
-
   const setFilters = filtersStore((state: FiltersState) => state.setFilters);
   const filters = filtersStore((state: FiltersState) => state.filters);
   const setSettingWorkspace = workspaceStore((state: WorkspaceState) => state.setSettingWorkspace);
@@ -48,7 +43,7 @@ console.log(workspace)
           }`}
           onClick={() => setFilters("current")}
         >
-          En cours
+          Current
         </div>
       </div>
       <WorkspaceInvitationButton
