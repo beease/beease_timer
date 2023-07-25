@@ -10,6 +10,10 @@ import {
   LineElement,
 } from "chart.js";
 import { trpc } from "../../trpc";
+import {
+  getTimeSessionsByDay,
+  getTimeSessionsByDayByProject,
+} from "../../libs/dates";
 interface Props {
   workspace: WorkspaceList;
 }
@@ -39,20 +43,15 @@ export const Statistics = ({ workspace }: Props) => {
       tension: number;
     }[];
   }>({ labels: [], datasets: [] });
-  const [dataPerParams, setDataPerParams] = useState<
-    Array<{
-      day: string;
-      projectId: string;
-      time: number;
-      price: number;
-    }>
-  >([]);
+  const [dataPerParams, setDataPerParams] = useState<{
+    time: number[];
+    labels: string[];
+  }>();
   const [selectedDate, setSelectedDate] = useState(new Date());
   const getTimeBetween = (startedAt: string, endedAt: string) => {
     const startedAtDate = new Date(startedAt);
     const endedAtDate = new Date(endedAt);
     const timeBetween = endedAtDate.getTime() - startedAtDate.getTime();
-
     return timeBetween;
   };
 
@@ -73,141 +72,71 @@ export const Statistics = ({ workspace }: Props) => {
     setUsers(allUsers);
   };
 
-  const getDataByTime = () => {
-    let totalTime = 0;
-    let totalPrice = 0;
-    workspace.projects.forEach((project) => {
-      project.memberSessions.forEach((memberSession) => {
-        if (memberSession.endedAt) {
-          const time = getTimeBetween(
-            memberSession.startedAt,
-            memberSession.endedAt
-          );
-          totalTime += time;
-          if (project.dailyPrice) {
-            totalPrice =
-              project.dailyPrice *
-              new Date(
-                getTimeBetween(memberSession.startedAt, memberSession.endedAt)
-              ).getUTCHours();
-          }
-        }
-      });
-    });
-    return {
-      totalHours: new Date(totalTime).getUTCHours(),
-      totalPrice: totalPrice,
+  const getDataFromSessions = () => {
+    // Object expected to be returned from getting all sessio by project
+    // const dataByProject: {
+    //   labels: string[];
+    //   usersTime: Array<{
+    //     user: string;
+    //     time: number[];
+    //   }>;
+    // } = {
+    //   labels: [],
+    //   time: [],
+    // };
+    let dataByUser: {
+      labels: string[];
+      time: number[];
+    } = {
+      time: [],
+      labels: [],
     };
-  };
-
-  const getDataByParams = () => {
-    function formatDate(date: string) {
-      const d = new Date(date);
-      let month = "" + (d.getMonth() + 1);
-      let day = "" + d.getDate();
-      const year = d.getFullYear();
-
-      if (month.length < 2) month = "0" + month;
-      if (day.length < 2) day = "0" + day;
-
-      return [year, month, day].join("-");
-    }
-
-    if (selectedUserId !== "") {
-      let startDate: Date, endDate: Date;
-
-      switch (selectedMode) {
-        case "day": {
-          startDate = new Date(
-            new Date(selectedDate.setUTCHours(0)).setUTCMinutes(0)
-          );
-          endDate = new Date(
-            new Date(selectedDate.setUTCHours(23)).setUTCMinutes(59)
-          );
-          break;
-        }
-        case "week":
-          startDate = new Date(
-            selectedDate.setDate(selectedDate.getDate() - selectedDate.getDay())
-          );
-          endDate = new Date(
-            selectedDate.setDate(
-              selectedDate.getDate() - selectedDate.getDay() + 6
-            )
-          );
-          break;
-        case "month":
-          startDate = new Date(
-            selectedDate.getFullYear(),
-            selectedDate.getMonth(),
-            1
-          );
-          endDate = new Date(
-            selectedDate.getFullYear(),
-            selectedDate.getMonth() + 1,
-            0
-          );
-          break;
-      }
-
-      const aggregatedTimeData: any = {};
-
-      workspace.projects.forEach((project) => {
-        project.memberSessions.forEach((memberSession) => {
-          if (
-            memberSession.endedAt &&
-            new Date(memberSession.startedAt) >= startDate &&
-            new Date(memberSession.endedAt) <= endDate
-          ) {
-            const time = getTimeBetween(
-              memberSession.startedAt,
-              memberSession.endedAt
+    switch (selectedMode) {
+      case "day": {
+        console.log(
+          "member sessions : ",
+          workspace.projects.find((project) => project.id === selectedProjectId)
+            ?.memberSessions
+        );
+        if (
+          selectedProjectId !== "" &&
+          workspace.projects.find((project) => project.id === selectedProjectId)
+            ?.memberSessions
+        ) {
+          if (selectedUserId !== "") {
+            dataByUser = getTimeSessionsByDay(
+              selectedDate,
+              workspace.projects.find(
+                (project) => project.id === selectedProjectId
+              )!.memberSessions,
+              selectedUserId,
+              users
             );
-            const hourByDay = new Date(time).getUTCHours();
-            const day = formatDate(memberSession.startedAt);
-
-            if (memberSession.memberWorkspace?.user.id === selectedUserId) {
-              const projectId = memberSession.projectId!;
-
-              if (!aggregatedTimeData[day]) {
-                aggregatedTimeData[day] = {};
-              }
-
-              if (!aggregatedTimeData[day][projectId]) {
-                aggregatedTimeData[day][projectId] = { time: 0, price: 0 };
-              }
-
-              aggregatedTimeData[day][projectId].time += hourByDay;
-              aggregatedTimeData[day][projectId].price += project.dailyPrice
-                ? hourByDay * project.dailyPrice
-                : 0;
-            }
           }
-        });
-      });
-
-      const dataByParams: Array<{
-        day: string;
-        projectId: string;
-        time: number;
-        price: number;
-      }> = [];
-
-      for (const day in aggregatedTimeData) {
-        for (const projectId in aggregatedTimeData[day]) {
-          dataByParams.push({
-            day,
-            projectId,
-            time: aggregatedTimeData[day][projectId].time,
-            price: aggregatedTimeData[day][projectId].price,
-          });
+          // Getting all times by project
+          // else {
+          //   dataByProject = getTimeSessionsByDayByProject(
+          //     selectedDate,
+          //     workspace.projects.find(
+          //       (project) => project.id === selectedProjectId
+          //     )!.memberSessions,
+          //     users
+          //   );
+          // }
         }
+        break;
       }
-      setDataPerParams(dataByParams);
+      case "week": {
+        break;
+      }
+      case "month": {
+        break;
+      }
     }
+    setDataPerParams(dataByUser);
   };
 
-  const getData = () => {
+  const getData = (byUser: boolean) => {
     const dataArray: {
       labels: string[];
       datasets: {
@@ -223,36 +152,44 @@ export const Statistics = ({ workspace }: Props) => {
         { label: "", data: [], fill: false, borderColor: "", tension: 0 },
       ],
     };
-    dataPerParams.forEach((dataPerParam) =>
-      dataPerParam.projectId === selectedProjectId
-        ? dataArray.labels.push(dataPerParam.day) &&
-          dataArray.labels.push(dataPerParam.day)
-        : null
-    );
-    dataPerParams.forEach((dataPerParam) =>
-      dataPerParam.projectId === selectedProjectId
-        ? dataArray.datasets[0].data.push(dataPerParam.time)
-        : null
-    );
-    console.log("data to display : ", dataToDisplay, dataPerParams);
+    if (byUser) {
+      dataPerParams?.labels.forEach((label) => {
+        dataArray.labels.push(label);
+      });
+      dataPerParams?.time.forEach((sessionTime) => {
+        dataArray.datasets[0].data.push(sessionTime);
+      });
+    }
+    console.log("data to display : ", dataArray, dataPerParams);
     setDataToDisplay(dataArray);
   };
-
-  console.log("data per params :", dataPerParams);
-
+  const options = {
+    responsive: true,
+    scales: {
+      y: {
+        beginAtZero: true,
+        // Error while defining a max range for time : need to be rectified by minutes/hours/days depending on the selected mode
+        // ticks: {
+        //   max: 24,
+        // },
+      },
+    },
+  };
   useEffect(() => {
-    getData();
-  }, [dataPerParams]);
-  useEffect(() => {
-    getDataByParams();
+    getDataFromSessions();
   }, [selectedMode, selectedDate, selectedUserId, selectedProjectId]);
   useEffect(() => {
-    getDataByTime();
-  }, [workspace]);
+    if (dataPerParams && selectedUserId !== "") {
+      getData(true);
+    } else {
+      getData(false);
+    }
+  }, [dataPerParams]);
   useEffect(() => {
     allUsers();
   }, []);
-
+  console.log("passed data : ", dataToDisplay);
+  console.log("selected User : ", selectedUserId);
   return (
     <div>
       <div>
@@ -261,7 +198,7 @@ export const Statistics = ({ workspace }: Props) => {
         </div>
         <div>
           <div>
-            <p>
+            {/* <p>
               Total :{" "}
               {getDataByTime().totalHours > 24
                 ? `jours : ${getDataByTime().totalHours / 24}, heures : ${
@@ -269,7 +206,7 @@ export const Statistics = ({ workspace }: Props) => {
                   }`
                 : `heures : ${getDataByTime().totalHours % 24}`}
             </p>
-            <p>Total price : {getDataByTime().totalPrice}</p>
+            <p>Total price : {getDataByTime().totalPrice}</p> */}
           </div>
           <div>
             <select
@@ -301,16 +238,15 @@ export const Statistics = ({ workspace }: Props) => {
               setSelectedMode(e.target.value as "day" | "week" | "month")
             }
           >
-            <option value='day'>Jour</option>
-
             {[
+              { label: "Jour", mode: "day" },
               { label: "Semaine", mode: "week" },
               { label: "Mois", mode: "month" },
             ].map((selectMode) => (
               <option value={selectMode.mode}>{selectMode.label}</option>
             ))}
           </select>
-          <Line data={dataToDisplay} />
+          <Line data={dataToDisplay} options={options} />
         </div>
       </div>
     </div>
