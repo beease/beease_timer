@@ -9,6 +9,7 @@ import { trpc } from "../../trpc";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
+import { ProjectStore, projectStore } from "../../stores/projectStore";
 
 interface Props {
   selectedWorkspaceId: string;
@@ -20,7 +21,9 @@ const validationSchema = z.object({
 });
 
 export const ProjectAdd = ({ selectedWorkspaceId }: Props) => {
-  const [isAddProjectDisplay, setIsAddProjectDisplay] = useState(false);
+  const setIsAddingProject = projectStore((state: ProjectStore) => state.setIsAddingProject);
+  const isAddingProject = projectStore((state: ProjectStore) => state.isAddingProject);
+
   const [colorProjectPopup, setColorProjectPopup] = useState(false);
 
   const addProjectFormRef = useRef<HTMLFormElement>(null);
@@ -63,7 +66,7 @@ export const ProjectAdd = ({ selectedWorkspaceId }: Props) => {
       const refsExist = addProjectFormRef.current && addProjectContRef.current;
       if (!refsExist) return;
 
-      if (isAddProjectDisplay) {
+      if (isAddingProject) {
         addProjectContRef.current.style.width = "100%";
         addProjectFormRef.current.style.opacity = "0";
         await wait(100);
@@ -80,12 +83,12 @@ export const ProjectAdd = ({ selectedWorkspaceId }: Props) => {
     };
 
     animation();
-  }, [isAddProjectDisplay, reset, setFocus]);
+  }, [isAddingProject, reset, setFocus]);
 
   return (
     <div ref={addProjectContRef} className="ProjectAdd">
       <BasicButton
-        icon={isAddProjectDisplay ? less : plus}
+        icon={isAddingProject ? less : plus}
         variant="grey"
         size="small"
         style={{
@@ -93,7 +96,7 @@ export const ProjectAdd = ({ selectedWorkspaceId }: Props) => {
           height: "48px !important",
         }}
         onClick={() => {
-          setIsAddProjectDisplay(!isAddProjectDisplay);
+          setIsAddingProject(!isAddingProject);
         }}
       />
       <form
@@ -102,7 +105,7 @@ export const ProjectAdd = ({ selectedWorkspaceId }: Props) => {
         onSubmit={handleSubmit(async (values) => {
           await mutationCreate.mutateAsync({ ...values, workspaceId: selectedWorkspaceId });
           reset();
-          setIsAddProjectDisplay(false);
+          setIsAddingProject(false);
         })}
       >
         <div className="input_cont ProjectAdd_input">

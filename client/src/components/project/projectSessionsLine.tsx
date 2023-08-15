@@ -6,6 +6,8 @@ import type { Session, MyUser } from "../../libs/interfaces";
 import { trpc } from "../../trpc";
 import { workspaceStore, WorkspaceState } from "../../stores/workspaceStore";
 import { projectStore, ProjectStore } from "../../stores/projectStore";
+import stop from "../../assets/stop.svg";
+import dayjs from "dayjs";
 
 interface Props {
   session: Session;
@@ -23,9 +25,10 @@ export const ProjectSessionsLine = ({ session, projectId, myUser }: Props) => {
   const toggleIsPlaying = projectStore(
     (state: ProjectStore) => state.toggleIsPlaying
   );
-
+  
   const utils = trpc.useContext();
   const mutationDeleteSession = trpc.memberSession.deleteSession.useMutation();
+  const mutationStopSession = trpc.memberSession.stopSession.useMutation();
 
   const handleDeleteSession = async () => {
     mutationDeleteSession.mutateAsync(
@@ -68,9 +71,64 @@ export const ProjectSessionsLine = ({ session, projectId, myUser }: Props) => {
     );
   };
 
-  const isAdminOrOwner = myUser.role === 'ADMIN' || myUser.role === 'OWNER';
-  const isMySession = session.memberWorkspace?.user.id === myUser.id;
-  const isDeletable = isAdminOrOwner || isMySession;
+  const StopSession = async (projectId: string, endedAt: string, userId?: string) => {
+    console.log('userId', userId)
+    await mutationStopSession.mutateAsync({
+       projectId: projectId,
+       endedAt: endedAt,
+       userId: userId
+     },
+     {
+       onSuccess: (newSession) => {
+         if(!newSession || !selectedWorkspaceId) return;
+         utils.workspace.getWorkspaceList.setData(
+           { workspaceId: selectedWorkspaceId },
+           (oldQueryData) => {
+             if(!oldQueryData) return;
+             const newProjects = oldQueryData.projects.map((project) => {
+               if(project.id === projectId){
+                 return {
+                   ...project,
+                   memberSessions: project.memberSessions.map((session) => (session.id === newSession.newSession.id ? newSession.newSession : session))
+                 }
+               }else{
+                 return project
+               }
+             });
+             return{
+               ...oldQueryData,
+               projects: newProjects
+             }
+           }),
+           utils.user.getMyUser.setData(
+             undefined,
+             (oldQueryData) => {
+               if(!oldQueryData) return;
+               return {...oldQueryData, currentSession: null}
+             }
+           )    
+       }
+     });
+   };
+   const isAdminOrOwner = myUser.role === 'ADMIN' || myUser.role === 'OWNER';
+   const isMySession = session.memberWorkspace?.user.id === myUser.id;
+   const isSessionActive = session.endedAt === null;
+   const isDeletable = !isSessionActive && (isAdminOrOwner || isMySession);
+   const isStopable = isSessionActive && (isAdminOrOwner || isMySession);
+
+   const handleStop = () => {
+    const now = dayjs().format();
+    if(isMySession){
+      toggleIsPlaying({
+            projectId: projectId,
+            workspaceId: selectedWorkspaceId,
+            startedAt: now
+      })    
+      StopSession(projectId, dayjs().format());
+    }else{
+      StopSession(projectId, dayjs().format(), session.memberWorkspace?.user.id);
+    }
+  };
 
   return (
     <div className="ProjectSessions_line">
@@ -88,18 +146,35 @@ export const ProjectSessionsLine = ({ session, projectId, myUser }: Props) => {
           ? formatTwoDates(session.startedAt, session.endedAt)
           : session.startedAt && formatDate(session.startedAt)}
       </div>
-      <BasicButton
-        icon={bin}
-        variant={isDeletable ? "grey" : "disable"}
-        size="small"
-        onClick={() => {
-          isDeletable && handleDeleteSession();
-        }}
-        style={{
-          height: "36px",
-          width: "36px",
-        }}
-      />
+      {
+        isStopable ? (
+          <BasicButton
+            variant="grey"
+            size="small"
+            icon={stop}
+            onClick={() => {
+              handleStop();
+            }}
+            style={{
+              height: "36px",
+              width: "36px",
+            }}
+          />
+        ) : (
+          <BasicButton
+            icon={bin}
+            variant={isDeletable ? "grey" : "disable"}
+            size="small"
+            onClick={() => {
+              isDeletable && handleDeleteSession();
+            }}
+            style={{
+              height: "36px",
+              width: "36px",
+            }}
+          />
+        )
+      }
     </div>
   );
 };

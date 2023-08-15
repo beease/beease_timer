@@ -49,14 +49,20 @@ export const memberSessionRouter = router({
       z.object({
         projectId: z.string(),
         endedAt: z.string(),
+        userId: z.string().optional(),
       })
     )
     .mutation(async (opts) => {
       const { ctx } = opts;
-      const { projectId, endedAt } = opts.input;
+      const { projectId, endedAt, userId } = opts.input;
 
       if (ctx.tokenPayload) {
-        const emitterId = ctx.tokenPayload.userId;
+        const emitterId = userId || ctx.tokenPayload.userId;
+        console.log("emitterId", emitterId)
+        console.log("projectId", projectId)
+        console.log("endedAt", endedAt)
+        console.log('userId', userId)
+
         return await stopSession(emitterId, projectId, endedAt);
       }
     }),

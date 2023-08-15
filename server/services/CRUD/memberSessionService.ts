@@ -60,36 +60,63 @@ export const createMemberSession = async (
     },
   })
 
-  const updateUser = await prisma.user.update({
-    where:{
-      id: userId
-    },
-    data: {
-      currentSession: {
-        connect: {
-          id: newSession.id
-        }
-      }
-    },
-    select: {
-      currentSession: {
-        select: {
-          projectId: true,
-          startedAt: true,
-          memberWorkspace: {
-            select: {
-              workspaceId: true,
+  if(endedAt){
+    const updateUser = await prisma.user.update({
+      where:{
+        id: userId
+      },
+      data: {
+      },
+      select: {
+        currentSession: {
+          select: {
+            projectId: true,
+            startedAt: true,
+            memberWorkspace: {
+              select: {
+                workspaceId: true,
+              }
             }
           }
-        }
-      },
-    }
-  })
-
+        },
+      }
+    })
     return { 
       newSession: newSession,
       updateUser: updateUser,
-    } 
+    }   
+  }else{
+    const updateUser = await prisma.user.update({
+      where:{
+        id: userId
+      },
+      data: {
+        currentSession: {
+          connect: {
+            id: newSession.id
+          }
+        }
+      },
+      select: {
+        currentSession: {
+          select: {
+            projectId: true,
+            startedAt: true,
+            memberWorkspace: {
+              select: {
+                workspaceId: true,
+              }
+            }
+          }
+        },
+      }
+    })
+    return { 
+      newSession: newSession,
+      updateUser: updateUser,
+    }   
+  }
+  
   } catch (err) {
     throw new TRPCError({
       code: "INTERNAL_SERVER_ERROR",

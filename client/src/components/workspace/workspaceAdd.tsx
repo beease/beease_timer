@@ -4,6 +4,7 @@ import check from "../../assets/check_w.svg";
 import cross from "../../assets/cross.svg";
 import { BasicButton } from "../ui/basicButton";
 import { workspaceStore, WorkspaceState } from "../../stores/workspaceStore";
+import { ProjectStore, projectStore } from "../../stores/projectStore";
 import { trpc } from '../../trpc';
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -19,6 +20,7 @@ export const WorkspaceAdd = () => {
 
   const setSettingWorkspace = workspaceStore((state: WorkspaceState) => state.setSettingWorkspace);
   const setSelectedWorkspaceId = workspaceStore((state: WorkspaceState) => state.setSelectedWorkspaceId);
+  const setIsAddingProject = projectStore((state: ProjectStore) => state.setIsAddingProject);  
   
   const utils = trpc.useContext();
 
@@ -50,6 +52,7 @@ export const WorkspaceAdd = () => {
       })
       setSettingWorkspace(null);
       setSelectedWorkspaceId(newWorkspace.id)
+      setIsAddingProject(true)
     },
   });
 

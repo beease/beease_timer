@@ -53,7 +53,7 @@ export const ProjectSessionsAdd = ({ projectId }: Props) => {
             if (project.id === projectId) {
               return {
                 ...project,
-                memberSessions: [...project.memberSessions, newSession],
+                memberSessions: [...project.memberSessions, newSession.newSession],
               };
             } else {
               return project;

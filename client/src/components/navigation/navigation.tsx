@@ -23,6 +23,12 @@ export const Navigation = () => {
         workspaceId: user.currentSession.memberWorkspace.workspaceId,
         startedAt: user.currentSession.startedAt
       })
+    }else if(user && PlayingProject && PlayingProject.projectId !== null && user.currentSession === null){
+      toggleIsPlaying({
+        projectId: null,
+        workspaceId: null,
+        startedAt: null
+      })
     }
   },[user])
 

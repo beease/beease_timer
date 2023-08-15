@@ -9,8 +9,10 @@ interface PlayingProject {
 export interface ProjectStore {
     PlayingProject: PlayingProject;
     MoreInfoProjectId: string | null;
+    isAddingProject: boolean;
     toggleMoreInfo: (projectId: string | null) => void;
     toggleIsPlaying: (project: PlayingProject) => void;
+    setIsAddingProject: (isAddingProject: boolean) => void;
 } 
 
 export const projectStore = create<ProjectStore>((set) => ({
@@ -20,8 +22,12 @@ export const projectStore = create<ProjectStore>((set) => ({
         startedAt: null,
     },
     MoreInfoProjectId: null,
+    isAddingProject: false,
     toggleMoreInfo: (projectId) => set((state) => ({
         MoreInfoProjectId: state.MoreInfoProjectId === projectId ? null : projectId
+    })),
+    setIsAddingProject: (isAddingProject) => set(() => ({
+        isAddingProject: isAddingProject
     })),
     toggleIsPlaying: async (data) => {
         set((state) => {

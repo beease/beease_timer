@@ -21,6 +21,7 @@ export const ProjectList = ({ selectedWorkspaceId }: Props) => {
   const isStatisticActive = workspaceStore(
     (state: WorkspaceState) => state.isStatisticActive
   );
+  
   const filters = filtersStore((state: FiltersState) => state.filters);
 
   if (error) return;
