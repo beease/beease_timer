@@ -4,7 +4,8 @@ import appRouter from "./routers/router";
 import router from "./router";
 import http from "http";
 import { createContext } from "./trpc";
-
+import { expressRouter } from "./routers/expressRouter";
+import 'dotenv/config'
 // import {
 //   getTokenByCredential,
 //   registerByEmail,
@@ -29,8 +30,11 @@ const app = express();
 const PORT = process.env.PORT || 3001;
 
 //const emailSchema = z.string().email();
+const allowedOrigins = [String(process.env.ORIGIN_URL), String(process.env.ORIGIN_URL2)];
 
 app.options("*", (_req, res) => {
+  const origin = _req.headers.origin;
+  console.log("origin option", origin, allowedOrigins);
   res.setHeader(
     "Access-Control-Allow-Methods",
     "GET, POST, OPTIONS, PUT, PATCH, DELETE"
@@ -40,16 +44,20 @@ app.options("*", (_req, res) => {
     "X-Requested-With, Content-Type, Authorization"
   );
   res.setHeader("Access-Control-Allow-Credentials", "true");
-  res.setHeader("Access-Control-Allow-Origin", String(process.env.ORIGIN_URL));
-
+  if(allowedOrigins.includes(String(origin))){
+    res.setHeader("Access-Control-Allow-Origin", origin ??"");
+  }
   res.sendStatus(200);
 });
 
 app.use(function (req: Request, res: Response, next: NextFunction) {
+  const origin = req.headers.origin;
   //utf8 setter
   res.setHeader("Content-Type", "application/json; charset=utf-8");
   // Website you wish to allow to connect
-  res.setHeader("Access-Control-Allow-Origin", String(process.env.ORIGIN_URL));
+  if(allowedOrigins.includes(String(req.headers.origin))){
+    res.setHeader("Access-Control-Allow-Origin", origin ??"");
+  }
   // Request methods you wish to allow
   res.setHeader(
     "Access-Control-Allow-Methods",
@@ -82,6 +90,8 @@ app.use(
     createContext,
   })
 );
+// http://79.137.37.169:8020
+app.use("/mail", expressRouter);
 
 //app.use("/",router);
 app.set("views", __dirname + "/views");
